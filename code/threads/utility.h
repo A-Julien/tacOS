@@ -32,9 +32,6 @@
 						// This is the same definition 
 						// as in the g++ library.
 
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-
 // Divide and either round up or down 
 #define divRoundDown(n,s)  ((n) / (s))
 #define divRoundUp(n,s)    (((n) / (s)) + ((((n) % (s)) > 0) ? 1 : 0))
