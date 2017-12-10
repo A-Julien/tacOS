@@ -29,7 +29,7 @@ $(foreach f,$(wildcard *.c),\
 
 # converts a COFF file to Nachos object format
 coff2noff: coff2noff.o
-	$(lkcc_V)$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+	$(lkcc_V)$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 ifneq ($$(MAKECMDGOALS),clean)
 -include $$(patsubst %.o,.%.d,coff2noff.o)
