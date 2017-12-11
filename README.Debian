@@ -115,6 +115,7 @@ else
 			install_package --no-update libc6-dev:i386 "in order to compile NachOS on amd64 systems"
 			install_package --no-update lib32stdc++-$GCC_VER-dev "in order to compile NachOS on amd64 systems"
 		fi
+		install_package --no-update linux-libc-dev:i386
 	fi
 
 	echo "Ok, you should be able to compile NachOS"
