@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # To compile NachOS on a Debian environment (x86), you need to
 # install the folowing packages:
@@ -53,12 +53,22 @@ install_package() {
 		shift
 	fi
 	$UPDATE $ROOT apt-get update
-	if dpkg -l "$1" | grep -s '^ii' ; then
+	local p
+	local INST_REQ=
+	for p in $1 ; do
+		if dpkg -l "$p" | grep -s '^ii' ; then
+			:
+		else
+			INST_REQ=1
+			break
+		fi
+	done
+	if [ -z "$INST_REQ" ]; then
 		return 0
 	fi
 	set +x
 	echo "**************************************************************"
-	echo "* Installing the $1 package from your distrib"
+	echo "* Installing the $1 package(s) from your distrib"
 	echo "* $2"
 	echo "**************************************************************"
 	echo "* Refuse the installation (and try to install it yourself    *"
@@ -67,7 +77,7 @@ install_package() {
 	echo "* upgraded, ...)                                             *"
 	echo "**************************************************************"
 	set -x
-	$ROOT apt-get install $1
+	$ROOT apt-get install $1 $3
 }
 
 # choose installation method
@@ -88,10 +98,13 @@ And restart this script
 EOF
 
 else
+	install_package build-essential "Installing basic development tools (make, gcc, g++, etc.)"
+	NO_UPDATE=--no-update
 	echo "MIPS cross compiler seems available in your distrib. Trying to use it"
 	if ! dpkg --print-foreign-architectures | grep -sq mipsel ; then
 		echo "Adding mipsel as a foreign architecture on your system"
 		$ROOT dpkg --add-architecture mipsel
+		NO_UPDATE=
 	fi
 	if test "$ARCH" = amd64 ; then
 		GCC_VER=$(gcc --version | head -1 | \
@@ -104,18 +117,20 @@ else
 		if ! dpkg --print-foreign-architectures | grep -sq i386 ; then
 			echo "Adding i386 as a foreign architecture on your system"
 			$ROOT dpkg --add-architecture i386
+			NO_UPDATE=
 		fi
 	fi
-	install_package gcc-mipsel-linux-gnu "Installing the cross-compiler of your distrib. gcc-multiarch and g++-multiarch might be asked to be removed"
+	install_package $NO_UPDATE gcc-mipsel-linux-gnu "Installing the cross-compiler of your distrib. gcc-multiarch and g++-multiarch might be asked to be removed"
 	if test "$ARCH" = amd64 ; then
+		PACKAGES=
 		if [ "$(apt-cache -q policy g++-${GCC_VER_MAJ}-multilib)" != "" ] ; then
-			install_package --no-update g++-${GCC_VER_MAJ}-multilib
+			PACKAGES="$PACKAGES g++-${GCC_VER_MAJ}-multilib"
 		else
 			# before gcc 5
-			install_package --no-update libc6-dev:i386 "in order to compile NachOS on amd64 systems"
-			install_package --no-update lib32stdc++-$GCC_VER-dev "in order to compile NachOS on amd64 systems"
+			PACKAGES="$PACKAGES libc6-dev:i386 lib32stdc++-$GCC_VER-dev"
 		fi
-		install_package --no-update linux-libc-dev:i386
+		install_package --no-update "$PACKAGES linux-libc-dev:i386" \
+			"in order to compile NachOS on amd64 systems" gcc-mipsel-linux-gnu
 	fi
 
 	echo "Ok, you should be able to compile NachOS"
@@ -139,7 +154,6 @@ fi
 exit 0
 
 ############################################################################
-
 
 # Here is a script to build and install a cross compiler to be used on Nachos
 #
