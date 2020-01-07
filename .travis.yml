@@ -16,7 +16,7 @@ addons:
 before_install:
 - ls -l
 - docker pull jalaimo/nachos-build
-- docker run -d -v code:/tacos --name guacamole jalaimo/nachos-build bash -c 'GIT_INIT_COMMIT=a8550946e865bff4dd452841e71b23387243de51 && tail -f /dev/null'
+- docker run -d -v $(pwd)/code:/tacos --name guacamole jalaimo/nachos-build bash -c 'GIT_INIT_COMMIT=a8550946e865bff4dd452841e71b23387243de51 && tail -f /dev/null'
 - docker ps -a
 
 script:
