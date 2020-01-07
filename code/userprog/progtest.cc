@@ -84,26 +84,35 @@ ConsoleTest (char *in, char *out)
     writeDone = new Semaphore ("write done", 0);
 
     for (;;){
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
+	   readAvail->P ();	// wait for character to arrive
+	   ch = console->GetChar ();
 
       // test if EOT/EOF
-      if( in == NULL){
+        if( in == NULL){
         
-        // TTY CTRL+D equivalent is 0x4 with UNIX;
-        if( ch == 0x04)
-            return;
-        // On windows, it seems to be -1
-        if(ch == -1)
-            return;    
+            // TTY CTRL+D equivalent is 0x4 with UNIX;
+            if( ch == 0x04)
+                return;
+            // On windows, it seems to be -1
+            if(ch == -1)
+                return;    
         
-      } else {
-        if(ch == EOF)
-            return;
-      }
+        } else {
+            if(ch == EOF)
+                return;
+        }
 
-      // echo it!
-      console->PutChar (ch);
-	  writeDone->P ();	// wait for write to finish
+        if(ch == 'c'){
+             console->PutChar ('<');
+            writeDone->P ();
+            console->PutChar ('c');
+            writeDone->P ();
+            console->PutChar ('>');
+            writeDone->P ();
+        } else {
+          // echo it!
+          console->PutChar (ch);
+    	  writeDone->P ();	// wait for write to finish
+        }
 	}
 }
