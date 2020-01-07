@@ -1,5 +1,5 @@
-language: c
-sudo: false
+language: bash
+sudo: required
 
 branches:
   only:
@@ -16,10 +16,12 @@ addons:
 before_install:
 - ls -l
 - docker pull jalaimo/nachos-build
+- docker run -d -v $(pwd)/code:/nachos --name guacamole jalaimo/nachos-build bash -c 'tail -f /dev/null'
 - docker ps -a
 
 script:
-  - docker exec -it -v code:/nachos --name guacamole jalaimo/nachos-build bash -c 'cd /nachos && make && cd build && ./nachos-userprog -x halt > /proc/1/fd/1'
+  - docker exec -it guacamole bash -c 'cd /nachos && make && cd build && ./nachos-userprog -x halt > /proc/1/fd/1'
+  - cat /proc/1/fd/1
   - doxygen Doxyfile
 
 deploy:
