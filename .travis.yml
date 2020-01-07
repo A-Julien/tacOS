@@ -15,13 +15,11 @@ addons:
 
 before_install:
 - ls -l
-- pwd
 - docker pull jalaimo/nachos-build
-- docker run -d -v code:/nachos --name guacamole jalaimo/nachos-build bash -c 'cd /nachos && make && cd build && ./nachos-userprog -x halt'
 - docker ps -a
 
 script:
-  - nachos-userprog -x halt
+  - docker exec -it -v code:/nachos --name guacamole jalaimo/nachos-build bash -c 'cd /nachos && make && cd build && ./nachos-userprog -x halt > /proc/1/fd/1'
   - doxygen Doxyfile
 
 deploy:
