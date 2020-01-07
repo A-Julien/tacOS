@@ -8,6 +8,11 @@ branches:
 services:
   - docker
   
+addons:
+  apt:
+    packages:
+      - doxygen
+
 before_install:
 - ls -l
 - pwd
@@ -17,13 +22,6 @@ before_install:
 
 script:
   - nachos-userprog -x halt
-
-addons:
-  apt:
-    packages:
-      - doxygen
-
-script:
   - doxygen Doxyfile
 
 deploy:
