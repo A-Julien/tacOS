@@ -54,4 +54,6 @@ void SynchConsole::SynchGetString(char *s, int n){
 	s[n] = '\0';
 }
 
+
+
 #endif // CHANGED
