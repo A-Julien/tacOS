@@ -29,6 +29,7 @@ SynchDisk *synchDisk;
 
 #ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
 Machine *machine;		// user program memory and registers
+SynchConsole *synchConsole;
 #endif
 
 #ifdef NETWORK
@@ -157,6 +158,8 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
+    synchConsole = new SynchConsole(NULL, NULL);
+
 #endif
 
 #ifdef FILESYS
@@ -177,7 +180,7 @@ Initialize (int argc, char **argv)
 //      Nachos is halting.  De-allocate global data structures.
 //----------------------------------------------------------------------
 void
-Cleanup ()
+Cleanup()
 {
     printf ("\nCleaning up...\n");
 #ifdef NETWORK
@@ -186,6 +189,7 @@ Cleanup ()
 
 #ifdef USER_PROGRAM
     delete machine;
+    delete synchConsole;
 #endif
 
 #ifdef FILESYS_NEEDED
