@@ -244,7 +244,7 @@ void
 Interrupt::Halt()
 {
     printf("Machine halting!\n\n");
-    printf("Retour : %d", machine->ReadRegister(2));
+    printf("Retour : %d ", machine->ReadRegister(2));
     stats->Print();
     Cleanup();     // Never returns.
 }

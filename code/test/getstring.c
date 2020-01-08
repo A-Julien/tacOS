@@ -1,8 +1,10 @@
 #include "syscall.h"
 
 int main(void){
-	char string[12];
-	GetString(string, 10);
+	char string[30];
+
+	GetString(string, 20);
+
 	PutString(string);
 	return 0;
 	

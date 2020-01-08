@@ -40,17 +40,16 @@ void SynchConsole::SynchPutString(const char s[]){
 		this->SynchPutChar(s[i]);
 		i++;
 	}
-	
+
 }
 
 void SynchConsole::SynchGetString(char *s, int n){
 	for(int i = 0; i < n; i++){
 		char c = this->SynchGetChar();
 		if(c == '\n' || c == EOF){
-			s[i] = '\0'; return;			
-		} 
+			s[i] = '\0'; return;
+		}
 		s[i] = c ;
-
 	}
 	s[n] = '\0';
 }
