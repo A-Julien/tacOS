@@ -11,7 +11,8 @@ int main()
 //String.size > 12	
 	PutString("Suplement SauceFromagereChef");
 	PutChar('\n');
-	Halt();
+	return 3;
+	//Halt();
 } 
 //SORTIE = "Samourai"; "aerospatiale"; "Suplement Sa"
 

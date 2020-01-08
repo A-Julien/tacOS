@@ -54,6 +54,17 @@ void copyStringFromMachine( int from, char *to, unsigned size){
   return;
 }
 
+void copyMachineFromString(char * from, int to, unsigned size){
+  for(unsigned i = 0; i < size; i++){
+    
+    machine->WriteMem(to+i, 1, from[i]);
+    if(from[i] == '\0') return;
+     
+  }
+  machine->WriteMem(size, 1, '\0');
+
+
+}
 //----------------------------------------------------------------------
 // ExceptionHandler
 //      Entry point into the Nachos kernel.  Called when a user program
@@ -81,24 +92,47 @@ void
 ExceptionHandler (ExceptionType which)
 {
     int type = machine->ReadRegister (2);
+    int size;
 
     if (which == SyscallException) {
       switch (type) {
-        case SC_Halt: 
-          DEBUG('a', "Shutdown, initiated by user program.\n");
-          interrupt->Halt();
-        break;
+        
         
         case SC_PutChar:
           DEBUG('p', "Putting char\n");
           synchConsole->SynchPutChar(machine->ReadRegister(4));
           break;
+
         case SC_PutString:
           DEBUG('p', "Putting String\n");
           char string [MAX_STRING_SIZE+1];
-         
           copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
           synchConsole->SynchPutString(string);
+          break;
+
+        case SC_GetChar:
+          machine->WriteRegister(2,synchConsole->SynchGetChar() );
+          
+        break;
+
+        case SC_GetString:
+
+          size = machine->ReadRegister(5);
+          char getString[MAX_STRING_SIZE+1];
+          synchConsole->SynchGetString(getString, size);
+          copyMachineFromString(getString,machine->ReadRegister(4),MAX_STRING_SIZE+1);
+
+        break;
+
+
+
+        case SC_Halt: 
+          DEBUG('a', "Shutdown, initiated by user program.\n");
+          interrupt->Halt();
+        break;
+        case SC_Exit:
+          machine->WriteRegister(2, machine->ReadRegister(4));
+          interrupt->Halt();
           break;
           
         default: 

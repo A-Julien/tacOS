@@ -40,6 +40,24 @@ __start:
  * 	convention on the MIPS.
  * -------------------------------------------------------------
  */
+  	.globl GetString
+	.ent	GetString
+GetString:
+	addiu $2,$0,SC_GetString
+	syscall
+	j	$31
+	.end Halt
+
+
+ 	.globl GetChar
+	.ent	GetChar
+GetChar:
+	addiu $2,$0,SC_GetChar
+	syscall
+	j	$31
+	.end Halt
+
+
 
 	.globl PutString
 	.ent	PutString

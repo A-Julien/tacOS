@@ -101,6 +101,7 @@ main (int argc, char **argv)
 		ASSERT (argc > 1);
 		StartProcess (*(argv + 1));
 		argCount = 2;
+			
 	    }
 	  else if (!strcmp (*argv, "-c"))
 	    {			// test the console
