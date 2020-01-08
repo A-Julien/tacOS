@@ -1,4 +1,5 @@
 language: c
+os: linux
 sudo: false
 
 branches:

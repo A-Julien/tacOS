@@ -15,6 +15,10 @@
 int
 main ()
 {
+    int a = 4;
+    int b = a +1;
+    a = a+b;
+
     Halt ();
 
     /* not reached */

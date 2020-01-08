@@ -300,8 +300,7 @@ Interrupt::CheckIfDue(bool advanceClock)
 					// to invoke an interrupt handler
     if (DebugIsEnabled('i'))
 	DumpState();
-    PendingInterrupt *toOccur = 
-		(PendingInterrupt *)pending->SortedRemove(&when);
+    PendingInterrupt *toOccur = (PendingInterrupt *)pending->SortedRemove(&when);
 
     if (toOccur == NULL)		// no pending interrupts
 	return FALSE;			
@@ -362,7 +361,7 @@ PrintPending(int arg)
 void
 Interrupt::DumpState()
 {
-  // LB: Print format adapted after the promotion of tick type 
+  // LB: Print format adapted after the promotion of tick type
   // from int to long long
   // printf("Time: %d, interrupts %s\n", stats->totalTicks, 
   //	 intLevelNames[level]);
