@@ -20,7 +20,7 @@ before_install:
 - docker ps -a
 
 script:
-  - docker exec -it guacamole bash -c 'cd /tacos/code && make && cd build && ./nachos-userprog -x halt > /tacos/test'
+  - docker exec -it guacamole bash -c 'cd /tacos/code && make && cd build && ./nachos-step2 -x putchar > /tacos/test'
   - cat test
   - doxygen Doxyfile
 
