@@ -19,6 +19,7 @@ before_install:
 - docker run -d -v $(pwd):/tacos --name guacamole jalaimo/nachos-build bash -c 'tail -f /dev/null'
 - docker ps -a
 - docker exec -it guacamole bash -c 'cd /tacos && GIT_INIT_COMMIT=a8550946e865bff4dd452841e71b23387243de51'
+- docker exec -it guacamole bash -c 'git rev-list --max-parents=0 HEAD'
 
 script:
   - docker exec -it guacamole bash -c 'cd /tacos/code && make && cd build && ./nachos-userprog -x halt > /proc/1/fd/1'
