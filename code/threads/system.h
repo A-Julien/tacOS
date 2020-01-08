@@ -8,6 +8,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#define MAX_STRING_SIZE 12	
+
 #include "copyright.h"
 #include "utility.h"
 #include "thread.h"
@@ -15,6 +17,7 @@
 #include "interrupt.h"
 #include "stats.h"
 #include "timer.h"
+
 
 // Initialization and cleanup routines
 extern void Initialize (int argc, char **argv);	// Initialization,
