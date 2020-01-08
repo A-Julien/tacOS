@@ -46,7 +46,7 @@ GetString:
 	addiu $2,$0,SC_GetString
 	syscall
 	j	$31
-	.end Halt
+	.end GetString
 
 
  	.globl GetChar
@@ -55,7 +55,7 @@ GetChar:
 	addiu $2,$0,SC_GetChar
 	syscall
 	j	$31
-	.end Halt
+	.end GetChar
 
 
 
@@ -65,7 +65,7 @@ PutString:
 	addiu $2,$0,SC_PutString
 	syscall
 	j	$31
-	.end Halt
+	.end PutString
 
 
 	.globl PutChar
@@ -74,7 +74,7 @@ PutChar:
 	addiu $2,$0,SC_PutChar
 	syscall
 	j	$31
-	.end Halt
+	.end PutChar
 
 
 	.globl Halt
