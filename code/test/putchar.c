@@ -5,9 +5,9 @@ void print(char c, int n)
 	int i;
 	for (i = 0; i < n; i++)
 	{
-		//putchar(c+i);
+		PutChar(c+i);
 	}
-	//putchar('\n');
+	PutChar('\n');
 }
 int main()
 {
