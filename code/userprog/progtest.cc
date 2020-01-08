@@ -13,6 +13,7 @@
 #include "console.h"
 #include "addrspace.h"
 #include "synch.h"
+#include "synchconsole.h"
 
 //----------------------------------------------------------------------
 // StartProcess
@@ -20,8 +21,7 @@
 //      memory, and jump to it.
 //----------------------------------------------------------------------
 
-void
-StartProcess (char *filename)
+void StartProcess (char *filename)
 {
     OpenFile *executable = fileSystem->Open (filename);
     AddrSpace *space;
@@ -83,13 +83,55 @@ ConsoleTest (char *in, char *out)
     readAvail = new Semaphore ("read avail", 0);
     writeDone = new Semaphore ("write done", 0);
 
-    for (;;)
-      {
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  console->PutChar (ch);	// echo it!
-	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q')
-	      return;		// if q, quit
-      }
+    for (;;){
+	   readAvail->P ();	// wait for character to arrive
+	   ch = console->GetChar ();
+
+      // test if EOT/EOF
+        if( in == NULL){
+        
+            // TTY CTRL+D equivalent is 0x4 with UNIX;
+            if( ch == 0x04)
+                return;
+            // On windows, it seems to be -1
+            if(ch == -1)
+                return;    
+        
+        } else {
+            if(ch == EOF)
+                return;
+        }
+
+        if(ch == 'c'){
+             console->PutChar ('<');
+            writeDone->P ();
+            console->PutChar ('c');
+            writeDone->P ();
+            console->PutChar ('>');
+            writeDone->P ();
+        } else {
+          // echo it!
+          console->PutChar (ch);
+    	  writeDone->P ();	// wait for write to finish
+        }
+	}
+}
+
+
+
+void SynchConsoleTest (char *readFile, char *writeFile){
+    char ch;
+    SynchConsole *synchconsole = new SynchConsole(readFile, writeFile);
+    while ((ch = synchconsole->SynchGetChar()) != EOF){
+        if(ch == 'c'){
+           synchconsole->SynchPutChar('<');
+           synchconsole->SynchPutChar('c');
+           synchconsole->SynchPutChar('>');
+
+        } else {
+            synchconsole->SynchPutChar(ch);
+        }
+    }
+    
+    fprintf(stderr, "Solaris: EOF detected in SynchConsole!\n");
 }
