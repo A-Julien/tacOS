@@ -116,10 +116,9 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_GetString:
                 size = machine->ReadRegister(5); // size passed in GetString() in syscall.h
-                printf("size : %d \n",size);
-                //char getString[MAX_STRING_SIZE+1];
-                getString = malloc(sizeof(char) * (size + 1));
-                synchConsole->SynchGetString((char *) getString, size);
+                getString = malloc(sizeof(char) * (size + 1)); //allocate the necessary size of the string
+
+                synchConsole->SynchGetString((char *) getString, size); //
                 copyMachineFromString((char *) getString, machine->ReadRegister(4), size + 1);
                 free(getString);
                 break;
