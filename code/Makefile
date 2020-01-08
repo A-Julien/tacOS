@@ -5,11 +5,13 @@ export DEFAULT_VERBOSITY
 
 .PHONY: all clean depend print build check mips-progs bin
 
-GIT_INIT_COMMIT:=$(shell git rev-list --max-parents=0 HEAD)
-ifeq ($(GIT_INIT_COMMIT),a8550946e865bff4dd452841e71b23387243de51)
-else
-$(error Your git does not seem to be correctly setup. Aborting.)
-endif
+############## COMENT FOR TRAVIS ERROR ##############
+
+#GIT_INIT_COMMIT:=$(shell git rev-list --max-parents=0 HEAD)
+#ifeq ($(GIT_INIT_COMMIT),a8550946e865bff4dd452841e71b23387243de51)
+#else
+#$(error Your git does not seem to be correctly setup. Aborting.)
+#endif
 
 # By default, build the check target so that we check that initial
 # nachos code still compile
