@@ -41,6 +41,15 @@ __start:
  * -------------------------------------------------------------
  */
 
+	.globl PutString
+	.ent	PutString
+PutString:
+	addiu $2,$0,SC_PutString
+	syscall
+	j	$31
+	.end Halt
+
+
 	.globl PutChar
 	.ent	PutChar
 PutChar:

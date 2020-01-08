@@ -40,6 +40,19 @@ UpdatePC ()
     machine->WriteRegister (NextPCReg, pc);
 }
 
+void copyStringFromMachine( int from, char *to, unsigned size){
+  int valChar;
+  for(unsigned i = 0; i < size; i++){
+    if(machine->ReadMem(from+i,sizeof(char),&valChar)){
+      to[i] = valChar;
+    } else {
+      to[i] = '\0';
+      return;
+    }
+  }
+  to[size] = '\0';
+  return;
+}
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -77,10 +90,17 @@ ExceptionHandler (ExceptionType which)
         break;
         
         case SC_PutChar:
+          DEBUG('p', "Putting char\n");
           synchConsole->SynchPutChar(machine->ReadRegister(4));
           break;
-        
-        
+        case SC_PutString:
+          DEBUG('p', "Putting String\n");
+          char string [MAX_STRING_SIZE+1];
+         
+          copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
+          synchConsole->SynchPutString(string);
+          break;
+          
         default: 
           printf("Unexpected user mode exception %d %d\n", which, type);
           ASSERT(FALSE);
