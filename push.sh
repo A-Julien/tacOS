@@ -9,7 +9,7 @@ merge_branch() {
     git stash || exit
     git checkout release || exit
     git merge --no-ff "$TRAVIS_COMMIT" || exit
-    git push @github.com/">https://${GITHUB_TOKEN}@github.com/A-Julien/tacOS.git"
+    git push https://${GITHUB_TOKEN}@github.com/A-Julien/tacOS.git
 }
 
 setup_git
