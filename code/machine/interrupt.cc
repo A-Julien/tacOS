@@ -86,7 +86,6 @@ Interrupt::~Interrupt()
 /// Interrupt::ChangeLevel
 /// 	Change interrupts to be enabled or disabled, without advancing
 ///	the simulated time (normally, enabling interrupts advances the time).
- /
 ///
 /// Interrupt::ChangeLevel
 /// 	Change interrupts to be enabled or disabled, without advancing

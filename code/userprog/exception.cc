@@ -24,7 +24,7 @@
  *   For now, this only handles the Halt() system call.
  *   Everything else core dumps.
  *   Copyright (c) 1992-1993 The Regents of the University of California.
- */                                                                                                           */
+ */
 
 
 #include "copyright.h"

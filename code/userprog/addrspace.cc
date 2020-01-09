@@ -126,7 +126,6 @@ AddrSpace::AddrSpace (OpenFile * executable)
 /// AddrSpace::~AddrSpace
 ///      Dealloate an address space.  Nothing for now!
 ///
- /
 AddrSpace::~AddrSpace ()
 {
   // LB: Missing [] for delete
