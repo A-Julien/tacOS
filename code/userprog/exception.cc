@@ -1,4 +1,11 @@
-// exception.cc 
+/**
+ * @file exception.cc
+ * @brief exception
+ * @author chef
+ */
+
+
+// exception.cc
 //      Entry point into the Nachos kernel from user programs.
 //      There are two kinds of things that can cause control to
 //      transfer back to here from user code:
@@ -39,6 +46,12 @@ UpdatePC() {
     machine->WriteRegister(NextPCReg, pc);
 }
 
+/**
+ * *
+ * @param[in] from
+ * @param[in] to
+ * @param[in] size
+ */
 void copyStringFromMachine(int from, char *to, unsigned size) {
     int valChar;
     for (unsigned i = 0; i < size; i++) {

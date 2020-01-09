@@ -14,7 +14,7 @@ test
 |   │    │   test1_input
 |   │    │   test2_input
 |   │    │   ...
-|   ───results_test
+|   └──results_test
 |   │    │   test1_result
 |   │    │   test2_input
 |   │    │   ...

@@ -339,3 +339,5 @@ CMakeListsPrivate.txt
 
 /docs/html
 /docs/latex
+/html
+/latex
