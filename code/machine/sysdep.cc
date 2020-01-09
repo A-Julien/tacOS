@@ -1,27 +1,29 @@
-// sysdep.cc
-//	Implementation of system-dependent interface.  Nachos uses the 
-//	routines defined here, rather than directly calling the UNIX library,
-//	to simplify porting between versions of UNIX, and even to
-//	other systems, such as MSDOS.
-//
-//	On UNIX, almost all of these routines are simple wrappers
-//	for the underlying UNIX system calls.
-//
-//	NOTE: all of these routines refer to operations on the underlying
-//	host machine (e.g., the DECstation, SPARC, etc.), supporting the 
-//	Nachos simulation code.  Nachos implements similar operations,
-//	(such as opening a file), but those are implemented in terms
-//	of hardware devices, which are simulated by calls to the underlying
-//	routines in the host workstation OS.
-//
-//	This file includes lots of calls to C routines.  C++ requires
-//	us to wrap all C definitions with a "extern "C" block".
-// 	This prevents the internal forms of the names from being
-// 	changed by the C++ compiler.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file sysdep.cc                                    
+/// @brief Implementation of system-dependent interface.                    
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo  
+///	  Nachos uses the 
+///	routines defined here, rather than directly calling the UNIX library,
+///	to simplify porting between versions of UNIX, and even to
+///	other systems, such as MSDOS.
+///
+///	On UNIX, almost all of these routines are simple wrappers
+///	for the underlying UNIX system calls.
+///
+///	NOTE: all of these routines refer to operations on the underlying
+///	host machine (e.g., the DECstation, SPARC, etc.), supporting the 
+///	Nachos simulation code.  Nachos implements similar operations,
+///	(such as opening a file), but those are implemented in terms
+///	of hardware devices, which are simulated by calls to the underlying
+///	routines in the host workstation OS.
+///
+///	This file includes lots of calls to C routines.  C++ requires
+///	us to wrap all C definitions with a "extern "C" block".
+/// 	This prevents the internal forms of the names from being
+/// 	changed by the C++ compiler.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 
@@ -94,22 +96,22 @@ int sendto (int, const void*, int, int, void*, int);
 #include "interrupt.h"
 #include "system.h"
 
-//----------------------------------------------------------------------
-// PollFile
-// 	Check open file or open socket to see if there are any 
-//	characters that can be read immediately.  If so, read them
-//	in, and return TRUE.
-//
-//	In the network case, if there are no threads for us to run,
-//	and no characters to be read,
-//	we need to give the other side a chance to get our host's CPU
-//	(otherwise, we'll go really slowly, since UNIX time-slices
-//	infrequently, and this would be like busy-waiting).  So we
-//	delay for a short fixed time, before allowing ourselves to be
-//	re-scheduled (sort of like a Yield, but cast in terms of UNIX).
-//
-//	"fd" -- the file descriptor of the file to be polled
-//----------------------------------------------------------------------
+///
+/// PollFile
+/// 	Check open file or open socket to see if there are any
+///	characters that can be read immediately.  If so, read them
+///	in, and return TRUE.
+///
+///	In the network case, if there are no threads for us to run,
+///	and no characters to be read,
+///	we need to give the other side a chance to get our host's CPU
+///	(otherwise, we'll go really slowly, since UNIX time-slices
+///	infrequently, and this would be like busy-waiting).  So we
+///	delay for a short fixed time, before allowing ourselves to be
+///	re-scheduled (sort of like a Yield, but cast in terms of UNIX).
+///
+///	@param "fd" -- the file descriptor of the file to be polled
+///
 
 bool
 PollFile(int fd)
@@ -137,13 +139,13 @@ PollFile(int fd)
     return TRUE;
 }
 
-//----------------------------------------------------------------------
-// OpenForWrite
-// 	Open a file for writing.  Create it if it doesn't exist; truncate it 
-//	if it does already exist.  Return the file descriptor.
-//
-//	"name" -- file name
-//----------------------------------------------------------------------
+///
+/// OpenForWrite
+/// 	Open a file for writing.  Create it if it doesn't exist; truncate it
+///	if it does already exist.  @return Return the file descriptor.
+///
+///	@param "name" -- file name
+///
 
 int
 OpenForWrite(const char *name)
@@ -154,13 +156,13 @@ OpenForWrite(const char *name)
     return fd;
 }
 
-//----------------------------------------------------------------------
-// OpenForReadWrite
-// 	Open a file for reading or writing.
-//	Return the file descriptor, or error if it doesn't exist.
-//
-//	"name" -- file name
-//----------------------------------------------------------------------
+///
+/// OpenForReadWrite
+/// 	Open a file for reading or writing.
+///	@return Return the file descriptor, or error if it doesn't exist.
+///
+///	@param "name" -- file name
+///
 
 int
 OpenForReadWrite(const char *name, bool crashOnError)
@@ -171,10 +173,10 @@ OpenForReadWrite(const char *name, bool crashOnError)
     return fd;
 }
 
-//----------------------------------------------------------------------
-// Read
-// 	Read characters from an open file.  Abort if read fails.
-//----------------------------------------------------------------------
+///
+/// Read
+/// 	Read characters from an open file.  Abort if read fails.
+///
 
 void
 Read(int fd, char *buffer, int nBytes)
@@ -183,11 +185,11 @@ Read(int fd, char *buffer, int nBytes)
     ASSERT(retVal == nBytes);
 }
 
-//----------------------------------------------------------------------
-// ReadPartial
-// 	Read characters from an open file, returning as many as are
-//	available.
-//----------------------------------------------------------------------
+///
+/// ReadPartial
+/// 	Read characters from an open file, returning as many as are
+///	available.
+///
 
 int
 ReadPartial(int fd, char *buffer, int nBytes)
@@ -196,10 +198,10 @@ ReadPartial(int fd, char *buffer, int nBytes)
 }
 
 
-//----------------------------------------------------------------------
-// WriteFile
-// 	Write characters to an open file.  Abort if write fails.
-//----------------------------------------------------------------------
+///
+/// WriteFile
+/// 	Write characters to an open file.  Abort if write fails.
+///
 
 void
 WriteFile(int fd, const char *buffer, int nBytes)
@@ -208,10 +210,10 @@ WriteFile(int fd, const char *buffer, int nBytes)
     ASSERT(retVal == nBytes);
 }
 
-//----------------------------------------------------------------------
-// Lseek
-// 	Change the location within an open file.  Abort on error.
-//----------------------------------------------------------------------
+///
+/// Lseek
+/// 	Change the location within an open file.  Abort on error.
+///
 
 void 
 Lseek(int fd, int offset, int whence)
@@ -220,10 +222,10 @@ Lseek(int fd, int offset, int whence)
     ASSERT(retVal >= 0);
 }
 
-//----------------------------------------------------------------------
-// Tell
-// 	Report the current location within an open file.
-//----------------------------------------------------------------------
+///
+/// Tell
+/// 	Report the current location within an open file.
+///
 
 int 
 Tell(int fd)
@@ -236,10 +238,10 @@ Tell(int fd)
 }
 
 
-//----------------------------------------------------------------------
-// Close
-// 	Close a file.  Abort on error.
-//----------------------------------------------------------------------
+///
+/// Close
+/// 	Close a file.  Abort on error.
+///
 
 void 
 Close(int fd)
@@ -248,10 +250,10 @@ Close(int fd)
     ASSERT(retVal >= 0); 
 }
 
-//----------------------------------------------------------------------
-// Unlink
-// 	Delete a file.
-//----------------------------------------------------------------------
+///
+/// Unlink
+/// 	Delete a file.
+///
 
 bool 
 Unlink(const char *name)
@@ -259,12 +261,12 @@ Unlink(const char *name)
     return unlink(name);
 }
 
-//----------------------------------------------------------------------
-// OpenSocket
-// 	Open an interprocess communication (IPC) connection.  For now, 
-//	just open a datagram port where other Nachos (simulating 
-//	workstations on a network) can send messages to this Nachos.
-//----------------------------------------------------------------------
+///
+/// OpenSocket
+/// 	Open an interprocess communication (IPC) connection.  For now,
+///	just open a datagram port where other Nachos (simulating
+///	workstations on a network) can send messages to this Nachos.
+///
 
 int
 OpenSocket()
@@ -277,10 +279,10 @@ OpenSocket()
     return sockID;
 }
 
-//----------------------------------------------------------------------
-// CloseSocket
-// 	Close the IPC connection. 
-//----------------------------------------------------------------------
+///
+/// CloseSocket
+/// 	Close the IPC connection.
+///
 
 void
 CloseSocket(int sockID)
@@ -288,10 +290,10 @@ CloseSocket(int sockID)
     (void) close(sockID);
 }
 
-//----------------------------------------------------------------------
-// InitSocketName
-// 	Initialize a UNIX socket address -- magical!
-//----------------------------------------------------------------------
+///
+/// InitSocketName
+/// 	Initialize a UNIX socket address -- magical!
+///
 
 static void 
 InitSocketName(struct sockaddr_un *uname, const char *name)
@@ -300,11 +302,11 @@ InitSocketName(struct sockaddr_un *uname, const char *name)
     strcpy(uname->sun_path, name);
 }
 
-//----------------------------------------------------------------------
-// AssignNameToSocket
-// 	Give a UNIX file name to the IPC port, so other instances of Nachos
-//	can locate the port. 
-//----------------------------------------------------------------------
+///
+/// AssignNameToSocket
+/// 	Give a UNIX file name to the IPC port, so other instances of Nachos
+///	can locate the port.
+///
 
 void
 AssignNameToSocket(const char *socketName, int sockID)
@@ -320,31 +322,31 @@ AssignNameToSocket(const char *socketName, int sockID)
     DEBUG('n', "Created socket %s\n", socketName);
 }
 
-//----------------------------------------------------------------------
-// DeAssignNameToSocket
-// 	Delete the UNIX file name we assigned to our IPC port, on cleanup.
-//----------------------------------------------------------------------
+///
+/// DeAssignNameToSocket
+/// 	Delete the UNIX file name we assigned to our IPC port, on cleanup.
+///
 void
 DeAssignNameToSocket(const char *socketName)
 {
     (void) unlink(socketName);
 }
 
-//----------------------------------------------------------------------
-// PollSocket
-// 	Return TRUE if there are any messages waiting to arrive on the
-//	IPC port.
-//----------------------------------------------------------------------
+///
+/// PollSocket
+/// @return	Return TRUE if there are any messages waiting to arrive on the
+///	IPC port.
+///
 bool
 PollSocket(int sockID)
 {
     return PollFile(sockID);	// on UNIX, socket ID's are just file ID's
 }
 
-//----------------------------------------------------------------------
-// ReadFromSocket
-// 	Read a fixed size packet off the IPC port.  Abort on error.
-//----------------------------------------------------------------------
+///
+/// ReadFromSocket
+/// 	Read a fixed size packet off the IPC port.  Abort on error.
+///
 void
 ReadFromSocket(int sockID, char *buffer, int packetSize)
 {
@@ -374,11 +376,11 @@ ReadFromSocket(int sockID, char *buffer, int packetSize)
     ASSERT(retVal == packetSize);
 }
 
-//----------------------------------------------------------------------
-// SendToSocket
-// 	Transmit a fixed size packet to another Nachos' IPC port.
-//	Abort on error.
-//----------------------------------------------------------------------
+///
+/// SendToSocket
+/// 	Transmit a fixed size packet to another Nachos' IPC port.
+///	Abort on error.
+///
 void
 SendToSocket(int sockID, const char *buffer, int packetSize, const char *toName)
 {
@@ -392,11 +394,11 @@ SendToSocket(int sockID, const char *buffer, int packetSize, const char *toName)
 }
 
 
-//----------------------------------------------------------------------
-// CallOnUserAbort
-// 	Arrange that "func" will be called when the user aborts (e.g., by
-//	hitting ctl-C.
-//----------------------------------------------------------------------
+///
+/// CallOnUserAbort
+/// 	Arrange that "func" will be called when the user aborts (e.g., by
+///	hitting ctl-C.
+///
 
 void 
 CallOnUserAbort(VoidNoArgFunctionPtr func)
@@ -404,12 +406,12 @@ CallOnUserAbort(VoidNoArgFunctionPtr func)
     (void)signal(SIGINT, (VoidFunctionPtr) func);
 }
 
-//----------------------------------------------------------------------
-// Sleep
-// 	Put the UNIX process running Nachos to sleep for x seconds,
-//	to give the user time to start up another invocation of Nachos
-//	in a different UNIX shell.
-//----------------------------------------------------------------------
+///
+/// Sleep
+/// 	Put the UNIX process running Nachos to sleep for x seconds,
+///	to give the user time to start up another invocation of Nachos
+///	in a different UNIX shell.
+///
 
 void 
 Delay(int seconds)
@@ -417,10 +419,10 @@ Delay(int seconds)
     (void) sleep((unsigned) seconds);
 }
 
-//----------------------------------------------------------------------
-// Abort
-// 	Quit and drop core.
-//----------------------------------------------------------------------
+///
+/// Abort
+/// 	Quit and drop core.
+///
 
 void 
 Abort()
@@ -428,10 +430,10 @@ Abort()
     abort();
 }
 
-//----------------------------------------------------------------------
-// Exit
-// 	Quit without dropping core.
-//----------------------------------------------------------------------
+///
+/// Exit
+/// 	Quit without dropping core.
+///
 
 void 
 Exit(int exitCode)
@@ -439,11 +441,11 @@ Exit(int exitCode)
     exit(exitCode);
 }
 
-//----------------------------------------------------------------------
-// RandomInit
-// 	Initialize the pseudo-random number generator.  We use the
-//	now obsolete "srand" and "rand" because they are more portable!
-//----------------------------------------------------------------------
+///
+/// RandomInit
+/// 	Initialize the pseudo-random number generator.  We use the
+///	now obsolete "srand" and "rand" because they are more portable!
+///
 
 void 
 RandomInit(unsigned seed)
@@ -451,10 +453,10 @@ RandomInit(unsigned seed)
     srand(seed);
 }
 
-//----------------------------------------------------------------------
-// Random
-// 	Return a pseudo-random number.
-//----------------------------------------------------------------------
+///
+/// Random
+/// @return	Return a pseudo-random number.
+///
 
 int 
 Random()
@@ -462,17 +464,17 @@ Random()
     return rand();
 }
 
-//----------------------------------------------------------------------
-// AllocBoundedArray
-// 	Return an array, with the two pages just before 
-//	and after the array unmapped, to catch illegal references off
-//	the end of the array.  Particularly useful for catching overflow
-//	beyond fixed-size thread execution stacks.
-//
-//	Note: Just return the useful part!
-//
-//	"size" -- amount of useful space needed (in bytes)
-//----------------------------------------------------------------------
+///
+/// AllocBoundedArray
+/// 	@return Return an array, with the two pages just before
+///	and after the array unmapped, to catch illegal references off
+///	the end of the array.  Particularly useful for catching overflow
+///	beyond fixed-size thread execution stacks.
+///
+///	Note: Just return the useful part!
+///
+///	@param "size" -- amount of useful space needed (in bytes)
+///
 
 char * 
 AllocBoundedArray(int size)
@@ -485,13 +487,13 @@ AllocBoundedArray(int size)
     return ptr + pgSize;
 }
 
-//----------------------------------------------------------------------
-// DeallocBoundedArray
-// 	Deallocate an array of integers, unprotecting its two boundary pages.
-//
-//	"ptr" -- the array to be deallocated
-//	"size" -- amount of useful space in the array (in bytes)
-//----------------------------------------------------------------------
+///
+/// DeallocBoundedArray
+/// 	Deallocate an array of integers, unprotecting its two boundary pages.
+///
+///	@param "ptr" -- the array to be deallocated
+///	@param "size" -- amount of useful space in the array (in bytes)
+///
 
 void 
 DeallocBoundedArray(char *ptr, int size)

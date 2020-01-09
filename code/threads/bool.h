@@ -1,7 +1,9 @@
-// Defining TRUE and FALSE is usually a Bad Idea,
-// because you will probably be inconsistent with anyone
-// else who had the same clever idea.
-// Therefore:  DON'T USE THIS FILE.
+/// @file list.h
+/// @brief  Routines to manage a singly-linked list of "things".
+/// Defining TRUE and FALSE is usually a Bad Idea,
+/// because you will probably be inconsistent with anyone
+/// else who had the same clever idea.
+/// Therefore:  DON'T USE THIS FILE.
 
 #ifndef _bool_h
 #define _bool_h 1

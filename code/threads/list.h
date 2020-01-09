@@ -1,14 +1,16 @@
-// list.h 
-//      Data structures to manage LISP-like lists.  
-//
-//      As in LISP, a list can contain any type of data structure
-//      as an item on the list: thread control blocks, 
-//      pending interrupts, etc.  That is why each item is a "void *",
-//      or in other words, a "pointers to anything".
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file list.h
+/// @brief  Data structures to manage LISP-like lists.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///
+///
+///      As in LISP, a list can contain any type of data structure
+///      as an item on the list: thread control blocks,
+///      pending interrupts, etc.  That is why each item is a "void *",
+///      or in other words, a "pointers to anything".
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef LIST_H
 #define LIST_H
@@ -16,13 +18,13 @@
 #include "copyright.h"
 #include "utility.h"
 
-// The following class defines a "list element" -- which is
-// used to keep track of one item on a list.  It is equivalent to a
-// LISP cell, with a "car" ("next") pointing to the next element on the list,
-// and a "cdr" ("item") pointing to the item on the list.
-//
-// Internal data structures kept public so that List operations can
-// access them directly.
+/// The following class defines a "list element" -- which is
+/// used to keep track of one item on a list.  It is equivalent to a
+/// LISP cell, with a "car" ("next") pointing to the next element on the list,
+/// and a "cdr" ("item") pointing to the item on the list.
+///
+/// Internal data structures kept public so that List operations can
+/// access them directly.
 
 class ListElement
 {

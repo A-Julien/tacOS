@@ -1,26 +1,28 @@
-// synchlist.cc
-//      Routines for synchronized access to a list.
-//
-//      Implemented by surrounding the List abstraction
-//      with synchronization routines.
-//
-//      Implemented in "monitor"-style -- surround each procedure with a
-//      lock acquire and release pair, using condition signal and wait for
-//      synchronization.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file synchlist.cc                                           
+/// @brief  Routines for synchronized access to a list.  
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///
+///
+///      Implemented by surrounding the List abstraction
+///      with synchronization routines.
+///
+///      Implemented in "monitor"-style -- surround each procedure with a
+///      lock acquire and release pair, using condition signal and wait for
+///      synchronization.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "synchlist.h"
 
-//----------------------------------------------------------------------
-// SynchList::SynchList
-//      Allocate and initialize the data structures needed for a 
-//      synchronized list, empty to start with.
-//      Elements can now be added to the list.
-//----------------------------------------------------------------------
+///
+/// SynchList::SynchList
+///      Allocate and initialize the data structures needed for a
+///      synchronized list, empty to start with.
+///      Elements can now be added to the list.
+///
 
 SynchList::SynchList ()
 {
@@ -29,10 +31,10 @@ SynchList::SynchList ()
     listEmpty = new Condition ("list empty cond");
 }
 
-//----------------------------------------------------------------------
-// SynchList::~SynchList
-//      De-allocate the data structures created for synchronizing a list. 
-//----------------------------------------------------------------------
+///
+/// SynchList::~SynchList
+///      De-allocate the data structures created for synchronizing a list.
+///
 
 SynchList::~SynchList ()
 {
@@ -41,14 +43,14 @@ SynchList::~SynchList ()
     delete listEmpty;
 }
 
-//----------------------------------------------------------------------
-// SynchList::Append
-//      Append an "item" to the end of the list.  Wake up anyone
-//      waiting for an element to be appended.
-//
-//      "item" is the thing to put on the list, it can be a pointer to 
-//              anything.
-//----------------------------------------------------------------------
+///
+/// SynchList::Append
+///      Append an "item" to the end of the list.  Wake up anyone
+///      waiting for an element to be appended.
+///
+///        @param"item" is the thing to put on the list, it can be a pointer to
+///              anything.
+///
 
 void
 SynchList::Append (void *item)
@@ -59,13 +61,13 @@ SynchList::Append (void *item)
     lock->Release ();
 }
 
-//----------------------------------------------------------------------
-// SynchList::Remove
-//      Remove an "item" from the beginning of the list.  Wait if
-//      the list is empty.
-// Returns:
-//      The removed item. 
-//----------------------------------------------------------------------
+///
+/// SynchList::Remove
+///      Remove an "item" from the beginning of the list.  Wait if
+///      the list is empty.
+/// Returns:
+///     @return The removed item.
+///
 
 void *
 SynchList::Remove ()
@@ -81,13 +83,13 @@ SynchList::Remove ()
     return item;
 }
 
-//----------------------------------------------------------------------
-// SynchList::Mapcar
-//      Apply function to every item on the list.  Obey mutual exclusion
-//      constraints.
-//
-//      "func" is the procedure to be applied.
-//----------------------------------------------------------------------
+///
+/// SynchList::Mapcar
+///      Apply function to every item on the list.  Obey mutual exclusion
+///      constraints.
+///
+///     @param "func" is the procedure to be applied.
+///
 
 void
 SynchList::Mapcar (VoidFunctionPtr func)

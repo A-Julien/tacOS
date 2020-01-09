@@ -1,15 +1,12 @@
-/**
- * @file system.h
- * @brief All global variables used in Nachos are defined here.
- * @author chef
- */
-
-// system.h
-//      All global variables used in Nachos are defined here.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file system.h
+/// @brief  Initialization and cleanup routines
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+/// system.h
+///      All global variables used in Nachos are defined here.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef SYSTEM_H
 #define SYSTEM_H
@@ -25,7 +22,6 @@
 #include "timer.h"
 
 
-// Initialization and cleanup routines
 extern void Initialize (int argc, char **argv);	// Initialization,
 						// called before anything else
 extern void Cleanup ();		// Cleanup, called when

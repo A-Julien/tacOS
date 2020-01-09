@@ -1,7 +1,7 @@
 /**
  * @file synchconsole.cc
- * @brief synchconsole
- * @author chef
+ * @brief
+ * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
 #include "copyright.h"

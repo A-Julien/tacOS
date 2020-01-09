@@ -1,4 +1,4 @@
-/* switch.h
+/** @file switch.h
  *	Definitions needed for implementing context switching.
  *
  *	Context switching is inherently machine dependent, since

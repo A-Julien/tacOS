@@ -1,18 +1,21 @@
-// synch.h 
-//      Data structures for synchronizing threads.
-//
-//      Three kinds of synchronization are defined here: semaphores,
-//      locks, and condition variables.  The implementation for
-//      semaphores is given; for the latter two, only the procedure
-//      interface is given -- they are to be implemented as part of 
-//      the first assignment.
-//
-//      Note that all the synchronization objects take a "name" as
-//      part of the initialization.  This is solely for debugging purposes.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// synch.h -- synchronization primitives.  
+/// @file synch.h
+/// @brief  Data structures for synchronizing threads.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///
+///
+///
+///      Three kinds of synchronization are defined here: semaphores,
+///      locks, and condition variables.  The implementation for
+///      semaphores is given; for the latter two, only the procedure
+///      interface is given -- they are to be implemented as part of
+///      the first assignment.
+///
+///      Note that all the synchronization objects take a "name" as
+///      part of the initialization.  This is solely for debugging purposes.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// synch.h -- synchronization primitives.
 
 #ifndef SYNCH_H
 #define SYNCH_H
@@ -21,20 +24,20 @@
 #include "thread.h"
 #include "list.h"
 
-// The following class defines a "semaphore" whose value is a non-negative
-// integer.  The semaphore has only two operations P() and V():
-//
-//      P() -- waits until value > 0, then decrement
-//
-//      V() -- increment, waking up a thread waiting in P() if necessary
-// 
-// Note that the interface does *not* allow a thread to read the value of 
-// the semaphore directly -- even if you did read the value, the
-// only thing you would know is what the value used to be.  You don't
-// know what the value is now, because by the time you get the value
-// into a register, a context switch might have occurred,
-// and some other thread might have called P or V, so the true value might
-// now be different.
+/// The following class defines a "semaphore" whose value is a non-negative
+/// integer.  The semaphore has only two operations P() and V():
+///
+///      P() -- waits until value > 0, then decrement
+///
+///      V() -- increment, waking up a thread waiting in P() if necessary
+///
+/// Note that the interface does *not* allow a thread to read the value of
+/// the semaphore directly -- even if you did read the value, the
+/// only thing you would know is what the value used to be.  You don't
+/// know what the value is now, because by the time you get the value
+/// into a register, a context switch might have occurred,
+/// and some other thread might have called P or V, so the true value might
+/// now be different.
 
 class Semaphore
 {

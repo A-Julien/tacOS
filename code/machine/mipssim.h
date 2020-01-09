@@ -1,18 +1,20 @@
-// mipssim.h 
-//	Internal data structures for simulating the MIPS instruction set.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file mipssim.h
+/// @briefData nternal data structures for simulating the MIPS instruction set.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///	Internal data structures for simulating the MIPS instruction set.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef MIPSSIM_H
 #define MIPSSIM_H
 
 #include "copyright.h"
 
-/*
+/**
  * OpCode values.  The names are straight from the MIPS
  * manual except for the following special ones:
  *

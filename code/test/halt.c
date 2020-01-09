@@ -1,4 +1,7 @@
-/* halt.c
+/**
+ * @file halt.c
+ * @brief  Data structures to manage LISP-like lists.
+ * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  *	Simple program to test whether running a user program works.
  *	
  *	Just do a "syscall" that shuts down the OS.

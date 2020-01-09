@@ -1,11 +1,14 @@
-// machine.cc 
-//	Routines for simulating the execution of user programs.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file machine.cc                                        
+/// @briefData Routines for simulating the execution of user programs.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo   
+/// machine.cc 
+///	Routines for simulating the execution of user programs.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "machine.h"
@@ -18,11 +21,11 @@ static const char* exceptionNames[] = { "no exception", "syscall",
 				"bus error", "address error", "overflow",
 				"illegal instruction" };
 
-//----------------------------------------------------------------------
-// CheckEndian
-// 	Check to be sure that the host really uses the format it says it 
-//	does, for storing the bytes of an integer.  Stop on error.
-//----------------------------------------------------------------------
+///
+/// CheckEndian
+/// 	Check to be sure that the host really uses the format it says it
+///	does, for storing the bytes of an integer.  Stop on error.
+///
 
 static
 void CheckEndian()
@@ -44,13 +47,13 @@ void CheckEndian()
 #endif
 }
 
-//----------------------------------------------------------------------
-// Machine::Machine
-// 	Initialize the simulation of user program execution.
-//
-//	"debug" -- if TRUE, drop into the debugger after each user instruction
-//		is executed.
-//----------------------------------------------------------------------
+///
+/// Machine::Machine
+/// 	Initialize the simulation of user program execution.
+///
+///	@param "debug" -- if TRUE, drop into the debugger after each user instruction
+///		is executed.
+///
 
 Machine::Machine(bool debug)
 {
@@ -75,10 +78,10 @@ Machine::Machine(bool debug)
     CheckEndian();
 }
 
-//----------------------------------------------------------------------
-// Machine::~Machine
-// 	De-allocate the data structures used to simulate user program execution.
-//----------------------------------------------------------------------
+///
+/// Machine::~Machine
+/// 	De-allocate the data structures used to simulate user program execution.
+///
 
 Machine::~Machine()
 {
@@ -87,15 +90,15 @@ Machine::~Machine()
         delete [] tlb;
 }
 
-//----------------------------------------------------------------------
-// Machine::RaiseException
-// 	Transfer control to the Nachos kernel from user mode, because
-//	the user program either invoked a system call, or some exception
-//	occured (such as the address translation failed).
-//
-//	"which" -- the cause of the kernel trap
-//	"badVaddr" -- the virtual address causing the trap, if appropriate
-//----------------------------------------------------------------------
+///
+/// Machine::RaiseException
+/// 	Transfer control to the Nachos kernel from user mode, because
+///	the user program either invoked a system call, or some exception
+///	occured (such as the address translation failed).
+///
+///	@param "which" -- the cause of the kernel trap
+///	@param "badVaddr" -- the virtual address causing the trap, if appropriate
+///
 
 void
 Machine::RaiseException(ExceptionType which, int badVAddr)
@@ -110,15 +113,15 @@ Machine::RaiseException(ExceptionType which, int badVAddr)
     interrupt->setStatus(UserMode);
 }
 
-//----------------------------------------------------------------------
-// Machine::Debugger
-// 	Primitive debugger for user programs.  Note that we can't use
-//	gdb to debug user programs, since gdb doesn't run on top of Nachos.
-//	It could, but you'd have to implement *a lot* more system calls
-//	to get it to work!
-//
-//	So just allow single-stepping, and printing the contents of memory.
-//----------------------------------------------------------------------
+///
+/// Machine::Debugger
+/// 	Primitive debugger for user programs.  Note that we can't use
+///	gdb to debug user programs, since gdb doesn't run on top of Nachos.
+///	It could, but you'd have to implement *a lot* more system calls
+///	to get it to work!
+///
+///	So just allow single-stepping, and printing the contents of memory.
+///
 
 void Machine::Debugger()
 {
@@ -160,11 +163,11 @@ void Machine::Debugger()
     delete [] buf;
 }
  
-//----------------------------------------------------------------------
-// Machine::DumpState
-// 	Print the user program's CPU state.  We might print the contents
-//	of memory, but that seemed like overkill.
-//----------------------------------------------------------------------
+///
+/// Machine::DumpState
+/// 	Print the user program's CPU state.  We might print the contents
+///	of memory, but that seemed like overkill.
+///
 
 void
 Machine::DumpState()
@@ -200,10 +203,10 @@ Machine::DumpState()
     printf("\n");
 }
 
-//----------------------------------------------------------------------
-// Machine::ReadRegister/WriteRegister
-//   	Fetch or write the contents of a user program register.
-//----------------------------------------------------------------------
+///
+/// Machine::ReadRegister/WriteRegister
+///   	Fetch or write the contents of a user program register.
+///
 
 int Machine::ReadRegister(int num)
     {
