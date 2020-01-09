@@ -22,6 +22,8 @@ int main()
 	PutChar('\n');
 	PutInt(-999999999);
 	PutChar('\n');
+    PutInt(10);
+    PutChar('\n');
 	PutInt(-1000000000); // RETURN -1
 	PutChar('\n');
 	return 0;

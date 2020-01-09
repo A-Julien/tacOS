@@ -4,7 +4,7 @@
 int main()
 {
 	int n;
-	for(int i = 0; i < 8; i++){
+	for(int i = 0; i < 11; i++){
 		GetInt(&n);
 		PutInt(n);
 		PutChar('\n');
