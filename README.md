@@ -9,6 +9,36 @@ Sauce blanche algérienne chef !
 *	Compte-Rendu  : ```CR.pdf```
 *	doc : https://a-julien.github.io/tacOS/
 
+## Testing
+## How
+All tests are perform by the CI
+
+## Test Architecture
+
+```
+test
+│   README.md
+|   test_unit.sh
+└───test_step2
+│   │   test1.c
+│   │   test2.c
+│   │   ...
+│   │   
+│   └───input_test
+|   │    │   test1_input
+|   │    │   test2_input
+|   │    │   ...
+|   ───results_test
+|   │    │   test1_result
+|   │    │   test2_input
+|   │    │   ...
+│   
+└───test_step3
+|   │   ...
+|
+|___ ...
+```
+
 ## Avancement 
 
 Olivier @ Julien Hugo : __J'ai finis la partie III de l'étape 2, tout est dans la branche I/O__

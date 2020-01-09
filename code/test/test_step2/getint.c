@@ -1,14 +1,14 @@
-#include "syscall.h"
+#include "../../userprog/syscall.h"
 
 
 int main()
 {
 	int n;
-	while(1){
+	//while(1){
 		GetInt(&n);
 		PutInt(n);
 		PutChar('\n');
-	}
+	//}
 	return 0;
 	
 } 

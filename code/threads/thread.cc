@@ -124,7 +124,7 @@ Thread::Fork (VoidFunctionPtr func, int arg)
 //      NOTE: Nachos will not catch all stack overflow conditions.
 //      In other words, your program may still crash because of an overflow.
 //
-//      If you get bizarre results (such as seg faults where there is no code)
+//      If you get bizarre results_test (such as seg faults where there is no code)
 //      then you *may* need to increase the stack size.  You can avoid stack
 //      overflows by not putting large data structures on the stack.
 //      Don't do this: void foo() { int bigArray[10000]; ... }
