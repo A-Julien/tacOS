@@ -1,16 +1,19 @@
-// network.h 
-//	Data structures to emulate a physical network connection.
-//	The network provides the abstraction of ordered, unreliable,
-//	fixed-size packet delivery to other machines on the network.
-//
-//	You may note that the interface to the network is similar to 
-//	the console device -- both are full duplex channels.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file network.h
+/// @briefData structures to emulate a physical network connection.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+/// network.h
+///	Data structures to emulate a physical network connection.
+///	The network provides the abstraction of ordered, unreliable,
+///	fixed-size packet delivery to other machines on the network.
+///
+///	You may note that the interface to the network is similar to
+///	the console device -- both are full duplex channels.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef NETWORK_H
 #define NETWORK_H
@@ -18,15 +21,15 @@
 #include "copyright.h"
 #include "utility.h"
 
-// Network address -- uniquely identifies a machine.  This machine's ID 
-//  is given on the command line.
+/// Network address -- uniquely identifies a machine.  This machine's ID
+///  is given on the command line.
 typedef int NetworkAddress;	 
 
-// The following class defines the network packet header.
-// The packet header is prepended to the data payload by the Network driver, 
-// before the packet is sent over the wire.  The format on the wire is:  
-//	packet header (PacketHeader)
-//	data (containing MailHeader from the PostOffice!)
+/// The following class defines the network packet header.
+/// The packet header is prepended to the data payload by the Network driver,
+/// before the packet is sent over the wire.  The format on the wire is:
+///	packet header (PacketHeader)
+///	data (containing MailHeader from the PostOffice!)
 
 class PacketHeader {
   public:

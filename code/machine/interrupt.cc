@@ -1,24 +1,25 @@
-// interrupt.cc 
-//	Routines to simulate hardware interrupts.
-//
-//	The hardware provides a routine (SetLevel) to enable or disable
-//	interrupts.
-//
-//	In order to emulate the hardware, we need to keep track of all
-//	interrupts the hardware devices would cause, and when they
-//	are supposed to occur.  
-//
-//	This module also keeps track of simulated time.  Time advances
-//	only when the following occur: 
-//		interrupts are re-enabled
-//		a user instruction is executed
-//		there is nothing in the ready queue
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file interrupt.cc                                     
+/// @briefDataRoutines to simulate hardware interrupts.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo  
+///
+///	The hardware provides a routine (SetLevel) to enable or disable
+///	interrupts.
+///
+///	In order to emulate the hardware, we need to keep track of all
+///	interrupts the hardware devices would cause, and when they
+///	are supposed to occur.  
+///
+///	This module also keeps track of simulated time.  Time advances
+///	only when the following occur: 
+///		interrupts are re-enabled
+///		a user instruction is executed
+///		there is nothing in the ready queue
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "interrupt.h"
@@ -30,16 +31,16 @@ static const char *intLevelNames[] = { "off", "on"};
 static const char *intTypeNames[] = { "timer", "disk", "console write", 
 			"console read", "network send", "network recv"};
 
-//----------------------------------------------------------------------
-// PendingInterrupt::PendingInterrupt
-// 	Initialize a hardware device interrupt that is to be scheduled 
-//	to occur in the near future.
-//
-//	"func" is the procedure to call when the interrupt occurs
-//	"param" is the argument to pass to the procedure
-//	"time" is when (in simulated time) the interrupt is to occur
-//	"kind" is the hardware device that generated the interrupt
-//----------------------------------------------------------------------
+///
+/// PendingInterrupt::PendingInterrupt
+/// 	Initialize a hardware device interrupt that is to be scheduled
+///	to occur in the near future.
+///
+///	@param "func" is the procedure to call when the interrupt occurs
+///	@param "param" is the argument to pass to the procedure
+///	@param "time" is when (in simulated time) the interrupt is to occur
+///	@param "kind" is the hardware device that generated the interrupt
+///
 
 PendingInterrupt::PendingInterrupt(VoidFunctionPtr func, int param, long long time, 
 				IntType kind)
@@ -50,12 +51,12 @@ PendingInterrupt::PendingInterrupt(VoidFunctionPtr func, int param, long long ti
     type = kind;
 }
 
-//----------------------------------------------------------------------
-// Interrupt::Interrupt
-// 	Initialize the simulation of hardware device interrupts.
-//	
-//	Interrupts start disabled, with no interrupts pending, etc.
-//----------------------------------------------------------------------
+///
+/// Interrupt::Interrupt
+/// 	Initialize the simulation of hardware device interrupts.
+///
+///	Interrupts start disabled, with no interrupts pending, etc.
+///
 
 Interrupt::Interrupt()
 {
@@ -66,10 +67,10 @@ Interrupt::Interrupt()
     status = SystemMode;
 }
 
-//----------------------------------------------------------------------
-// Interrupt::~Interrupt
-// 	De-allocate the data structures needed by the interrupt simulation.
-//----------------------------------------------------------------------
+///
+/// Interrupt::~Interrupt
+/// 	De-allocate the data structures needed by the interrupt simulation.
+///
 
 Interrupt::~Interrupt()
 {
@@ -81,21 +82,21 @@ Interrupt::~Interrupt()
     delete pending;
 }
 
-//----------------------------------------------------------------------
-// Interrupt::ChangeLevel
-// 	Change interrupts to be enabled or disabled, without advancing 
-//	the simulated time (normally, enabling interrupts advances the time).
-
-//----------------------------------------------------------------------
-// Interrupt::ChangeLevel
-// 	Change interrupts to be enabled or disabled, without advancing 
-//	the simulated time (normally, enabling interrupts advances the time).
-//
-//	Used internally.
-//
-//	"old" -- the old interrupt status
-//	"now" -- the new interrupt status
-//----------------------------------------------------------------------
+///
+/// Interrupt::ChangeLevel
+/// 	Change interrupts to be enabled or disabled, without advancing
+///	the simulated time (normally, enabling interrupts advances the time).
+ /
+///
+/// Interrupt::ChangeLevel
+/// 	Change interrupts to be enabled or disabled, without advancing
+///	the simulated time (normally, enabling interrupts advances the time).
+///
+///	Used internally.
+///
+///	@param "old" -- the old interrupt status
+///	@param "now" -- the new interrupt status
+///
 void
 Interrupt::ChangeLevel(IntStatus old, IntStatus now)
 {
@@ -103,16 +104,16 @@ Interrupt::ChangeLevel(IntStatus old, IntStatus now)
     DEBUG('i',"\tinterrupts: %s -> %s\n",intLevelNames[old],intLevelNames[now]);
 }
 
-//----------------------------------------------------------------------
-// Interrupt::SetLevel
-// 	Change interrupts to be enabled or disabled, and if interrupts
-//	are being enabled, advance simulated time by calling OneTick().
-//
-// Returns:
-//	The old interrupt status.
-// Parameters:
-//	"now" -- the new interrupt status
-//----------------------------------------------------------------------
+///
+/// Interrupt::SetLevel
+/// 	Change interrupts to be enabled or disabled, and if interrupts
+///	are being enabled, advance simulated time by calling OneTick().
+///
+/// Returns:
+///	@return The old interrupt status.
+/// Parameters:
+///	@param "now" -- the new interrupt status
+///
 
 IntStatus
 Interrupt::SetLevel(IntStatus now)
@@ -129,27 +130,27 @@ Interrupt::SetLevel(IntStatus now)
     return old;
 }
 
-//----------------------------------------------------------------------
-// Interrupt::Enable
-// 	Turn interrupts on.  Who cares what they used to be? 
-//	Used in ThreadRoot, to turn interrupts on when first starting up
-//	a thread.
-//----------------------------------------------------------------------
+///
+/// Interrupt::Enable
+/// 	Turn interrupts on.  Who cares what they used to be?
+///	Used in ThreadRoot, to turn interrupts on when first starting up
+///	a thread.
+///
 void
 Interrupt::Enable()
 { 
     (void) SetLevel(IntOn); 
 }
 
-//----------------------------------------------------------------------
-// Interrupt::OneTick
-// 	Advance simulated time and check if there are any pending 
-//	interrupts to be called. 
-//
-//	Two things can cause OneTick to be called:
-//		interrupts are re-enabled
-//		a user instruction is executed
-//----------------------------------------------------------------------
+///
+/// Interrupt::OneTick
+/// 	Advance simulated time and check if there are any pending
+///	interrupts to be called.
+///
+///	Two things can cause OneTick to be called:
+///		interrupts are re-enabled
+///		a user instruction is executed
+///
 void
 Interrupt::OneTick()
 {
@@ -181,16 +182,16 @@ Interrupt::OneTick()
     }
 }
 
-//----------------------------------------------------------------------
-// Interrupt::YieldOnReturn
-// 	Called from within an interrupt handler, to cause a context switch
-//	(for example, on a time slice) in the interrupted thread,
-//	when the handler returns.
-//
-//	We can't do the context switch here, because that would switch
-//	out the interrupt handler, and we want to switch out the 
-//	interrupted thread.
-//----------------------------------------------------------------------
+///
+/// Interrupt::YieldOnReturn
+/// 	Called from within an interrupt handler, to cause a context switch
+///	(for example, on a time slice) in the interrupted thread,
+///	when the handler returns.
+///
+///	We can't do the context switch here, because that would switch
+///	out the interrupt handler, and we want to switch out the
+///	interrupted thread.
+///
 
 void
 Interrupt::YieldOnReturn()
@@ -199,17 +200,17 @@ Interrupt::YieldOnReturn()
     yieldOnReturn = TRUE; 
 }
 
-//----------------------------------------------------------------------
-// Interrupt::Idle
-// 	Routine called when there is nothing in the ready queue.
-//
-//	Since something has to be running in order to put a thread
-//	on the ready queue, the only thing to do is to advance 
-//	simulated time until the next scheduled hardware interrupt.
-//
-//	If there are no pending interrupts, stop.  There's nothing
-//	more for us to do.
-//----------------------------------------------------------------------
+///
+/// Interrupt::Idle
+/// 	Routine called when there is nothing in the ready queue.
+///
+///	Since something has to be running in order to put a thread
+///	on the ready queue, the only thing to do is to advance
+///	simulated time until the next scheduled hardware interrupt.
+///
+///	If there are no pending interrupts, stop.  There's nothing
+///	more for us to do.
+///
 void
 Interrupt::Idle()
 {
@@ -236,10 +237,10 @@ Interrupt::Idle()
     Halt();
 }
 
-//----------------------------------------------------------------------
-// Interrupt::Halt
-// 	Shut down Nachos cleanly, printing out performance statistics.
-//----------------------------------------------------------------------
+///
+/// Interrupt::Halt
+/// 	Shut down Nachos cleanly, printing out performance statistics.
+///
 void
 Interrupt::Halt()
 {
@@ -249,22 +250,21 @@ Interrupt::Halt()
     Cleanup();     // Never returns.
 }
 
-//----------------------------------------------------------------------
-// Interrupt::Schedule
-// 	Arrange for the CPU to be interrupted when simulated time
-//	reaches "now + when".
-//
-//	Implementation: just put it on a sorted list.
-//
-//	NOTE: the Nachos kernel should not call this routine directly.
-//	Instead, it is only called by the hardware device simulators.
-//
-//	"handler" is the procedure to call when the interrupt occurs
-//	"arg" is the argument to pass to the procedure
-//	"fromNow" is how far in the future (in simulated time) the 
-//		 interrupt is to occur
-//	"type" is the hardware device that generated the interrupt
-//----------------------------------------------------------------------
+///
+/// Interrupt::Schedule
+/// 	Arrange for the CPU to be interrupted when simulated time
+///	reaches "now + when".
+///
+///	Implementation: just put it on a sorted list.
+///
+///	NOTE: the Nachos kernel should not call this routine directly.
+///	Instead, it is only called by the hardware device simulators.
+///
+///	@param "handler" is the procedure to call when the interrupt occurs
+///	@param "arg" is the argument to pass to the procedure
+///	@param "fromNow" is how far in the future (in simulated time) the interrupt is to occur
+///	@param "type" is the hardware device that generated the interrupt
+///
 void
 Interrupt::Schedule(VoidFunctionPtr handler, int arg, long long fromNow, IntType type)
 {
@@ -278,19 +278,19 @@ Interrupt::Schedule(VoidFunctionPtr handler, int arg, long long fromNow, IntType
     pending->SortedInsert(toOccur, when);
 }
 
-//----------------------------------------------------------------------
-// Interrupt::CheckIfDue
-// 	Check if an interrupt is scheduled to occur, and if so, fire it off.
-//
-// Returns:
-//	TRUE, if we fired off any interrupt handlers
-// Params:
-//	"advanceClock" -- if TRUE, there is nothing in the ready queue,
-//		so we should simply advance the clock to when the next 
-//		pending interrupt would occur (if any).  If the pending
-//		interrupt is just the time-slice daemon, however, then 
-//		we're done!
-//----------------------------------------------------------------------
+///
+/// Interrupt::CheckIfDue
+/// 	Check if an interrupt is scheduled to occur, and if so, fire it off.
+///
+/// Returns:
+///	@return TRUE, if we fired off any interrupt handlers
+/// Params:
+///	@param "advanceClock" -- if TRUE, there is nothing in the ready queue,
+///		so we should simply advance the clock to when the next
+///		pending interrupt would occur (if any).  If the pending
+///		interrupt is just the time-slice daemon, however, then
+///		we're done!
+///
 bool
 Interrupt::CheckIfDue(bool advanceClock)
 {
@@ -338,11 +338,11 @@ Interrupt::CheckIfDue(bool advanceClock)
     return TRUE;
 }
 
-//----------------------------------------------------------------------
-// PrintPending
-// 	Print information about an interrupt that is scheduled to occur.
-//	When, where, why, etc.
-//----------------------------------------------------------------------
+///
+/// PrintPending
+/// 	Print information about an interrupt that is scheduled to occur.
+///	When, where, why, etc.
+///
 
 static void
 PrintPending(int arg)
@@ -353,11 +353,11 @@ PrintPending(int arg)
 	intTypeNames[pend->type], pend->when);
 }
 
-//----------------------------------------------------------------------
-// DumpState
-// 	Print the complete interrupt state - the status, and all interrupts
-//	that are scheduled to occur in the future.
-//----------------------------------------------------------------------
+///
+/// DumpState
+/// 	Print the complete interrupt state - the status, and all interrupts
+///	that are scheduled to occur in the future.
+///
 
 void
 Interrupt::DumpState()

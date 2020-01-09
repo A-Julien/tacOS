@@ -1,23 +1,26 @@
-// stats.h 
-//	Data structures for gathering statistics about Nachos performance.
-//
-// DO NOT CHANGE -- these stats are maintained by the machine emulation
-//
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file stats.h
+/// @brief Implementation of system-dependent interface.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+/// stats.h
+///	Data structures for gathering statistics about Nachos performance.
+///
+/// DO NOT CHANGE -- these stats are maintained by the machine emulation
+///
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef STATS_H
 #define STATS_H
 
 #include "copyright.h"
 
-// The following class defines the statistics that are to be kept
-// about Nachos behavior -- how much time (ticks) elapsed, how
-// many user instructions executed, etc.
-//
-// The fields in this class are public to make it easier to update.
+/// The following class defines the statistics that are to be kept
+/// about Nachos behavior -- how much time (ticks) elapsed, how
+/// many user instructions executed, etc.
+///
+/// The fields in this class are public to make it easier to update.
 
 class Statistics {
   public:

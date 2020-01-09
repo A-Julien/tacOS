@@ -1,16 +1,16 @@
-// directory.h 
-//	Data structures to manage a UNIX-like directory of file names.
-// 
-//      A directory is a table of pairs: <file name, sector #>,
-//	giving the name of each file in the directory, and 
-//	where to find its file header (the data structure describing
-//	where to find the file's data blocks) on disk.
-//
-//      We assume mutual exclusion is provided by the caller.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file  directory.h
+/// @brief Data structures to manage a UNIX-like directory of file names.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///      A directory is a table of pairs: <file name, sector #>,
+///	giving the name of each file in the directory, and
+///	where to find its file header (the data structure describing
+///	where to find the file's data blocks) on disk.
+///
+///      We assume mutual exclusion is provided by the caller.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 
@@ -22,12 +22,12 @@
 #define FileNameMaxLen 		9	// for simplicity, we assume 
 					// file names are <= 9 characters long
 
-// The following class defines a "directory entry", representing a file
-// in the directory.  Each entry gives the name of the file, and where
-// the file's header is to be found on disk.
-//
-// Internal data structures kept public so that Directory operations can
-// access them directly.
+/// The following class defines a "directory entry", representing a file
+/// in the directory.  Each entry gives the name of the file, and where
+/// the file's header is to be found on disk.
+///
+/// Internal data structures kept public so that Directory operations can
+/// access them directly.
 
 class DirectoryEntry {
   public:

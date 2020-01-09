@@ -1,4 +1,9 @@
-/* matmult.c 
+/**
+ * @file  matmult.c
+ * @brief  Data structures to manage LISP-like lists.
+ * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+ *
+ * matmult.c
  *    Test program to do matrix multiplication on large arrays.
  *
  *    Intended to stress virtual memory system.

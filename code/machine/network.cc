@@ -1,28 +1,30 @@
-// network.cc 
-//	Routines to simulate a network interface, using UNIX sockets
-//	to deliver packets between multiple invocations of nachos.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file network.cc
+/// @briefData Routines to simulate a network interface, using UNIX sockets
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///	Routines to simulate a network interface, using UNIX sockets
+///	to deliver packets between multiple invocations of nachos.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "system.h"
 
 #include <strings.h> /* for bzero */
 
-// Dummy functions because C++ can't call member functions indirectly 
+/// Dummy functions because C++ can't call member functions indirectly
 static void NetworkReadPoll(int arg)
 { Network *net = (Network *)arg; net->CheckPktAvail(); }
 static void NetworkSendDone(int arg)
 { Network *net = (Network *)arg; net->SendDone(); }
 
-// Initialize the network emulation
-//   addr is used to generate the socket name
-//   reliability says whether we drop packets to emulate unreliable links
-//   readAvail, writeDone, callArg -- analogous to console
+/// Initialize the network emulation
+///   addr is used to generate the socket name
+///   reliability says whether we drop packets to emulate unreliable links
+///   readAvail, writeDone, callArg -- analogous to console
 Network::Network(NetworkAddress addr, double reliability,
 	VoidFunctionPtr readAvail, VoidFunctionPtr writeDone, int callArg)
 {
@@ -53,9 +55,9 @@ Network::~Network()
     DeAssignNameToSocket(sockName);
 }
 
-// if a packet is already buffered, we simply delay reading 
-// the incoming packet.  In real life, the incoming 
-// packet might be dropped if we can't read it in time.
+/// if a packet is already buffered, we simply delay reading
+/// the incoming packet.  In real life, the incoming
+/// packet might be dropped if we can't read it in time.
 void
 Network::CheckPktAvail()
 {
@@ -85,7 +87,7 @@ Network::CheckPktAvail()
     (*readHandler)(handlerArg);	
 }
 
-// notify user that another packet can be sent
+/// notify user that another packet can be sent
 void
 Network::SendDone()
 {
@@ -94,11 +96,11 @@ Network::SendDone()
     (*writeHandler)(handlerArg);
 }
 
-// send a packet by concatenating hdr and data, and schedule
-// an interrupt to tell the user when the next packet can be sent 
-//
-// Note we always pad out a packet to MaxWireSize before putting it into
-// the socket, because it's simpler at the receive end.
+/// send a packet by concatenating hdr and data, and schedule
+/// an interrupt to tell the user when the next packet can be sent
+///
+/// Note we always pad out a packet to MaxWireSize before putting it into
+/// the socket, because it's simpler at the receive end.
 void
 Network::Send(PacketHeader hdr, char* data)
 {

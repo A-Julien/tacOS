@@ -1,15 +1,18 @@
-// openfile.cc 
-//	Routines to manage an open Nachos file.  As in UNIX, a
-//	file must be open before we can read or write to it.
-//	Once we're all done, we can close it (in Nachos, by deleting
-//	the OpenFile data structure).
-//
-//	Also as in UNIX, for convenience, we keep the file header in
-//	memory while the file is open.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file  openfile.c                                    
+/// @brief Routines to manage an open Nachos file.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo 
+/// openfile.cc 
+///	Routines to manage an open Nachos file.  As in UNIX, a
+///	file must be open before we can read or write to it.
+///	Once we're all done, we can close it (in Nachos, by deleting
+///	the OpenFile data structure).
+///
+///	Also as in UNIX, for convenience, we keep the file header in
+///	memory while the file is open.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "filehdr.h"
@@ -18,13 +21,13 @@
 
 #include <strings.h> /* for bzero */
 
-//----------------------------------------------------------------------
-// OpenFile::OpenFile
-// 	Open a Nachos file for reading and writing.  Bring the file header
-//	into memory while the file is open.
-//
-//	"sector" -- the location on disk of the file header for this file
-//----------------------------------------------------------------------
+///
+/// OpenFile::OpenFile
+/// 	Open a Nachos file for reading and writing.  Bring the file header
+///	into memory while the file is open.
+///
+///	@param "sector" -- the location on disk of the file header for this file
+///
 
 OpenFile::OpenFile(int sector)
 { 
@@ -33,23 +36,23 @@ OpenFile::OpenFile(int sector)
     seekPosition = 0;
 }
 
-//----------------------------------------------------------------------
-// OpenFile::~OpenFile
-// 	Close a Nachos file, de-allocating any in-memory data structures.
-//----------------------------------------------------------------------
+///
+/// OpenFile::~OpenFile
+/// 	Close a Nachos file, de-allocating any in-memory data structures.
+///
 
 OpenFile::~OpenFile()
 {
     delete hdr;
 }
 
-//----------------------------------------------------------------------
-// OpenFile::Seek
-// 	Change the current location within the open file -- the point at
-//	which the next Read or Write will start from.
-//
-//	"position" -- the location within the file for the next Read/Write
-//----------------------------------------------------------------------
+///
+/// OpenFile::Seek
+/// 	Change the current location within the open file -- the point at
+///	which the next Read or Write will start from.
+///
+///	@param "position" -- the location within the file for the next Read/Write
+///
 
 void
 OpenFile::Seek(int position)
@@ -57,18 +60,18 @@ OpenFile::Seek(int position)
     seekPosition = position;
 }	
 
-//----------------------------------------------------------------------
-// OpenFile::Read/Write
-// 	Read/write a portion of a file, starting from seekPosition.
-//	Return the number of bytes actually written or read, and as a
-//	side effect, increment the current position within the file.
-//
-//	Implemented using the more primitive ReadAt/WriteAt.
-//
-//	"into" -- the buffer to contain the data to be read from disk 
-//	"from" -- the buffer containing the data to be written to disk 
-//	"numBytes" -- the number of bytes to transfer
-//----------------------------------------------------------------------
+///
+/// OpenFile::Read/Write
+/// 	Read/write a portion of a file, starting from seekPosition.
+///	Return the number of bytes actually written or read, and as a
+///	side effect, increment the current position within the file.
+///
+///	Implemented using the more primitive ReadAt/WriteAt.
+///
+///	@param "into" -- the buffer to contain the data to be read from disk
+///	@param "from" -- the buffer containing the data to be written to disk
+///	@param "numBytes" -- the number of bytes to transfer
+///
 
 int
 OpenFile::Read(char *into, int numBytes)
@@ -86,31 +89,31 @@ OpenFile::Write(const char *into, int numBytes)
    return result;
 }
 
-//----------------------------------------------------------------------
-// OpenFile::ReadAt/WriteAt
-// 	Read/write a portion of a file, starting at "position".
-//	Return the number of bytes actually written or read, but has
-//	no side effects (except that Write modifies the file, of course).
 //
-//	There is no guarantee the request starts or ends on an even disk sector
-//	boundary; however the disk only knows how to read/write a whole disk
-//	sector at a time.  Thus:
-//
-//	For ReadAt:
-//	   We read in all of the full or partial sectors that are part of the
-//	   request, but we only copy the part we are interested in.
-//	For WriteAt:
-//	   We must first read in any sectors that will be partially written,
-//	   so that we don't overwrite the unmodified portion.  We then copy
-//	   in the data that will be modified, and write back all the full
-//	   or partial sectors that are part of the request.
-//
-//	"into" -- the buffer to contain the data to be read from disk 
-//	"from" -- the buffer containing the data to be written to disk 
-//	"numBytes" -- the number of bytes to transfer
-//	"position" -- the offset within the file of the first byte to be
-//			read/written
-//----------------------------------------------------------------------
+/// OpenFile::ReadAt/WriteAt
+/// 	Read/write a portion of a file, starting at "position".
+///	Return the number of bytes actually written or read, but has
+///	no side effects (except that Write modifies the file, of course).
+///
+///	There is no guarantee the request starts or ends on an even disk sector
+///	boundary; however the disk only knows how to read/write a whole disk
+///	sector at a time.  Thus:
+///
+///	For ReadAt:
+///	   We read in all of the full or partial sectors that are part of the
+///	   request, but we only copy the part we are interested in.
+///	For WriteAt:
+///	   We must first read in any sectors that will be partially written,
+///	   so that we don't overwrite the unmodified portion.  We then copy
+///	   in the data that will be modified, and write back all the full
+///	   or partial sectors that are part of the request.
+///
+///	@param "into" -- the buffer to contain the data to be read from disk
+///	@param "from" -- the buffer containing the data to be written to disk
+///	@param "numBytes" -- the number of bytes to transfer
+///	@param "position" -- the offset within the file of the first byte to be
+///			read/written
+///
 
 int
 OpenFile::ReadAt(char *into, int numBytes, int position)
@@ -184,10 +187,10 @@ OpenFile::WriteAt(const char *from, int numBytes, int position)
     return numBytes;
 }
 
-//----------------------------------------------------------------------
-// OpenFile::Length
-// 	Return the number of bytes in the file.
-//----------------------------------------------------------------------
+///
+/// OpenFile::Length
+/// 	@return Return the number of bytes in the file.
+///
 
 int
 OpenFile::Length() 

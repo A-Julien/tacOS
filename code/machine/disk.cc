@@ -1,17 +1,20 @@
-// disk.cc 
-//	Routines to simulate a physical disk device; reading and writing
-//	to the disk is simulated as reading and writing to a UNIX file.
-//	See disk.h for details about the behavior of disks (and
-//	therefore about the behavior of this simulation).
-//
-//	Disk operations are asynchronous, so we have to invoke an interrupt
-//	handler when the simulated operation completes.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file disk.cc
+/// @briefDataRoutines Routines to simulate a physical disk device
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+/// disk.cc 
+///	Routines to simulate a physical disk device; reading and writing
+///	to the disk is simulated as reading and writing to a UNIX file.
+///	See disk.h for details about the behavior of disks (and
+///	therefore about the behavior of this simulation).
+///
+///	Disk operations are asynchronous, so we have to invoke an interrupt
+///	handler when the simulated operation completes.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "disk.h"
@@ -28,17 +31,17 @@
 // dummy procedure because we can't take a pointer of a member function
 static void DiskDone(int arg) { ((Disk *)arg)->HandleInterrupt(); }
 
-//----------------------------------------------------------------------
-// Disk::Disk()
-// 	Initialize a simulated disk.  Open the UNIX file (creating it
-//	if it doesn't exist), and check the magic number to make sure it's 
-// 	ok to treat it as Nachos disk storage.
-//
-//	"name" -- text name of the file simulating the Nachos disk
-//	"callWhenDone" -- interrupt handler to be called when disk read/write
-//	   request completes
-//	"callArg" -- argument to pass the interrupt handler
-//----------------------------------------------------------------------
+///
+/// Disk::Disk()
+/// 	Initialize a simulated disk.  Open the UNIX file (creating it
+///	if it doesn't exist), and check the magic number to make sure it's
+/// 	ok to treat it as Nachos disk storage.
+///
+///	@param "name" -- text name of the file simulating the Nachos disk
+///	@param "callWhenDone" -- interrupt handler to be called when disk read/write
+///	   request completes
+///	@param "callArg" -- argument to pass the interrupt handler
+///
 
 Disk::Disk(const char* name, VoidFunctionPtr callWhenDone, int callArg)
 {
@@ -67,21 +70,21 @@ Disk::Disk(const char* name, VoidFunctionPtr callWhenDone, int callArg)
     active = FALSE;
 }
 
-//----------------------------------------------------------------------
-// Disk::~Disk()
-// 	Clean up disk simulation, by closing the UNIX file representing the
-//	disk.
-//----------------------------------------------------------------------
+///
+/// Disk::~Disk()
+/// 	Clean up disk simulation, by closing the UNIX file representing the
+///	disk.
+///
 
 Disk::~Disk()
 {
     Close(fileno);
 }
 
-//----------------------------------------------------------------------
-// Disk::PrintSector()
-// 	Dump the data in a disk read/write request, for debugging.
-//----------------------------------------------------------------------
+///
+/// Disk::PrintSector()
+/// 	Dump the data in a disk read/write request, for debugging.
+///
 
 static void
 PrintSector (bool writing, int sector, char *data)
@@ -97,20 +100,20 @@ PrintSector (bool writing, int sector, char *data)
     printf("\n"); 
 }
 
-//----------------------------------------------------------------------
-// Disk::ReadRequest/WriteRequest
-// 	Simulate a request to read/write a single disk sector
-//	   Do the read/write immediately to the UNIX file
-//	   Set up an interrupt handler to be called later,
-//	      that will notify the caller when the simulator says
-//	      the operation has completed.
-//
-//	Note that a disk only allows an entire sector to be read/written,
-//	not part of a sector.
-//
-//	"sectorNumber" -- the disk sector to read/write
-//	"data" -- the bytes to be written, the buffer to hold the incoming bytes
-//----------------------------------------------------------------------
+///
+/// Disk::ReadRequest/WriteRequest
+/// 	Simulate a request to read/write a single disk sector
+///	   Do the read/write immediately to the UNIX file
+///	   Set up an interrupt handler to be called later,
+///	      that will notify the caller when the simulator says
+///	      the operation has completed.
+///
+///	Note that a disk only allows an entire sector to be read/written,
+///	not part of a sector.
+///
+///	@param "sectorNumber" -- the disk sector to read/write
+///	@param "data" -- the bytes to be written, the buffer to hold the incoming bytes
+///
 
 void
 Disk::ReadRequest(int sectorNumber, char* data)
@@ -152,11 +155,11 @@ Disk::WriteRequest(int sectorNumber, char* data)
     interrupt->Schedule(DiskDone, (int) this, ticks, DiskInt);
 }
 
-//----------------------------------------------------------------------
-// Disk::HandleInterrupt()
-// 	Called when it is time to invoke the disk interrupt handler,
-//	to tell the Nachos kernel that the disk request is done.
-//----------------------------------------------------------------------
+///
+/// Disk::HandleInterrupt()
+/// 	Called when it is time to invoke the disk interrupt handler,
+///	to tell the Nachos kernel that the disk request is done.
+///
 
 void
 Disk::HandleInterrupt ()
@@ -165,16 +168,16 @@ Disk::HandleInterrupt ()
     (*handler)(handlerArg);
 }
 
-//----------------------------------------------------------------------
-// Disk::TimeToSeek()
-//	Returns how long it will take to position the disk head over the correct
-//	track on the disk.  Since when we finish seeking, we are likely
-//	to be in the middle of a sector that is rotating past the head,
-//	we also return how long until the head is at the next sector boundary.
-//	
-//   	Disk seeks at one track per SeekTime ticks (cf. stats.h)
-//   	and rotates at one sector per RotationTime ticks
-//----------------------------------------------------------------------
+///
+/// Disk::TimeToSeek()
+///	@return Returns how long it will take to position the disk head over the correct
+///	track on the disk.  Since when we finish seeking, we are likely
+///	to be in the middle of a sector that is rotating past the head,
+///	we also return how long until the head is at the next sector boundary.
+///
+///   	Disk seeks at one track per SeekTime ticks (cf. stats.h)
+///   	and rotates at one sector per RotationTime ticks
+///
 
 int
 Disk::TimeToSeek(int newSector, int *rotation) 
@@ -193,11 +196,11 @@ Disk::TimeToSeek(int newSector, int *rotation)
     return seek;
 }
 
-//----------------------------------------------------------------------
-// Disk::ModuloDiff()
-// 	Return number of sectors of rotational delay between target sector
-//	"to" and current sector position "from"
-//----------------------------------------------------------------------
+///
+/// Disk::ModuloDiff()
+/// @return 	Return number of sectors of rotational delay between target sector
+///	@param "to" and current sector position "from"
+///
 
 int 
 Disk::ModuloDiff(int to, int from)
@@ -208,26 +211,26 @@ Disk::ModuloDiff(int to, int from)
     return ((toOffset - fromOffset) + SectorsPerTrack) % SectorsPerTrack;
 }
 
-//----------------------------------------------------------------------
-// Disk::ComputeLatency()
-// 	Return how long will it take to read/write a disk sector, from
-//	the current position of the disk head.
-//
-//   	Latency = seek time + rotational latency + transfer time
-//   	Disk seeks at one track per SeekTime ticks (cf. stats.h)
-//   	and rotates at one sector per RotationTime ticks
-//
-//   	To find the rotational latency, we first must figure out where the 
-//   	disk head will be after the seek (if any).  We then figure out
-//   	how long it will take to rotate completely past newSector after 
-//	that point.
-//
-//   	The disk also has a "track buffer"; the disk continuously reads
-//   	the contents of the current disk track into the buffer.  This allows 
-//   	read requests to the current track to be satisfied more quickly.
-//   	The contents of the track buffer are discarded after every seek to 
-//   	a new track.
-//----------------------------------------------------------------------
+///
+/// Disk::ComputeLatency()
+/// 	Return how long will it take to read/write a disk sector, from
+///	the current position of the disk head.
+///
+///   	Latency = seek time + rotational latency + transfer time
+///   	Disk seeks at one track per SeekTime ticks (cf. stats.h)
+///   	and rotates at one sector per RotationTime ticks
+///
+///   	To find the rotational latency, we first must figure out where the
+///   	disk head will be after the seek (if any).  We then figure out
+///   	how long it will take to rotate completely past newSector after
+///	that point.
+///
+///   	The disk also has a "track buffer"; the disk continuously reads
+///   	the contents of the current disk track into the buffer.  This allows
+///   	read requests to the current track to be satisfied more quickly.
+///   	The contents of the track buffer are discarded after every seek to
+///   	a new track.
+///
 
 int
 Disk::ComputeLatency(int newSector, bool writing)
@@ -252,11 +255,11 @@ Disk::ComputeLatency(int newSector, bool writing)
     return(seek + rotation + RotationTime);
 }
 
-//----------------------------------------------------------------------
-// Disk::UpdateLast
-//   	Keep track of the most recently requested sector.  So we can know
-//	what is in the track buffer.
-//----------------------------------------------------------------------
+///
+/// Disk::UpdateLast
+///   	Keep track of the most recently requested sector.  So we can know
+///	what is in the track buffer.
+///
 
 void
 Disk::UpdateLast(int newSector)

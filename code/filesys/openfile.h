@@ -1,21 +1,23 @@
-// openfile.h 
-//	Data structures for opening, closing, reading and writing to 
-//	individual files.  The operations supported are similar to
-//	the UNIX ones -- type 'man open' to the UNIX prompt.
-//
-//	There are two implementations.  One is a "STUB" that directly
-//	turns the file operations into the underlying UNIX operations.
-//	(cf. comment in filesys.h).
-//
-//	The other is the "real" implementation, that turns these
-//	operations into read and write disk sector requests. 
-//	In this baseline implementation of the file system, we don't 
-//	worry about concurrent accesses to the file system
-//	by different threads -- this is part of the assignment.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file  openfile.h
+/// @brief 	Data structures for opening, closing, reading and writing
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///	Data structures for opening, closing, reading and writing to
+///	individual files.  The operations supported are similar to
+///	the UNIX ones -- type 'man open' to the UNIX prompt.
+///
+///	There are two implementations.  One is a "STUB" that directly
+///	turns the file operations into the underlying UNIX operations.
+///	(cf. comment in filesys.h).
+///
+///	The other is the "real" implementation, that turns these
+///	operations into read and write disk sector requests.
+///	In this baseline implementation of the file system, we don't
+///	worry about concurrent accesses to the file system
+///	by different threads -- this is part of the assignment.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef OPENFILE_H
 #define OPENFILE_H

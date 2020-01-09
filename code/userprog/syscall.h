@@ -1,19 +1,19 @@
 /**
  * @file syscal.h
- * @brief syscal
- * @author chef
- */
-
-/* syscalls.h
- * 	Nachos system call interface.  These are Nachos kernel operations
+ * @brief This file is included by user programs and by the Nachos kernel.
+ * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+ *
+ *  Nachos system call interface.  These are Nachos kernel operations
  * 	that can be invoked from user programs, by trapping to the kernel
  *	via the "syscall" instruction.
  *
- *	This file is included by user programs and by the Nachos kernel. 
- *
  * Copyright (c) 1992-1993 The Regents of the University of California.
- * All rights reserved.  See copyright.h for copyright notice and limitation 
+ * All rights reserved.  See copyright.h for copyright notice and limitation
  * of liability and disclaimer of warranty provisions.
+ */
+
+/* syscalls.h
+
  */
 
 #ifndef SYSCALLS_H

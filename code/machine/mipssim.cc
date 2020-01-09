@@ -1,14 +1,16 @@
-// mipssim.cc -- simulate a MIPS R2/3000 processor
-//
-//   This code has been adapted from Ousterhout's MIPSSIM package.
-//   Byte ordering is little-endian, so we can be compatible with
-//   DEC RISC systems.
-//
-//   DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file mipssim.cc                                                                
+/// @brief simulate a MIPS R2/3000 processor
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo                           
+///
+///   This code has been adapted from Ousterhout's MIPSSIM package.
+///   Byte ordering is little-endian, so we can be compatible with
+///   DEC RISC systems.
+///
+///   DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 
@@ -18,15 +20,12 @@
 
 static void Mult(int a, int b, bool signedArith, int* hiPtr, int* loPtr);
 
-//----------------------------------------------------------------------
-// Machine::Run
-// 	Simulate the execution of a user-level program on Nachos.
-//	Called by the kernel when the program starts up; never returns.
-//
-//	This routine is re-entrant, in that it can be called multiple
-//	times concurrently -- one for each thread executing user code.
-//----------------------------------------------------------------------
-
+/// Machine::Run
+/// 	Simulate the execution of a user-level program on Nachos.
+///	Called by the kernel when the program starts up; never returns.
+///
+///	This routine is re-entrant, in that it can be called multiple
+///	times concurrently -- one for each thread executing user code
 void
 Machine::Run()
 {
@@ -57,10 +56,10 @@ Machine::Run()
 }
 
 
-//----------------------------------------------------------------------
+//
 // TypeToReg
 // 	Retrieve the register # referred to in an instruction. 
-//----------------------------------------------------------------------
+//
 
 static int 
 TypeToReg(RegType reg, Instruction *instr)
@@ -79,7 +78,7 @@ TypeToReg(RegType reg, Instruction *instr)
     }
 }
 
-//----------------------------------------------------------------------
+//
 // Machine::OneInstruction
 // 	Execute one instruction from a user-level program
 //
@@ -100,7 +99,7 @@ TypeToReg(RegType reg, Instruction *instr)
 //	leaving.  This allows the Nachos kernel to control our behavior
 //	by controlling the contents of memory, the translation table,
 //	and the register set.
-//----------------------------------------------------------------------
+//
 
 void
 Machine::OneInstruction(Instruction *instr)
@@ -620,13 +619,13 @@ Machine::OneInstruction(Instruction *instr)
     registers[NextPCReg] = pcAfter;
 }
 
-//----------------------------------------------------------------------
-// Machine::DelayedLoad
-// 	Simulate effects of a delayed load.
-//
-// 	NOTE -- RaiseException/CheckInterrupts must also call DelayedLoad,
-//	since any delayed load must get applied before we trap to the kernel.
-//----------------------------------------------------------------------
+///
+/// Machine::DelayedLoad
+/// 	Simulate effects of a delayed load.
+///
+/// 	NOTE -- RaiseException/CheckInterrupts must also call DelayedLoad,
+///	since any delayed load must get applied before we trap to the kernel.
+///
 
 void
 Machine::DelayedLoad(int nextReg, int nextValue)
@@ -637,10 +636,10 @@ Machine::DelayedLoad(int nextReg, int nextValue)
     registers[0] = 0; 	// and always make sure R0 stays zero.
 }
 
-//----------------------------------------------------------------------
-// Instruction::Decode
-// 	Decode a MIPS instruction 
-//----------------------------------------------------------------------
+///
+/// Instruction::Decode
+/// 	Decode a MIPS instruction
+///
 
 void
 Instruction::Decode()
@@ -681,12 +680,12 @@ Instruction::Decode()
     }
 }
 
-//----------------------------------------------------------------------
-// Mult
-// 	Simulate R2000 multiplication.
-// 	The words at *hiPtr and *loPtr are overwritten with the
-// 	double-length result of the multiplication.
-//----------------------------------------------------------------------
+///
+/// Mult
+/// 	Simulate R2000 multiplication.
+/// 	The words at *hiPtr and *loPtr are overwritten with the
+/// 	double-length result of the multiplication.
+///
 
 static void
 Mult(int a, int b, bool signedArith, int* hiPtr, int* loPtr)

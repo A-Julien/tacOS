@@ -1,42 +1,43 @@
-// translate.cc 
-//	Routines to translate virtual addresses to physical addresses.
-//	Software sets up a table of legal translations.  We look up
-//	in the table on every memory reference to find the true physical
-//	memory location.
-//
-// Two types of translation are supported here.
-//
-//	Linear page table -- the virtual page # is used as an index
-//	into the table, to find the physical page #.
-//
-//	Translation lookaside buffer -- associative lookup in the table
-//	to find an entry with the same virtual page #.  If found,
-//	this entry is used for the translation.
-//	If not, it traps to software with an exception. 
-//
-//	In practice, the TLB is much smaller than the amount of physical
-//	memory (16 entries is common on a machine that has 1000's of
-//	pages).  Thus, there must also be a backup translation scheme
-//	(such as page tables), but the hardware doesn't need to know
-//	anything at all about that.
-//
-//	Note that the contents of the TLB are specific to an address space.
-//	If the address space changes, so does the contents of the TLB!
-//
-// DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file translate.c                                       
+/// @brief  Routines to translate virtual addresses to physical addresses.    
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///	Software sets up a table of legal translations.  We look up
+///	in the table on every memory reference to find the true physical
+///	memory location.
+///
+/// Two types of translation are supported here.
+///
+///	Linear page table -- the virtual page # is used as an index
+///	into the table, to find the physical page #.
+///
+///	Translation lookaside buffer -- associative lookup in the table
+///	to find an entry with the same virtual page #.  If found,
+///	this entry is used for the translation.
+///	If not, it traps to software with an exception. 
+///
+///	In practice, the TLB is much smaller than the amount of physical
+///	memory (16 entries is common on a machine that has 1000's of
+///	pages).  Thus, there must also be a backup translation scheme
+///	(such as page tables), but the hardware doesn't need to know
+///	anything at all about that.
+///
+///	Note that the contents of the TLB are specific to an address space.
+///	If the address space changes, so does the contents of the TLB!
+///
+/// DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "machine.h"
 #include "addrspace.h"
 #include "system.h"
 
-// Routines for converting Words and Short Words to and from the
-// simulated machine's format of little endian.  These end up
-// being NOPs when the host machine is also little endian (DEC and Intel).
+/// Routines for converting Words and Short Words to and from the
+/// simulated machine's format of little endian.  These end up
+/// being NOPs when the host machine is also little endian (DEC and Intel).
 
 unsigned int
 WordToHost(unsigned int word) {
@@ -71,18 +72,18 @@ unsigned short
 ShortToMachine(unsigned short shortword) { return ShortToHost(shortword); }
 
 
-//----------------------------------------------------------------------
-// Machine::ReadMem
-//      Read "size" (1, 2, or 4) bytes of virtual memory at "addr" into 
-//	the location pointed to by "value".
-//
-//   	Returns FALSE if the translation step from virtual to physical memory
-//   	failed.
-//
-//	"addr" -- the virtual address to read from
-//	"size" -- the number of bytes to read (1, 2, or 4)
-//	"value" -- the place to write the result
-//----------------------------------------------------------------------
+///
+/// Machine::ReadMem
+///      Read "size" (1, 2, or 4) bytes of virtual memory at "addr" into
+///	the location pointed to by "value".
+///
+///   	@return Returns FALSE if the translation step from virtual to physical memory
+///   	failed.
+///
+///	@param "addr" -- the virtual address to read from
+///	@param "size" -- the number of bytes to read (1, 2, or 4)
+///	@param "value" -- the place to write the result
+///
 
 bool
 Machine::ReadMem(int addr, int size, int *value)
@@ -121,18 +122,18 @@ Machine::ReadMem(int addr, int size, int *value)
     return (TRUE);
 }
 
-//----------------------------------------------------------------------
-// Machine::WriteMem
-//      Write "size" (1, 2, or 4) bytes of the contents of "value" into
-//	virtual memory at location "addr".
-//
-//   	Returns FALSE if the translation step from virtual to physical memory
-//   	failed.
-//
-//	"addr" -- the virtual address to write to
-//	"size" -- the number of bytes to be written (1, 2, or 4)
-//	"value" -- the data to be written
-//----------------------------------------------------------------------
+///
+/// Machine::WriteMem
+///      Write "size" (1, 2, or 4) bytes of the contents of "value" into
+///	virtual memory at location "addr".
+///
+///   	@return Returns FALSE if the translation step from virtual to physical memory
+///   	failed.
+///
+///	@param "addr" -- the virtual address to write to
+///	@param "size" -- the number of bytes to be written (1, 2, or 4)
+///	@param "value" -- the data to be written
+///
 
 bool
 Machine::WriteMem(int addr, int size, int value)
@@ -168,20 +169,20 @@ Machine::WriteMem(int addr, int size, int value)
     return TRUE;
 }
 
-//----------------------------------------------------------------------
-// Machine::Translate
-// 	Translate a virtual address into a physical address, using 
-//	either a page table or a TLB.  Check for alignment and all sorts 
-//	of other errors, and if everything is ok, set the use/dirty bits in 
-//	the translation table entry, and store the translated physical 
-//	address in "physAddr".  If there was an error, returns the type
-//	of the exception.
-//
-//	"virtAddr" -- the virtual address to translate
-//	"physAddr" -- the place to store the physical address
-//	"size" -- the amount of memory being read or written
-// 	"writing" -- if TRUE, check the "read-only" bit in the TLB
-//----------------------------------------------------------------------
+///
+/// Machine::Translate
+/// 	Translate a virtual address into a physical address, using
+///	either a page table or a TLB.  Check for alignment and all sorts
+///	of other errors, and if everything is ok, set the use/dirty bits in
+///	the translation table entry, and store the translated physical
+///	address in "physAddr".  If there was an error, returns the type
+///	of the exception.
+///
+///	@param "virtAddr" -- the virtual address to translate
+///	@param "physAddr" -- the place to store the physical address
+///	@param "size" -- the amount of memory being read or written
+/// @param 	"writing" -- if TRUE, check the "read-only" bit in the TLB
+///
 
 ExceptionType
 Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)

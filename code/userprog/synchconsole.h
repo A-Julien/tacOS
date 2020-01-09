@@ -1,8 +1,10 @@
 /**
  * @file synchconsole.h
- * @brief synchconsole
- * @author chef
+ * @brief
+ * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+ *
  */
+
 #ifndef SYNCHCONSOLE_H
 #define SYNCHCONSOLE_H
 

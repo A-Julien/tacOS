@@ -1,12 +1,15 @@
-// synchlist.h 
-//      Data structures for synchronized access to a list.
-//
-//      Implemented by surrounding the List abstraction
-//      with synchronization routines.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file synchlist.h
+/// @brief  Data structures for synchronized access to a list.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///
+///      Data structures for synchronized access to a list.
+///
+///      Implemented by surrounding the List abstraction
+///      with synchronization routines.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #ifndef SYNCHLIST_H
 #define SYNCHLIST_H
@@ -15,11 +18,11 @@
 #include "list.h"
 #include "synch.h"
 
-// The following class defines a "synchronized list" -- a list for which:
-// these constraints hold:
-//      1. Threads trying to remove an item from a list will
-//      wait until the list has an element on it.
-//      2. One thread at a time can access list data structures
+/// The following class defines a "synchronized list" -- a list for which:
+/// these constraints hold:
+///      1. Threads trying to remove an item from a list will
+///      wait until the list has an element on it.
+///      2. One thread at a time can access list data structures
 
 class SynchList
 {

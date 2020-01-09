@@ -1,27 +1,29 @@
-// post.h 
-//	Data structures for providing the abstraction of unreliable,
-//	ordered, fixed-size message delivery to mailboxes on other 
-//	(directly connected) machines.  Messages can be dropped by
-//	the network, but they are never corrupted.
-//
-// 	The US Post Office delivers mail to the addressed mailbox. 
-// 	By analogy, our post office delivers packets to a specific buffer 
-// 	(MailBox), based on the mailbox number stored in the packet header.
-// 	Mail waits in the box until a thread asks for it; if the mailbox
-//      is empty, threads can wait for mail to arrive in it. 
-//
-// 	Thus, the service our post office provides is to de-multiplex 
-// 	incoming packets, delivering them to the appropriate thread.
-//
-//      With each message, you get a return address, which consists of a "from
-// 	address", which is the id of the machine that sent the message, and
-// 	a "from box", which is the number of a mailbox on the sending machine 
-//	to which you can send an acknowledgement, if your protocol requires 
-//	this.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file post.h
+/// @brief  Data structures
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///	Data structures for providing the abstraction of unreliable,
+///	ordered, fixed-size message delivery to mailboxes on other
+///	(directly connected) machines.  Messages can be dropped by
+///	the network, but they are never corrupted.
+///
+/// 	The US Post Office delivers mail to the addressed mailbox.
+/// 	By analogy, our post office delivers packets to a specific buffer
+/// 	(MailBox), based on the mailbox number stored in the packet header.
+/// 	Mail waits in the box until a thread asks for it; if the mailbox
+///      is empty, threads can wait for mail to arrive in it.
+///
+/// 	Thus, the service our post office provides is to de-multiplex
+/// 	incoming packets, delivering them to the appropriate thread.
+///
+///      With each message, you get a return address, which consists of a "from
+/// 	address", which is the id of the machine that sent the message, and
+/// 	a "from box", which is the number of a mailbox on the sending machine
+///	to which you can send an acknowledgement, if your protocol requires
+///	this.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 
@@ -31,13 +33,13 @@
 #include "network.h"
 #include "synchlist.h"
 
-// Mailbox address -- uniquely identifies a mailbox on a given machine.
-// A mailbox is just a place for temporary storage for messages.
+/// Mailbox address -- uniquely identifies a mailbox on a given machine.
+/// A mailbox is just a place for temporary storage for messages.
 typedef int MailBoxAddress;
 
-// The following class defines part of the message header.  
-// This is prepended to the message by the PostOffice, before the message 
-// is sent to the Network.
+/// The following class defines part of the message header.
+/// This is prepended to the message by the PostOffice, before the message
+/// is sent to the Network.
 
 class MailHeader {
   public:

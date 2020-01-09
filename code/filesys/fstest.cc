@@ -1,16 +1,18 @@
-// fstest.cc 
-//	Simple test routines for the file system.  
-//
-//	We implement:
-//	   Copy -- copy a file from UNIX to Nachos
-//	   Print -- cat the contents of a Nachos file 
-//	   Perftest -- a stress test for the Nachos file system
-//		read and write a really large file in tiny chunks
-//		(won't work on baseline system!)
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file  fstest.cc                                   
+/// @brief Routines to manage an open Nachos file.       
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo 
+///	Simple test routines for the file system.  
+///
+///	We implement:
+///	   Copy -- copy a file from UNIX to Nachos
+///	   Print -- cat the contents of a Nachos file 
+///	   Perftest -- a stress test for the Nachos file system
+///		read and write a really large file in tiny chunks
+///		(won't work on baseline system!)
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 
@@ -23,10 +25,10 @@
 
 #define TransferSize 	10 	// make it small, just to be difficult
 
-//----------------------------------------------------------------------
-// Copy
-// 	Copy the contents of the UNIX file "from" to the Nachos file "to"
-//----------------------------------------------------------------------
+///
+/// Copy
+/// 	Copy the contents of the UNIX file "from" to the Nachos file "to"
+///
 
 void
 Copy(const char *from, const char *to)
@@ -69,10 +71,10 @@ Copy(const char *from, const char *to)
     fclose(fp);
 }
 
-//----------------------------------------------------------------------
-// Print
-// 	Print the contents of the Nachos file "name".
-//----------------------------------------------------------------------
+///
+/// Print
+/// 	Print the contents of the Nachos file "name".
+///
 
 void
 Print(char *name)
@@ -96,17 +98,17 @@ Print(char *name)
     return;
 }
 
-//----------------------------------------------------------------------
-// PerformanceTest
-// 	Stress the Nachos file system by creating a large file, writing
-//	it out a bit at a time, reading it back a bit at a time, and then
-//	deleting the file.
-//
-//	Implemented as three separate routines:
-//	  FileWrite -- write the file
-//	  FileRead -- read the file
-//	  PerformanceTest -- overall control, and print out performance #'s
-//----------------------------------------------------------------------
+///
+/// PerformanceTest
+/// 	Stress the Nachos file system by creating a large file, writing
+///	it out a bit at a time, reading it back a bit at a time, and then
+///	deleting the file.
+///
+///	Implemented as three separate routines:
+///	  FileWrite -- write the file
+///	  FileRead -- read the file
+///	  PerformanceTest -- overall control, and print out performance #'s
+///
 
 #define FileName 	"TestFile"
 #define Contents 	"1234567890"

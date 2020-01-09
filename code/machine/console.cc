@@ -1,17 +1,20 @@
-// console.cc 
-//	Routines to simulate a serial port to a console device.
-//	A console has input (a keyboard) and output (a display).
-//	These are each simulated by operations on UNIX files.
-//	The simulated device is asynchronous,
-//	so we have to invoke the interrupt handler (after a simulated
-//	delay), to signal that a byte has arrived and/or that a written
-//	byte has departed.
-//
-//  DO NOT CHANGE -- part of the machine emulation
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file console.cc                                         
+/// @briefDataRoutines Routines to simulate a serial port to a console device.
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo    
+/// console.cc 
+///	Routines to simulate a serial port to a console device.
+///	A console has input (a keyboard) and output (a display).
+///	These are each simulated by operations on UNIX files.
+///	The simulated device is asynchronous,
+///	so we have to invoke the interrupt handler (after a simulated
+///	delay), to signal that a byte has arrived and/or that a written
+///	byte has departed.
+///
+///  DO NOT CHANGE -- part of the machine emulation
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "console.h"
@@ -23,18 +26,17 @@ static void ConsoleReadPoll(int c)
 static void ConsoleWriteDone(int c)
 { Console *console = (Console *)c; console->WriteDone(); }
 
-//----------------------------------------------------------------------
-// Console::Console
-// 	Initialize the simulation of a hardware console device.
-//
-//	"readFile" -- UNIX file simulating the keyboard (NULL -> use stdin)
-//	"writeFile" -- UNIX file simulating the display (NULL -> use stdout)
-// 	"readAvail" is the interrupt handler called when a character arrives
-//		from the keyboard
-// 	"writeDone" is the interrupt handler called when a character has
-//		been output, so that it is ok to request the next char be
-//		output
-//----------------------------------------------------------------------
+///
+/// Console::Console
+/// 	Initialize the simulation of a hardware console device.
+///
+///	@param "readFile" -- UNIX file simulating the keyboard (NULL -> use stdin)
+///	@param "writeFile" -- UNIX file simulating the display (NULL -> use stdout)
+/// @param 	"readAvail" is the interrupt handler called when a character arrives from the keyboard
+/// 	@param "writeDone" is the interrupt handler called when a character has
+///		been output, so that it is ok to request the next char be
+///		output
+///
 
 Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail, 
 		VoidFunctionPtr writeDone, int callArg)
@@ -59,10 +61,10 @@ Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail,
     interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
 }
 
-//----------------------------------------------------------------------
-// Console::~Console
-// 	Clean up console emulation
-//----------------------------------------------------------------------
+///
+/// Console::~Console
+/// 	Clean up console emulation
+///
 
 Console::~Console()
 {
@@ -72,16 +74,16 @@ Console::~Console()
 	Close(writeFileNo);
 }
 
-//----------------------------------------------------------------------
-// Console::CheckCharAvail()
-// 	Periodically called to check if a character is available for
-//	input from the simulated keyboard (eg, has it been typed?).
-//
-//	Only read it in if there is buffer space for it (if the previous
-//	character has been grabbed out of the buffer by the Nachos kernel).
-//	Invoke the "read" interrupt handler, once the character has been 
-//	put into the buffer. 
-//----------------------------------------------------------------------
+///
+/// Console::CheckCharAvail()
+/// 	Periodically called to check if a character is available for
+///	input from the simulated keyboard (eg, has it been typed?).
+///
+///	Only read it in if there is buffer space for it (if the previous
+///	character has been grabbed out of the buffer by the Nachos kernel).
+///	Invoke the "read" interrupt handler, once the character has been
+///	put into the buffer.
+///
 
 void
 Console::CheckCharAvail()
@@ -104,12 +106,12 @@ Console::CheckCharAvail()
     (*readHandler)(handlerArg);	
 }
 
-//----------------------------------------------------------------------
-// Console::WriteDone()
-// 	Internal routine called when it is time to invoke the interrupt
-//	handler to tell the Nachos kernel that the output character has
-//	completed.
-//----------------------------------------------------------------------
+///
+/// Console::WriteDone()
+/// 	Internal routine called when it is time to invoke the interrupt
+///	handler to tell the Nachos kernel that the output character has
+///	completed.
+///
 
 void
 Console::WriteDone()
@@ -119,11 +121,11 @@ Console::WriteDone()
     (*writeHandler)(handlerArg);
 }
 
-//----------------------------------------------------------------------
-// Console::GetChar()
-// 	Read a character from the input buffer, if there is any there.
-//	Either return the character, or EOF if none buffered.
-//----------------------------------------------------------------------
+///
+/// Console::GetChar()
+/// 	Read a character from the input buffer, if there is any there.
+///	Either return the character, or EOF if none buffered.
+///
 
 char
 Console::GetChar()
@@ -134,11 +136,11 @@ Console::GetChar()
    return ch;
 }
 
-//----------------------------------------------------------------------
-// Console::PutChar()
-// 	Write a character to the simulated display, schedule an interrupt 
-//	to occur in the future, and return.
-//----------------------------------------------------------------------
+///
+/// Console::PutChar()
+/// 	Write a character to the simulated display, schedule an interrupt
+///	to occur in the future, and return.
+///
 
 void
 Console::PutChar(char ch)

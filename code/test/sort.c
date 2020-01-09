@@ -1,4 +1,5 @@
-/* sort.c 
+/**
+ * @file sort.c
  *    Test program to sort a large number of integers.
  *
  *    Intention is to stress virtual memory system.

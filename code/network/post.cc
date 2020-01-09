@@ -1,19 +1,21 @@
-// post.cc 
-// 	Routines to deliver incoming network messages to the correct
-//	"address" -- a mailbox, or a holding area for incoming messages.
-//	This module operates just like the US postal service (in other
-//	words, it works, but it's slow, and you can't really be sure if
-//	your mail really got through!).
-//
-//	Note that once we prepend the MailHdr to the outgoing message data,
-//	the combination (MailHdr plus data) looks like "data" to the Network 
-//	device.
-//
-// 	The implementation synchronizes incoming messages with threads
-//	waiting for those messages.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// @file post.cc                                              
+/// @brief  Routines to deliver incoming network                                   
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo      
+/// 	Routines to deliver incoming network messages to the correct
+///	"address" -- a mailbox, or a holding area for incoming messages.
+///	This module operates just like the US postal service (in other
+///	words, it works, but it's slow, and you can't really be sure if
+///	your mail really got through!).
+///
+///	Note that once we prepend the MailHdr to the outgoing message data,
+///	the combination (MailHdr plus data) looks like "data" to the Network 
+///	device.
+///
+/// 	The implementation synchronizes incoming messages with threads
+///	waiting for those messages.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -21,15 +23,15 @@
 
 #include <strings.h> /* for bzero */
 
-//----------------------------------------------------------------------
-// Mail::Mail
-//      Initialize a single mail message, by concatenating the headers to
-//	the data.
-//
-//	"pktH" -- source, destination machine ID's
-//	"mailH" -- source, destination mailbox ID's
-//	"data" -- payload data
-//----------------------------------------------------------------------
+///
+/// Mail::Mail
+///      Initialize a single mail message, by concatenating the headers to
+///	the data.
+///
+///	@param "pktH" -- source, destination machine ID's
+///	@param "mailH" -- source, destination mailbox ID's
+///	@param "data" -- payload data
+///
 
 Mail::Mail(PacketHeader pktH, MailHeader mailH, char *msgData)
 {
@@ -40,13 +42,13 @@ Mail::Mail(PacketHeader pktH, MailHeader mailH, char *msgData)
     bcopy(msgData, data, mailHdr.length);
 }
 
-//----------------------------------------------------------------------
-// MailBox::MailBox
-//      Initialize a single mail box within the post office, so that it
-//	can receive incoming messages.
-//
-//	Just initialize a list of messages, representing the mailbox.
-//----------------------------------------------------------------------
+///
+/// MailBox::MailBox
+///      Initialize a single mail box within the post office, so that it
+///	can receive incoming messages.
+///
+///	Just initialize a list of messages, representing the mailbox.
+///
 
 
 MailBox::MailBox()
@@ -54,27 +56,27 @@ MailBox::MailBox()
     messages = new SynchList(); 
 }
 
-//----------------------------------------------------------------------
-// MailBox::~MailBox
-//      De-allocate a single mail box within the post office.
-//
-//	Just delete the mailbox, and throw away all the queued messages 
-//	in the mailbox.
-//----------------------------------------------------------------------
+///
+/// MailBox::~MailBox
+///      De-allocate a single mail box within the post office.
+///
+///	Just delete the mailbox, and throw away all the queued messages
+///	in the mailbox.
+///
 
 MailBox::~MailBox()
 { 
     delete messages; 
 }
 
-//----------------------------------------------------------------------
-// PrintHeader
-// 	Print the message header -- the destination machine ID and mailbox
-//	#, source machine ID and mailbox #, and message length.
-//
-//	"pktHdr" -- source, destination machine ID's
-//	"mailHdr" -- source, destination mailbox ID's
-//----------------------------------------------------------------------
+///
+/// PrintHeader
+/// 	Print the message header -- the destination machine ID and mailbox
+///	#, source machine ID and mailbox #, and message length.
+///
+///	@param "pktHdr" -- source, destination machine ID's
+///	@param "mailHdr" -- source, destination mailbox ID's
+///
 
 static void 
 PrintHeader(PacketHeader pktHdr, MailHeader mailHdr)
@@ -83,18 +85,18 @@ PrintHeader(PacketHeader pktHdr, MailHeader mailHdr)
     	    pktHdr.from, mailHdr.from, pktHdr.to, mailHdr.to, mailHdr.length);
 }
 
-//----------------------------------------------------------------------
-// MailBox::Put
-// 	Add a message to the mailbox.  If anyone is waiting for message
-//	arrival, wake them up!
-//
-//	We need to reconstruct the Mail message (by concatenating the headers
-//	to the data), to simplify queueing the message on the SynchList.
-//
-//	"pktHdr" -- source, destination machine ID's
-//	"mailHdr" -- source, destination mailbox ID's
-//	"data" -- payload message data
-//----------------------------------------------------------------------
+///
+/// MailBox::Put
+/// 	Add a message to the mailbox.  If anyone is waiting for message
+///	arrival, wake them up!
+///
+///	We need to reconstruct the Mail message (by concatenating the headers
+///	to the data), to simplify queueing the message on the SynchList.
+///
+///	@param "pktHdr" -- source, destination machine ID's
+///	@param "mailHdr" -- source, destination mailbox ID's
+///	@param "data" -- payload message data
+///
 
 void 
 MailBox::Put(PacketHeader pktHdr, MailHeader mailHdr, char *data)
@@ -106,17 +108,17 @@ MailBox::Put(PacketHeader pktHdr, MailHeader mailHdr, char *data)
 					// any waiters
 }
 
-//----------------------------------------------------------------------
-// MailBox::Get
-// 	Get a message from a mailbox, parsing it into the packet header,
-//	mailbox header, and data. 
-//
-//	The calling thread waits if there are no messages in the mailbox.
-//
-//	"pktHdr" -- address to put: source, destination machine ID's
-//	"mailHdr" -- address to put: source, destination mailbox ID's
-//	"data" -- address to put: payload message data
-//----------------------------------------------------------------------
+///
+/// MailBox::Get
+/// 	Get a message from a mailbox, parsing it into the packet header,
+///	mailbox header, and data.
+///
+///	The calling thread waits if there are no messages in the mailbox.
+///
+///	@param "pktHdr" -- address to put: source, destination machine ID's
+///	@param "mailHdr" -- address to put: source, destination mailbox ID's
+///	@param "data" -- address to put: payload message data
+///
 
 void 
 MailBox::Get(PacketHeader *pktHdr, MailHeader *mailHdr, char *data) 
@@ -138,14 +140,14 @@ MailBox::Get(PacketHeader *pktHdr, MailHeader *mailHdr, char *data)
 					// need, we can now discard the message
 }
 
-//----------------------------------------------------------------------
+//
 // PostalHelper, ReadAvail, WriteDone
 // 	Dummy functions because C++ can't indirectly invoke member functions
 //	The first is forked as part of the "postal worker thread; the
 //	later two are called by the network interrupt handler.
 //
 //	"arg" -- pointer to the Post Office managing the Network
-//----------------------------------------------------------------------
+//
 
 static void PostalHelper(int arg)
 { PostOffice* po = (PostOffice *) arg; po->PostalDelivery(); }
@@ -154,24 +156,24 @@ static void ReadAvail(int arg)
 static void WriteDone(int arg)
 { PostOffice* po = (PostOffice *) arg; po->PacketSent(); }
 
-//----------------------------------------------------------------------
-// PostOffice::PostOffice
-// 	Initialize a post office as a collection of mailboxes.
-//	Also initialize the network device, to allow post offices
-//	on different machines to deliver messages to one another.
-//
-//      We use a separate thread "the postal worker" to wait for messages 
-//	to arrive, and deliver them to the correct mailbox.  Note that
-//	delivering messages to the mailboxes can't be done directly
-//	by the interrupt handlers, because it requires a Lock.
-//
-//	"addr" is this machine's network ID 
-//	"reliability" is the probability that a network packet will
-//	  be delivered (e.g., reliability = 1 means the network never
-//	  drops any packets; reliability = 0 means the network never
-//	  delivers any packets)
-//	"nBoxes" is the number of mail boxes in this Post Office
-//----------------------------------------------------------------------
+///
+/// PostOffice::PostOffice
+/// 	Initialize a post office as a collection of mailboxes.
+///	Also initialize the network device, to allow post offices
+///	on different machines to deliver messages to one another.
+///
+///      We use a separate thread "the postal worker" to wait for messages
+///	to arrive, and deliver them to the correct mailbox.  Note that
+///	delivering messages to the mailboxes can't be done directly
+///	by the interrupt handlers, because it requires a Lock.
+///
+///	@param "addr" is this machine's network ID
+///	@param "reliability" is the probability that a network packet will
+///	  be delivered (e.g., reliability = 1 means the network never
+///	  drops any packets; reliability = 0 means the network never
+///	  delivers any packets)
+///	@param "nBoxes" is the number of mail boxes in this Post Office
+///
 
 PostOffice::PostOffice(NetworkAddress addr, double reliability, int nBoxes)
 {
@@ -196,10 +198,10 @@ PostOffice::PostOffice(NetworkAddress addr, double reliability, int nBoxes)
     t->Fork(PostalHelper, (int) this);
 }
 
-//----------------------------------------------------------------------
-// PostOffice::~PostOffice
-// 	De-allocate the post office data structures.
-//----------------------------------------------------------------------
+///
+/// PostOffice::~PostOffice
+/// 	De-allocate the post office data structures.
+///
 
 PostOffice::~PostOffice()
 {
@@ -210,13 +212,13 @@ PostOffice::~PostOffice()
     delete sendLock;
 }
 
-//----------------------------------------------------------------------
-// PostOffice::PostalDelivery
-// 	Wait for incoming messages, and put them in the right mailbox.
-//
-//      Incoming messages have had the PacketHeader stripped off,
-//	but the MailHeader is still tacked on the front of the data.
-//----------------------------------------------------------------------
+///
+/// PostOffice::PostalDelivery
+/// 	Wait for incoming messages, and put them in the right mailbox.
+///
+///      Incoming messages have had the PacketHeader stripped off,
+///	but the MailHeader is still tacked on the front of the data.
+///
 
 void
 PostOffice::PostalDelivery()
@@ -245,18 +247,18 @@ PostOffice::PostalDelivery()
     }
 }
 
-//----------------------------------------------------------------------
-// PostOffice::Send
-// 	Concatenate the MailHeader to the front of the data, and pass 
-//	the result to the Network for delivery to the destination machine.
-//
-//	Note that the MailHeader + data looks just like normal payload
-//	data to the Network.
-//
-//	"pktHdr" -- source, destination machine ID's
-//	"mailHdr" -- source, destination mailbox ID's
-//	"data" -- payload message data
-//----------------------------------------------------------------------
+///
+/// PostOffice::Send
+/// 	Concatenate the MailHeader to the front of the data, and pass
+///	the result to the Network for delivery to the destination machine.
+///
+///	Note that the MailHeader + data looks just like normal payload
+///	data to the Network.
+///
+///	@param "pktHdr" -- source, destination machine ID's
+///	@param "mailHdr" -- source, destination mailbox ID's
+///	@param "data" -- payload message data
+///
 
 void
 PostOffice::Send(PacketHeader pktHdr, MailHeader mailHdr, const char* data)
@@ -290,20 +292,20 @@ PostOffice::Send(PacketHeader pktHdr, MailHeader mailHdr, const char* data)
 					// we can delete our buffer
 }
 
-//----------------------------------------------------------------------
-// PostOffice::Send
-// 	Retrieve a message from a specific box if one is available, 
-//	otherwise wait for a message to arrive in the box.
-//
-//	Note that the MailHeader + data looks just like normal payload
-//	data to the Network.
-//
-//
-//	"box" -- mailbox ID in which to look for message
-//	"pktHdr" -- address to put: source, destination machine ID's
-//	"mailHdr" -- address to put: source, destination mailbox ID's
-//	"data" -- address to put: payload message data
-//----------------------------------------------------------------------
+///
+/// PostOffice::Send
+/// 	Retrieve a message from a specific box if one is available,
+///	otherwise wait for a message to arrive in the box.
+///
+///	Note that the MailHeader + data looks just like normal payload
+///	data to the Network.
+///
+///
+///	@param "box" -- mailbox ID in which to look for message
+///	@param "pktHdr" -- address to put: source, destination machine ID's
+///	@param "mailHdr" -- address to put: source, destination mailbox ID's
+///	@param "data" -- address to put: payload message data
+///
 
 void
 PostOffice::Receive(int box, PacketHeader *pktHdr, 
@@ -315,12 +317,12 @@ PostOffice::Receive(int box, PacketHeader *pktHdr,
     ASSERT(mailHdr->length <= MaxMailSize);
 }
 
-//----------------------------------------------------------------------
-// PostOffice::IncomingPacket
-// 	Interrupt handler, called when a packet arrives from the network.
-//
-//	Signal the PostalDelivery routine that it is time to get to work!
-//----------------------------------------------------------------------
+///
+/// PostOffice::IncomingPacket
+/// 	Interrupt handler, called when a packet arrives from the network.
+///
+///	Signal the PostalDelivery routine that it is time to get to work!
+
 
 void
 PostOffice::IncomingPacket()
@@ -328,15 +330,15 @@ PostOffice::IncomingPacket()
     messageAvailable->V(); 
 }
 
-//----------------------------------------------------------------------
-// PostOffice::PacketSent
-// 	Interrupt handler, called when the next packet can be put onto the 
-//	network.
-//
-//	The name of this routine is a misnomer; if "reliability < 1",
-//	the packet could have been dropped by the network, so it won't get
-//	through.
-//----------------------------------------------------------------------
+///
+/// PostOffice::PacketSent
+/// 	Interrupt handler, called when the next packet can be put onto the
+///	network.
+///
+///	The name of this routine is a misnomer; if "reliability < 1",
+///	the packet could have been dropped by the network, so it won't get
+///	through.
+///
 
 void 
 PostOffice::PacketSent()

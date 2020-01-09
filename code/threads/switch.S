@@ -1,4 +1,4 @@
-/* switch.s 
+/** @file  switch.s
  *   	Machine dependent context switch routines.  DO NOT MODIFY THESE! 
  *
  *	Context switching is inherently machine dependent, since

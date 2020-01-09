@@ -1,10 +1,14 @@
-// utility.cc 
-//      Debugging routines.  Allows users to control whether to 
-//      print DEBUG statements, based on a command line argument.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file utility.cc 
+/// @brief Debugging routines
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
+///
+/// 
+///      Debugging routines.  Allows users to control whether to 
+///      print DEBUG statements, based on a command line argument.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "utility.h"
@@ -19,16 +23,16 @@
 
 static const char *enableFlags = NULL;	// controls which DEBUG messages are printed 
 
-//----------------------------------------------------------------------
-// DebugInit
-//      Initialize so that only DEBUG messages with a flag in flagList 
-//      will be printed.
-//
-//      If the flag is "+", we enable all DEBUG messages.
-//
-//      "flagList" is a string of characters for whose DEBUG messages are 
-//              to be enabled.
-//----------------------------------------------------------------------
+///
+/// DebugInit
+///      Initialize so that only DEBUG messages with a flag in flagList
+///      will be printed.
+///
+///      If the flag is "+", we enable all DEBUG messages.
+///
+///      @param[in]"flagList" is a string of characters for whose DEBUG messages are
+///              to be enabled.
+///
 
 void
 DebugInit (const char *flagList)
@@ -36,10 +40,10 @@ DebugInit (const char *flagList)
     enableFlags = flagList;
 }
 
-//----------------------------------------------------------------------
-// DebugIsEnabled
-//      Return TRUE if DEBUG messages with "flag" are to be printed.
-//----------------------------------------------------------------------
+///
+/// DebugIsEnabled
+///      @return TRUE if DEBUG messages with "flag" are to be printed.
+///
 
 bool
 DebugIsEnabled (char flag)
@@ -51,11 +55,11 @@ DebugIsEnabled (char flag)
 	return FALSE;
 }
 
-//----------------------------------------------------------------------
-// DEBUG
-//      Print a debug message, if flag is enabled.  Like printf,
-//      only with an extra argument on the front.
-//----------------------------------------------------------------------
+///
+/// DEBUG
+///      Print a debug message, if flag is enabled.  Like printf,
+///      only with an extra argument on the front.
+///
 
 void
 DEBUG (char flag, const char *format, ...)

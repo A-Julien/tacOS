@@ -1,31 +1,31 @@
-// list.cc 
-//
-//      Routines to manage a singly-linked list of "things".
-//
-//      A "ListElement" is allocated for each item to be put on the
-//      list; it is de-allocated when the item is removed. This means
-//      we don't need to keep a "next" pointer in every object we
-//      want to put on a list.
-// 
-//      NOTE: Mutual exclusion must be provided by the caller.
-//      If you want a synchronized list, you must use the routines 
-//      in synchlist.cc.
-//
-// Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
-// of liability and disclaimer of warranty provisions.
+/// @file list.h                                            
+/// @brief  Routines to manage a singly-linked list of "things".
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo         
+///
+///      A "ListElement" is allocated for each item to be put on the
+///      list; it is de-allocated when the item is removed. This means
+///      we don't need to keep a "next" pointer in every object we
+///      want to put on a list.
+/// 
+///      NOTE: Mutual exclusion must be provided by the caller.
+///      If you want a synchronized list, you must use the routines 
+///      in synchlist.cc.
+///
+/// Copyright (c) 1992-1993 The Regents of the University of California.
+/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "list.h"
 
-//----------------------------------------------------------------------
-// ListElement::ListElement
-//      Initialize a list element, so it can be added somewhere on a list.
-//
-//      "itemPtr" is the item to be put on the list.  It can be a pointer
-//              to anything.
-//      "sortKey" is the priority of the item, if any.
-//----------------------------------------------------------------------
+///
+/// ListElement::ListElement
+///      Initialize a list element, so it can be added somewhere on a list.
+///
+///      @param "itemPtr" is the item to be put on the list.  It can be a pointer
+///              to anything.
+///      @param "sortKey" is the priority of the item, if any.
+///
 
 ListElement::ListElement (void *itemPtr, long long sortKey)
 {
@@ -34,26 +34,26 @@ ListElement::ListElement (void *itemPtr, long long sortKey)
     next = NULL;		// assume we'll put it at the end of the list 
 }
 
-//----------------------------------------------------------------------
-// List::List
-//      Initialize a list, empty to start with.
-//      Elements can now be added to the list.
-//----------------------------------------------------------------------
+///
+/// List::List
+///      Initialize a list, empty to start with.
+///      Elements can now be added to the list.
+///
 
 List::List ()
 {
     first = last = NULL;
 }
 
-//----------------------------------------------------------------------
-// List::~List
-//      Prepare a list for deallocation.  If the list still contains any 
-//      ListElements, de-allocate them.  However, note that we do *not*
-//      de-allocate the "items" on the list -- this module allocates
-//      and de-allocates the ListElements to keep track of each item,
-//      but a given item may be on multiple lists, so we can't
-//      de-allocate them here.
-//----------------------------------------------------------------------
+///
+/// List::~List
+///      Prepare a list for deallocation.  If the list still contains any
+///      ListElements, de-allocate them.  However, note that we do *not*
+///      de-allocate the "items" on the list -- this module allocates
+///      and de-allocates the ListElements to keep track of each item,
+///      but a given item may be on multiple lists, so we can't
+///      de-allocate them here.
+///
 
 List::~List ()
 {
@@ -61,17 +61,17 @@ List::~List ()
 	;			// delete all the list elements
 }
 
-//----------------------------------------------------------------------
-// List::Append
-//      Append an "item" to the end of the list.
-//      
-//      Allocate a ListElement to keep track of the item.
-//      If the list is empty, then this will be the only element.
-//      Otherwise, put it at the end.
-//
-//      "item" is the thing to put on the list, it can be a pointer to 
-//              anything.
-//----------------------------------------------------------------------
+///
+/// List::Append
+///      Append an "item" to the end of the list.
+///
+///      Allocate a ListElement to keep track of the item.
+///      If the list is empty, then this will be the only element.
+///      Otherwise, put it at the end.
+///
+///      @param "item" is the thing to put on the list, it can be a pointer to
+///              anything.
+///
 
 void
 List::Append (void *item)
@@ -90,17 +90,17 @@ List::Append (void *item)
       }
 }
 
-//----------------------------------------------------------------------
-// List::Prepend
-//      Put an "item" on the front of the list.
-//      
-//      Allocate a ListElement to keep track of the item.
-//      If the list is empty, then this will be the only element.
-//      Otherwise, put it at the beginning.
-//
-//      "item" is the thing to put on the list, it can be a pointer to 
-//              anything.
-//----------------------------------------------------------------------
+///
+/// List::Prepend
+///      Put an "item" on the front of the list.
+///
+///      Allocate a ListElement to keep track of the item.
+///      If the list is empty, then this will be the only element.
+///      Otherwise, put it at the beginning.
+///
+///     @param  "item" is the thing to put on the list, it can be a pointer to
+///              anything.
+///
 
 void
 List::Prepend (void *item)
@@ -119,13 +119,13 @@ List::Prepend (void *item)
       }
 }
 
-//----------------------------------------------------------------------
-// List::Remove
-//      Remove the first "item" from the front of the list.
-// 
-// Returns:
-//      Pointer to removed item, NULL if nothing on the list.
-//----------------------------------------------------------------------
+///
+/// List::Remove
+///      Remove the first "item" from the front of the list.
+///
+/// Returns:
+///      @return Pointer to removed item, NULL if nothing on the list.
+///
 
 void *
 List::Remove ()
@@ -133,15 +133,15 @@ List::Remove ()
     return SortedRemove (NULL);	// Same as SortedRemove, but ignore the key
 }
 
-//----------------------------------------------------------------------
-// List::Mapcar
-//      Apply a function to each item on the list, by walking through  
-//      the list, one element at a time.
-//
-//      Unlike LISP, this mapcar does not return anything!
-//
-//      "func" is the procedure to apply to each element of the list.
-//----------------------------------------------------------------------
+///
+/// List::Mapcar
+///      Apply a function to each item on the list, by walking through
+///      the list, one element at a time.
+///
+///      Unlike LISP, this mapcar does not return anything!
+///
+///      @param "func" is the procedure to apply to each element of the list.
+///
 
 void
 List::Mapcar (VoidFunctionPtr func)
@@ -153,10 +153,10 @@ List::Mapcar (VoidFunctionPtr func)
       }
 }
 
-//----------------------------------------------------------------------
-// List::IsEmpty
-//      Returns TRUE if the list is empty (has no items).
-//----------------------------------------------------------------------
+///
+/// List::IsEmpty
+///     @return Returns TRUE if the list is empty (has no items).
+///
 
 bool
 List::IsEmpty ()
@@ -167,20 +167,20 @@ List::IsEmpty ()
 	return FALSE;
 }
 
-//----------------------------------------------------------------------
-// List::SortedInsert
-//      Insert an "item" into a list, so that the list elements are
-//      sorted in increasing order by "sortKey".
-//      
-//      Allocate a ListElement to keep track of the item.
-//      If the list is empty, then this will be the only element.
-//      Otherwise, walk through the list, one element at a time,
-//      to find where the new item should be placed.
-//
-//      "item" is the thing to put on the list, it can be a pointer to 
-//              anything.
-//      "sortKey" is the priority of the item.
-//----------------------------------------------------------------------
+///
+/// List::SortedInsert
+///      Insert an "item" into a list, so that the list elements are
+///      sorted in increasing order by "sortKey".
+///
+///      Allocate a ListElement to keep track of the item.
+///      If the list is empty, then this will be the only element.
+///      Otherwise, walk through the list, one element at a time,
+///      to find where the new item should be placed.
+///
+///      @param "item" is the thing to put on the list, it can be a pointer to
+///              anything.
+///      @param "sortKey" is the priority of the item.
+///
 
 void
 List::SortedInsert (void *item, long long sortKey)
@@ -215,18 +215,18 @@ List::SortedInsert (void *item, long long sortKey)
       }
 }
 
-//----------------------------------------------------------------------
-// List::SortedRemove
-//      Remove the first "item" from the front of a sorted list.
-// 
-// Returns:
-//      Pointer to removed item, NULL if nothing on the list.
-//      Sets *keyPtr to the priority value of the removed item
-//      (this is needed by interrupt.cc, for instance).
-//
-//      "keyPtr" is a pointer to the location in which to store the 
-//              priority of the removed item.
-//----------------------------------------------------------------------
+///
+/// List::SortedRemove
+///      Remove the first "item" from the front of a sorted list.
+///
+/// Returns:
+///      @return Pointer to removed item, NULL if nothing on the list.
+///      Sets *keyPtr to the priority value of the removed item
+///      (this is needed by interrupt.cc, for instance).
+///
+///      @@param "keyPtr" is a pointer to the location in which to store the
+///              priority of the removed item.
+///
 
 void *
 List::SortedRemove (long long *keyPtr)
