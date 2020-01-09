@@ -29,7 +29,7 @@ void SynchConsole::SynchPutChar(const char ch){
      writeDone->P();
 }
 
-char SynchConsole::SynchGetChar(){
+int SynchConsole::SynchGetChar(){
 	 readAvail->P();
 	 return console->GetChar();
 }
