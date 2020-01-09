@@ -8,11 +8,8 @@ merge_branch() {
     git fetch --all || exit
     git checkout release || exit
     git merge --no-ff "$TRAVIS_COMMIT" || exit
-    git push @github.com/">https://${GITHUB_TOKEN}@github.com/<your-github-user>/<your-repository-name>.git
+    git push @github.com/">https://${GITHUB_TOKEN}@github.com/A-Julien/tacOS.git"
 }
 
 setup_git
 merge_branch
-
-
-
