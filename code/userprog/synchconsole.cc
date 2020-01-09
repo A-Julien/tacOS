@@ -1,4 +1,8 @@
-#ifdef CHANGED
+/**
+ * @file synchconsole.cc
+ * @brief synchconsole
+ * @author chef
+ */
 
 #include "copyright.h"
 #include "system.h"
@@ -33,7 +37,10 @@ int SynchConsole::SynchGetChar(){
 	 readAvail->P();
 	 return console->GetChar();
 }
-
+/**
+ *
+ * @param[in] s s
+ */
 void SynchConsole::SynchPutString(const char s[]){
 	int i = 0;
 	while(s[i] != '\0'){
@@ -57,4 +64,3 @@ void SynchConsole::SynchGetString(char *s, int n){
 bool SynchConsole::Feof(){
 	return console->Feof();
 }
-#endif // CHANGED

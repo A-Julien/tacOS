@@ -1,4 +1,10 @@
-/* syscalls.h 
+/**
+ * @file syscal.h
+ * @brief syscal
+ * @author chef
+ */
+
+/* syscalls.h
  * 	Nachos system call interface.  These are Nachos kernel operations
  * 	that can be invoked from user programs, by trapping to the kernel
  *	via the "syscall" instruction.
@@ -101,15 +107,17 @@ typedef int OpenFileId;
 /* Create a Nachos file, with "name" */
 void Create (char *name);
 
-/* Open the Nachos file "name", and return an "OpenFileId" that can 
+/** Open the Nachos file "name", and return an "OpenFileId" that can
+ *
  * be used to read and write to the file.
  */
 OpenFileId Open (char *name);
 
-/* Write "size" bytes from "buffer" to the open file. */
+/** Write "size" bytes from "buffer" to the open file. */
 void Write (char *buffer, int size, OpenFileId id);
 
-/* Read "size" bytes from the open file into "buffer".  
+/**
+ * Read "size" bytes from the open file into "buffer".
  * Return the number of bytes actually read -- if the open file isn't
  * long enough, or if it is an I/O device, and there aren't enough 
  * characters to read, return whatever is available (for I/O devices, 
@@ -117,21 +125,26 @@ void Write (char *buffer, int size, OpenFileId id);
  */
 int Read (char *buffer, int size, OpenFileId id);
 
-/* Close the file, we're done reading and writing to it. */
+/**
+ * Close the file, we're done reading and writing to it.
+ * */
 void Close (OpenFileId id);
 
 
 
-/* User-level thread operations: Fork and Yield.  To allow multiple
+/**
+ * User-level thread operations: Fork and Yield.  To allow multiple
  * threads to run within a user program. 
  */
 
-/* Fork a thread to run a procedure ("func") in the *same* address space 
+/**
+ * Fork a thread to run a procedure ("func") in the *same* address space
  * as the current thread.
  */
 void Fork (void (*func) ());
 
-/* Yield the CPU to another runnable thread, whether in this address space 
+/**
+ * Yield the CPU to another runnable thread, whether in this address space
  * or not. 
  */
 void Yield ();
@@ -147,6 +160,9 @@ void GetString(char * string, int taille);
 
 void GetInt(int * n);
 
+/**
+ * @param[in] the in
+ */
 void PutInt(int n);
 
 // Return 1 if feof 0 instead

@@ -1,4 +1,9 @@
-// system.cc 
+/**
+ * @file system.cc
+ * @brief Nachos initialization and cleanup routines.
+ * @author chef
+ */
+// system.cc
 //      Nachos initialization and cleanup routines.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
@@ -75,6 +80,12 @@ TimerInterruptHandler (int dummy)
 //      "argv" is an array of strings, one for each command line argument
 //              ex: "nachos -d +" -> argv = {"nachos", "-d", "+"}
 //----------------------------------------------------------------------
+/**
+ *
+ *
+ * @param[in] argc
+ * @param[in] argv
+ */
 void
 Initialize (int argc, char **argv)
 {

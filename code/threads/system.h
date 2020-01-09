@@ -1,4 +1,10 @@
-// system.h 
+/**
+ * @file system.h
+ * @brief All global variables used in Nachos are defined here.
+ * @author chef
+ */
+
+// system.h
 //      All global variables used in Nachos are defined here.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.

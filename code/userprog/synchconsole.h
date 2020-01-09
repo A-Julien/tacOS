@@ -1,5 +1,8 @@
-#ifdef CHANGED
-
+/**
+ * @file synchconsole.h
+ * @brief synchconsole
+ * @author chef
+ */
 #ifndef SYNCHCONSOLE_H
 #define SYNCHCONSOLE_H
 
@@ -17,9 +20,8 @@ class SynchConsole {
 		void SynchPutString(const char *s); // Unix puts(3S)
 		void SynchGetString(char *s, int n); // Unix fgets(3S)
 		bool Feof(); // Unix Feof
-		
+
 	private:
 		Console *console;
 };
 #endif // SYNCHCONSOLE_H
-#endif // CHANGED
