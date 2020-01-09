@@ -40,13 +40,39 @@ __start:
  * 	convention on the MIPS.
  * -------------------------------------------------------------
  */
+
+   	.globl Feof
+	.ent	Feof
+Feof:
+	addiu $2,$0,SC_Feof
+	syscall
+	j	$31
+	.end Feof
+
+
+  	.globl PutInt
+	.ent	PutInt
+PutInt:
+	addiu $2,$0,SC_PutInt
+	syscall
+	j	$31
+	.end PutInt
+
+  	.globl GetInt
+	.ent	GetInt
+GetInt:
+	addiu $2,$0,SC_GetInt
+	syscall
+	j	$31
+	.end GetInt
+
   	.globl GetString
 	.ent	GetString
 GetString:
 	addiu $2,$0,SC_GetString
 	syscall
 	j	$31
-	.end Halt
+	.end GetString
 
 
  	.globl GetChar
@@ -55,7 +81,7 @@ GetChar:
 	addiu $2,$0,SC_GetChar
 	syscall
 	j	$31
-	.end Halt
+	.end GetChar
 
 
 
@@ -65,7 +91,7 @@ PutString:
 	addiu $2,$0,SC_PutString
 	syscall
 	j	$31
-	.end Halt
+	.end PutString
 
 
 	.globl PutChar
@@ -74,7 +100,7 @@ PutChar:
 	addiu $2,$0,SC_PutChar
 	syscall
 	j	$31
-	.end Halt
+	.end PutChar
 
 
 	.globl Halt
