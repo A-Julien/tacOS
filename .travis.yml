@@ -16,14 +16,18 @@ addons:
 
 before_install:
 - ls -l
-- docker pull jalaimo/nachos-build
-- docker run -d -v $(pwd):/tacos --name guacamole jalaimo/nachos-build bash -c 'tail -f /dev/null'
-- docker ps -a
+- docker pull jalaimo/nachos-build #pull docker image
+- docker run -d -v $(pwd):/tacos --name guacamole jalaimo/nachos-build bash -c 'tail -f /dev/null' # create and run nachos-docker
+- docker ps -a # check if all is ok
 
 script:
-  - docker exec -it guacamole bash -c 'cd /tacos/code && make'
-  - docker exec -it guacamole bash -c 'cd /tacos/code/test && ./test_unit.sh'
-  - doxygen Doxyfile
+  - docker exec -it guacamole bash -c 'cd /tacos/code && make' #make nachOS
+  - docker exec -it guacamole bash -c 'cd /tacos/code/test && ./test_unit.sh' # Execute unit Test
+
+after_success:
+  - doxygen Doxyfile # make Doxygen
+  - chmod +x push.sh
+  - ./push.sh # merged on release branch
 
 deploy:
   provider: pages
