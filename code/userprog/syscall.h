@@ -35,6 +35,8 @@
 #define SC_GetString 14
 #define SC_GetInt 15
 #define SC_PutInt 16
+#define SC_Feof 17
+
 
 #ifdef IN_USER_MODE
 
@@ -146,6 +148,9 @@ void GetString(char * string, int taille);
 void GetInt(int * n);
 
 void PutInt(int n);
+
+// Return 1 if feof 0 instead
+int Feof();
 
 #endif // IN_USER_MODE
 

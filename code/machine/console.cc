@@ -149,3 +149,9 @@ Console::PutChar(char ch)
     interrupt->Schedule(ConsoleWriteDone, (int)this, ConsoleTime,
 					ConsoleWriteInt);
 }
+
+bool Console::Feof(){
+    if (PollFile(readFileNo))
+        return false;
+    return true;
+}

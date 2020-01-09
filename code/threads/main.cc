@@ -122,7 +122,9 @@ main (int argc, char **argv)
 	    {			// test the console
 		if (argc == 1)
 		    SynchConsoleTest (NULL, NULL);
-		else
+		else if (argc == 2){
+			SynchConsoleTest (*(argv + 1), NULL);
+		}
 		  {
 		      ASSERT (argc > 2);
 		      SynchConsoleTest (*(argv + 1), *(argv + 2));

@@ -189,6 +189,14 @@ ExceptionHandler(ExceptionType which) {
         machine->WriteMem(machine->ReadRegister(4), sizeof(int), resultat);
       break; 
 
+      case SC_Feof:
+        if(synchConsole->Feof()){
+          machine->WriteRegister(2, 1);
+        } else {
+          machine->WriteRegister(2, 0);
+        }
+      break;
+
       case SC_Halt:
       DEBUG('a', "Shutdown, initiated by user program.\n");
       interrupt->Halt();
