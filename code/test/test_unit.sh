@@ -43,10 +43,10 @@ done
 if grep -q 'ERROR' 'tests_restult'
 then
    echo -e "[\e[31mERROR\e[39m] Some test failed during execution"
+   rm tests_restult # remove result test file
    exit 64
 else
   echo -e "[\e[32mSUCEED\e[39m] "
+  rm tests_restult # remove result test file
   exit 0
 fi
-
-rm tests_restult # remove result test file

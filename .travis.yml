@@ -1,5 +1,6 @@
 language: bash
 sudo: required
+os: linux
 
 branches:
   only:
@@ -20,7 +21,7 @@ before_install:
 - docker ps -a
 
 script:
-  - docker exec -it guacamole bash -c 'cd /tacos/code && make > /tacos/test'
+  - docker exec -it guacamole bash -c 'cd /tacos/code && make'
   - docker exec -it guacamole bash -c 'cd /tacos/code/test && ./test_unit.sh'
   - doxygen Doxyfile
 

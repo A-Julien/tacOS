@@ -24,11 +24,6 @@ int main()
 	PutChar('\n');
 	PutInt(-1000000000); // RETURN -1
 	PutChar('\n');
-
-
-
-
-
 	return 0;
 	
 } 
