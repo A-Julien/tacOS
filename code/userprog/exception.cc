@@ -66,6 +66,9 @@ void copyMachineFromString(char *from, int to, unsigned size) {
 }
 
 void ProcedurePutInt(int n){
+  if(n > 999999999 || n < -999999999){
+    machine->RaiseException(IntOutOfBounds, 0);
+  }
   if(n == 0){
      synchConsole->SynchPutChar('0');
      return;
@@ -108,7 +111,8 @@ void ProcedureGetInt(int * n){
   }
   for(int i = debut ; i <= index; i++){
     if(number[i] > '9' || number[i] < '0' ){
-      //RAISE EXCEPTION CE N'EST PAS UN CHIFFRE
+      machine->RaiseException(CharInsteadOfInt, 0);
+      synchConsole->SynchPutChar('!');
     }
     res = res * 10 + (number[i] - '0'); 
   }
@@ -152,8 +156,6 @@ ExceptionHandler(ExceptionType which) {
 
   if (which == SyscallException) {
     switch (type) {
-
-
       case SC_PutChar:
       DEBUG('p', "Putting char\n");
       synchConsole->SynchPutChar(machine->ReadRegister(4));
@@ -211,8 +213,14 @@ ExceptionHandler(ExceptionType which) {
       printf("Unexpected user mode exception %d %d\n", which, type);
       ASSERT(FALSE);
 
-              }
+    }
               UpdatePC();
-            }
+  } else if (which == CharInsteadOfInt){
+    printf("Il fallais rentrer un caractère..");
+    interrupt->Halt();
+  } else if (which == IntOutOfBounds){
+    printf("Dépassement de value d'un int..");
+     interrupt->Halt();
+  }
 
-          }
+}
