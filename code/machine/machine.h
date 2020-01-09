@@ -49,7 +49,9 @@ enum ExceptionType { NoException,           // Everything ok!
 		     OverflowException,     // Integer overflow in add or sub.
 		     IllegalInstrException, // Unimplemented or reserved instr.
 		     
-		     NumExceptionTypes
+		     NumExceptionTypes, 
+             CharInsteadOfInt, // L'utilisateur a saisi un caractère lors de la saisie d'entier
+             IntOutOfBounds // |int| > 10^10-1
 };
 
 // User program CPU state.  The full set of MIPS registers, plus a few
