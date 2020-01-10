@@ -1,6 +1,6 @@
 /**
  * @file putstring.c
- * @brief
+ * @brief Write 3 sentences
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
@@ -20,5 +20,5 @@ int main()
 	return 3;
 	//Halt();
 } 
-//SORTIE = "Samourai"; "aerospatiale"; "Suplement Sa"
+
 

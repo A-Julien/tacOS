@@ -150,22 +150,69 @@ void Fork (void (*func) ());
 void Yield ();
 
 
+//----------------------------------------------------------------------
+// PutChar
+// Write a char in the current SynchConsole
+// @param c : the char
+//----------------------------------------------------------------------
+
 void PutChar( char c);
+
+
+//----------------------------------------------------------------------
+// PutChar
+// Write a String in the current SynchConsole
+// Only one syscall is made there
+// @param s : The string
+//----------------------------------------------------------------------
 
 void PutString(char * string);
 
-char GetChar();
+
+//----------------------------------------------------------------------
+// GetChar
+// Get the char written in the current SynchConsole
+// @return char
+//----------------------------------------------------------------------
+
+int GetChar();
+
+//----------------------------------------------------------------------
+// GetString
+// Get the a String written in the current SynchConsole
+// Only one syscall is made there
+// @param string : The adresse where the string will be writted
+// @param taille : The max size of the string.
+//----------------------------------------------------------------------
 
 void GetString(char * string, int taille);
 
+//----------------------------------------------------------------------
+// GetInt
+// Get the int written in the current SynchConsole
+// @param *n, the adress where the in will be writted.
+//----------------------------------------------------------------------
+
 void GetInt(int * n);
 
-/**
- * @param[in] the in
- */
+
+//----------------------------------------------------------------------
+// PutInt
+// Write a int in the current SynchConsole
+// @param n : The int
+//----------------------------------------------------------------------
+
+
+
 void PutInt(int n);
 
-// Return 1 if feof 0 instead
+//----------------------------------------------------------------------
+// Feof
+// Know if there is char to be read in the SynchConsole
+// @return 1 if feof 0 instead
+//----------------------------------------------------------------------
+//
+
 int Feof();
 
 #endif // IN_USER_MODE

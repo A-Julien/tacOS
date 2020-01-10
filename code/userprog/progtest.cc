@@ -69,8 +69,13 @@ WriteDone (int arg)
 
 //----------------------------------------------------------------------
 // ConsoleTest
-//      Test the console by echoing characters typed at the input onto
-//      the output.  Stop when the user types a 'q'.
+//      Test the Console by echoing characters typed at the input onto
+//      the output.  Stop when the user types a ctrl+d command.
+//       convert a 'c' charactere to "<c>
+//   @param *in The input file  (NULL for STDIN)
+//   @param *out The output file  (NULL for STDOUT)
+// This function is implemented to test a the Console class.
+// ! An error may occur : the first or the second char may be lost for when STDIN is the input !
 //----------------------------------------------------------------------
 
 void
@@ -116,6 +121,16 @@ ConsoleTest (char *in, char *out)
 	}
 }
 
+//----------------------------------------------------------------------
+// SynchConsoleTest
+//      Test the SynchConsole by echoing characters typed at the input onto
+//      the output.  Stop when the user types a ctrl+d command.
+//       convert a 'c' charactere to "<c>
+//   @param *in The input file  (NULL for STDIN)
+//   @param *out The output file  (NULL for STDOUT)
+// This function is implemented to test a the SynchConsole class.
+// ! An error may occur : the first or the second char may be lost for when STDIN is the input for the first input !
+//----------------------------------------------------------------------
 
 
 void SynchConsoleTest (char *readFile, char *writeFile){

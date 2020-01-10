@@ -1,6 +1,6 @@
 /**
  * @file getint.c
- * @brief get an int and write it in the console
+ * @brief Test if the exception is correctly raised
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
@@ -16,11 +16,10 @@
 int main()
 {
 	int n;
-	for(int i = 0; i < 11; i++){
-		GetInt(&n);
-		PutInt(n);
-		PutChar('\n');
-	}
+	GetInt(&n);
+	PutInt(n);
+	PutChar('\n');
+
 	return 0;
 	
 } 

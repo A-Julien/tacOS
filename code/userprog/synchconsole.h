@@ -1,8 +1,8 @@
 /**
  * @file synchconsole.h
- * @brief
+ * @brief Synchrone Data structures to simulate the behavior of a terminal I/O device.
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
- *
+ * Synchconsole do the same work as console but synchronously.
  */
 
 #ifndef SYNCHCONSOLE_H

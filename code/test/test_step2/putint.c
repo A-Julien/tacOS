@@ -1,6 +1,6 @@
 /**
  * @file putint.c
- * @brief
+ * @brief Test the PutInt system Function
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
@@ -30,11 +30,11 @@ int main()
 	PutChar('\n');
     PutInt(10);
     PutChar('\n');
-	PutInt(-1000000000); // RETURN -1
+	PutInt(-1000000000); // Raise IntOutOfBounds Exception
 	PutChar('\n');
 	return 0;
 	
 } 
-//SORTIE = "Samourai"; "aerospatiale"; "Suplement Sa"
+
 
 
