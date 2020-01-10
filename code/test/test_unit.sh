@@ -28,6 +28,20 @@
 #|
 #└─── ...
 
+lauch_test(){
+  if test -f "$d"input_test/"$file"_input; then #check if test need input
+        RESULT=$(../build/nachos-step2 -x ../build/"$d$file" <"$d""input_test/$file"_input)
+      else
+        RESULT=$(../build/nachos-step2 -x ../build/"$d$file")
+      fi
+}
+
+filename_extractor(){
+  dlenght=$(echo $1 | wc -c) #get directory lenght
+  "$2"="${file::-2}"           #remove .c extention
+  "$2"="${file:dlenght-1}"     # remove directory lenght to get filename
+}
+
 for d in */; do #for all step test folder
   if [ "${d::9}" == "test_step" ]; then
     echo "-----------------------"
@@ -35,10 +49,10 @@ for d in */; do #for all step test folder
     echo "-----------------------"
 
     for file in "$d"*.c; do # for all unit test in step
-      dlenght=$(echo $d | wc -c) #get directory lenght
-      file=${file::-2}           #remove .c extention
-      file=${file:dlenght-1}     # remove directory lenght to get filename
-
+      #dlenght=$(echo $d | wc -c) #get directory lenght
+      #file=${file::-2}           #remove .c extention
+      #file=${file:dlenght-1}     # remove directory lenght to get filename
+      filename_extractor "$d" "$file"
       echo "Testing $file""->"
       if test -f "$d"input_test/"$file"_input; then #check if test need input
         RESULT=$(../build/nachos-step2 -x ../build/"$d$file" <"$d""input_test/$file"_input)
