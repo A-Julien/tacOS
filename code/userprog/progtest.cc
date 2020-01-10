@@ -75,7 +75,7 @@ WriteDone (int arg)
 //   @param *in The input file  (NULL for STDIN)
 //   @param *out The output file  (NULL for STDOUT)
 // This function is implemented to test a the Console class.
-// /!\ An error may occur : the first or the second char may be lost for when STDIN is the input /!\
+// ! An error may occur : the first or the second char may be lost for when STDIN is the input !
 //----------------------------------------------------------------------
 
 void
@@ -129,7 +129,7 @@ ConsoleTest (char *in, char *out)
 //   @param *in The input file  (NULL for STDIN)
 //   @param *out The output file  (NULL for STDOUT)
 // This function is implemented to test a the SynchConsole class.
-// /!\ An error may occur : the first or the second char may be lost for when STDIN is the input for the first input/!\
+// ! An error may occur : the first or the second char may be lost for when STDIN is the input for the first input !
 //----------------------------------------------------------------------
 
 
