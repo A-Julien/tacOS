@@ -125,7 +125,7 @@ Console::WriteDone()
 /// Console::GetChar()
 /// 	Read a character from the input buffer, if there is any there.
 ///	Either return the character, or EOF if none buffered.
-///
+/// @return char The caracter available in the current FD
 
 char
 Console::GetChar()
@@ -140,7 +140,7 @@ Console::GetChar()
 /// Console::PutChar()
 /// 	Write a character to the simulated display, schedule an interrupt
 ///	to occur in the future, and return.
-///
+/// @param ch : The caracter you wanted to be Put
 
 void
 Console::PutChar(char ch)
@@ -152,6 +152,12 @@ Console::PutChar(char ch)
 					ConsoleWriteInt);
 }
 
+///
+/// Console::Feof
+///     Initialize the simulation of a hardware console device.
+///
+/// @return bool : Return a bololean that indicate wether there is something more to read or not
+///
 bool Console::Feof(){
     if (PollFile(readFileNo))
         return false;

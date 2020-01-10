@@ -45,12 +45,14 @@ static void UpdatePC() {
 }
 
 /**
- * Copy a string from MIPS to Kernel
- *
- * @param[in] from
- * @param[in] to
- * @param[in] size
+ * copyStringFromMachine
+ * Copy a string from MIPS to Kernel 
+ * @param from : the Machine adresse where the string is
+ * @param to : the Kernel adresse where to copy the string
+ * @param size : the string's adresse
  */
+
+
 void copyStringFromMachine(int from, char *to, unsigned size) {
     int valChar;
     for (unsigned i = 0; i < size; i++) {
@@ -66,6 +68,14 @@ void copyStringFromMachine(int from, char *to, unsigned size) {
 }
 
 
+/**
+ * copyMachineFromString
+ * Copy a string from Kernel to Mips 
+ * @param[in/out] from : the Kernel adresse where the string is
+ * @param to : the Machine adresse where to copy the string
+ * @param size : the string's adresse
+ */
+
 void copyMachineFromString(char *from, int to, unsigned size) {
     for (unsigned i = 0; i < size; i++) {
 
@@ -77,6 +87,14 @@ void copyMachineFromString(char *from, int to, unsigned size) {
 
 
 }
+
+/**
+ * ProcedurePutInt
+ * Put an int in the SynchConsole current output stream
+ * Be carefull the absolute value of the int must be lower than 10^10-1
+ * Negative int is supported
+ * @param n : The int to be printed
+ */
 
 void ProcedurePutInt(int n) {
     int stock = n;
@@ -105,6 +123,14 @@ void ProcedurePutInt(int n) {
     }
 }
 
+/**
+ * ProcedurePutInt
+ * Get the int that have been written int the input stream of the SynchConsole
+ * Be carefull the absolute value of the int must be lower than 10^10-1
+ * Negative int is supported
+ * @param n : The adress where the int will be written
+ */
+
 void ProcedureGetInt(int *n) {
     //un entier est inferieur à 10 digit
     int res = 0;
@@ -112,17 +138,24 @@ void ProcedureGetInt(int *n) {
     bool positif = TRUE;
     char number[12] = "00000000000";
     number[12] = '\0';
+    // Get the string
     synchConsole->SynchGetString(number, 11);
-
+    // Find where the '\0' is
     int index = 0;
     while (number[index] != '\0' && number[index] != '\n' && number[index] != EOF) {
         index++;
     }
     index--;
+
+    // There, we know the characteres of the int are between nunmber[0] and number[index]
+    // No need to dig further
     if (number[0] == '-') {
+        // If the first charactere is '-' then the int is a negativ number. 
         positif = FALSE;
+        // Thus, the int is writted betwen number[1] and number[index]
         debut = 1;
     }
+
     for (int i = debut; i <= index; i++) {
         if (number[i] > '9' || number[i] < '0') {
             machine->RaiseException(CharInsteadOfInt, 0);
@@ -133,6 +166,7 @@ void ProcedureGetInt(int *n) {
     if (!positif) {
         res = -res;
     }
+    // Write the int into the expetected adresses
     *n = res;
 
 }
@@ -157,7 +191,7 @@ void ProcedureGetInt(int *n) {
 /// And don't forget to increment the pc before returning. (Or else you'll
 /// loop making the same system call forever!
 ///
-/// @param[in] which is the kind of exception.  The list of possible exceptions are in machine.h.
+/// @param which is the kind of exception.  The list of possible exceptions are in machine.h.
 ///----------------------------------------------------------------------
 
 void
