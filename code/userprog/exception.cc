@@ -172,7 +172,7 @@ void ProcedureGetInt(int *n) {
 }
 
 
-///----------------------------------------------------------------------
+///
 /// ExceptionHandler
 ///      Entry point into the Nachos kernel.  Called when a user program
 ///      is executing, and either does a syscall, or generates an addressing
@@ -192,7 +192,7 @@ void ProcedureGetInt(int *n) {
 /// loop making the same system call forever!
 ///
 /// @param which is the kind of exception.  The list of possible exceptions are in machine.h.
-///----------------------------------------------------------------------
+///
 
 void
 ExceptionHandler(ExceptionType which) {
