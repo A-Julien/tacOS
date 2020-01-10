@@ -1,6 +1,6 @@
 /**
  * @file putchar.c
- * @brief
+ * @brief Juste write 'abcd' to test the PutChar system function
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
@@ -21,4 +21,3 @@ int main()
 	print('a',4);
 	Halt();
 } 
-//SORTIE = 'abcd';

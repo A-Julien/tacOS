@@ -1,6 +1,6 @@
 /**
  * @file getstring.c
- * @brief
+ * @brief Get a 20 max length string and write it.
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
