@@ -3,7 +3,7 @@
 # CI UNIT TEST ALGORITHM #
 ##########################
 #
-# RUN ALL UNIT TEST FOR ALL STEP
+# THIS SCRIPT RUN ALL UNIT TEST FOR ALL STEP
 # Please follow the file architecture
 #
 #test

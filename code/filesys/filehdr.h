@@ -21,6 +21,12 @@
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
 #define MaxFileSize 	(NumDirect * SectorSize)
 
+///enum that define if the FileHeader define a file or a directory
+enum File_type{
+    f, // file type
+    d // directory type
+};
+
 /// The following class defines the Nachos "file header" (in UNIX terms,
 /// the "i-node"), describing where on disk to find all of the data in the file.
 /// The file header is organized as a simple table of pointers to
@@ -56,6 +62,8 @@ class FileHeader {
 					// in bytes
 
     void Print();			// Print the contents of the file.
+
+    File_type type;
 
   private:
     int numBytes;			// Number of bytes in the file
