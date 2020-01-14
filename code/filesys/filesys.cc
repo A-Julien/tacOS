@@ -106,6 +106,8 @@ FileSystem::FileSystem(bool format) {
 
         DEBUG('f', "Writing headers back to disk.\n");
         mapHdr->WriteBack(FreeMapSector);
+        dirHdr->type = d; // because root is a directory
+        dirHdr->test();
         dirHdr->WriteBack(DirectorySector);
 
         // OK to open the bitmap and directory files now
@@ -114,8 +116,7 @@ FileSystem::FileSystem(bool format) {
 
         freeMapFile = new OpenFile(FreeMapSector);
         root_directory_file = new OpenFile(DirectorySector);
-        current_directory_file = root_directory_file; // At the beginning currentDirectoryFile is the root_directory_file
-
+        current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
 
         // Once we have the files "open", we can write the initial version
         // of each file back to disk.  The directory at this point is completely
@@ -127,6 +128,32 @@ FileSystem::FileSystem(bool format) {
         freeMap->WriteBack(freeMapFile);     // flush changes to disk
         directory->WriteBack(root_directory_file);
 
+        //create . and ..
+        Create(".", 0, d);
+        Create("..", 0, d);
+
+        directory->FetchFrom(root_directory_file); // get update from disk
+        freeMap->FetchFrom(freeMapFile); // get freeMap update from disk
+
+        //create file header for . and ..
+        FileHeader *dot_fh = new FileHeader();
+        FileHeader *double_dot_fh = new FileHeader();
+
+        //get sectors
+        int dot_sector = directory->Find(".");
+        int double_dot_sector = directory->Find("..");
+        //get file header of . and ..
+        dot_fh->FetchFrom(dot_sector);
+        double_dot_fh->FetchFrom(double_dot_sector);
+
+        //set dot and double dot on root sector
+        dot_fh->set_sector(0, DirectorySector);
+        double_dot_fh->set_sector(0, DirectorySector);
+
+        //write modifications on disk
+        dot_fh->WriteBack(dot_sector);
+        double_dot_fh->WriteBack(double_dot_sector);
+
         if (DebugIsEnabled('f')) {
             freeMap->Print();
             directory->Print();
@@ -136,12 +163,16 @@ FileSystem::FileSystem(bool format) {
             delete mapHdr;
             delete dirHdr;
         }
-    } else {
-        // if we are not formatting the disk, just open the files representing
-        // the bitmap and directory; these are left open while Nachos is running
-        freeMapFile = new OpenFile(FreeMapSector);
-        root_directory_file = new OpenFile(DirectorySector);
+        return;
     }
+
+    // if we are not formatting the disk, just open the files representing
+    // the bitmap and directory; these are left open while Nachos is running
+    freeMapFile = new OpenFile(FreeMapSector);
+    root_directory_file = new OpenFile(DirectorySector);
+    current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
+
+
 }
 
 ///
@@ -183,7 +214,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(current_directory_file);
 
     if (directory->Find(name) != -1)
         success = FALSE;            // file is already in directory
@@ -204,7 +235,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
                 // everthing worked, flush all changes back to disk
                 hdr->type = type;
                 hdr->WriteBack(sector);
-                directory->WriteBack(root_directory_file);
+                directory->WriteBack(current_directory_file);
                 freeMap->WriteBack(freeMapFile);
             }
             delete hdr;
@@ -219,27 +250,32 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
 /// FileSystem::Create_new_folder
 /// 	Create a new folder in the Nachos file system.
 ///
-///
 ///	@return Return TRUE if everything goes ok, otherwise, return FALSE.
-///
-///
 ///	@param "name" -- name of file to be created
 ///
 bool FileSystem::create_new_directory(const char *directory_name) {
     Directory *new_directory = new Directory(NumDirEntries); // init the new directory
-    if(!this->Create(directory_name,DirectoryFileSize, d)) return false; // create the entry in current directory
+
+    // create the entry in current directory if already exist, return before writing it on disk
+    if(!this->Create(directory_name,DirectoryFileSize, d)) return false;
+
     OpenFile *open_new_directory = this->Open(directory_name); // open new directory
     new_directory->WriteBack(open_new_directory); // write new directory on disk
     delete open_new_directory; // delete open_new_directory
 
     //update current directory
     Directory *current_directory = new Directory(NumDirEntries); // init the new directory
-    current_directory->FetchFrom(root_directory_file); //Fetch current directory
-    current_directory->WriteBack(root_directory_file);//write modifications of current directory into disk
+    current_directory->FetchFrom(current_directory_file); //Fetch current directory
+    current_directory->WriteBack(current_directory_file); //write modifications of current directory into disk
 
+    delete current_directory;
     return true;
 }
-
+/*
+bool FileSystem::change_directory(const char *name){
+    Directory *current_directory = new Directory(NumDirEntries);
+    return true;
+}*/
 ///
 /// FileSystem::Open
 /// 	Open a file for reading and writing.

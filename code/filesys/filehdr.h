@@ -58,18 +58,22 @@ class FileHeader {
 					// to the disk sector containing
 					// the byte
 
-    int FileLength();			// Return the length of the file 
-					// in bytes
+    int FileLength();			// Return the length of the file in bytes
 
     void Print();			// Print the contents of the file.
 
     File_type type;
 
-  private:
-    int numBytes;			// Number of bytes in the file
-    int numSectors;			// Number of data sectors in the file
-    int dataSectors[NumDirect];		// Disk sector numbers for each data 
-					// block in the file
-};
+    void test();
+    int get_sector(int id_sector);
+    void set_sector(int id_sector, int sector);
+
+
+        private:
+            int numBytes;			// Number of bytes in the file
+            int numSectors;			// Number of data sectors in the file
+            int dataSectors[NumDirect];		// Disk sector numbers for each data block in the file
+
+        };
 
 #endif // FILEHDR_H

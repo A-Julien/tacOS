@@ -164,7 +164,7 @@ Directory::List() {
     for (int i = 0; i < tableSize; i++){
         if (table[i].inUse){
             fileHeader->FetchFrom(table[i].sector);
-            if(fileHeader->type == d){printf("%s\\\n", table[i].name);continue;}
+            if(fileHeader->type == d){printf("%s/\n", table[i].name);continue;}
             printf("%s\n", table[i].name);
         }
     }

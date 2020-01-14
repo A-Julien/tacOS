@@ -45,25 +45,24 @@
 // implementation is available
 class FileSystem {
 public:
-FileSystem(bool format) {}
+    FileSystem(bool format) {}
 
-bool Create(const char *name, int initialSize) {
-int fileDescriptor = OpenForWrite(name);
+    bool Create(const char *name, int initialSize) {
+    int fileDescriptor = OpenForWrite(name);
 
-if (fileDescriptor == -1) return FALSE;
-Close(fileDescriptor);
-return TRUE;
-}
+    if (fileDescriptor == -1) return FALSE;
+    Close(fileDescriptor);
+    return TRUE;
+    }
 
-OpenFile* Open(char *name) {
-int fileDescriptor = OpenForReadWrite(name, FALSE);
+    OpenFile* Open(char *name) {
+    int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-if (fileDescriptor == -1) return NULL;
-return new OpenFile(fileDescriptor);
-}
+    if (fileDescriptor == -1) return NULL;
+    return new OpenFile(fileDescriptor);
+    }
 
-bool Remove(char *name) { return Unlink(name) == 0; }
-
+    bool Remove(char *name) { return Unlink(name) == 0; }
 };
 
 #else // FILESYS
