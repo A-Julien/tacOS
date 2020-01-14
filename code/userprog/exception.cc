@@ -204,12 +204,10 @@ ExceptionHandler(ExceptionType which) {
     if (which == SyscallException) {
         switch (type) {
             case SC_PutChar:
-                DEBUG('p', "Putting char\n");
                 synchConsole->SynchPutChar(machine->ReadRegister(4));
                 break;
 
             case SC_PutString:
-                DEBUG('p', "Putting String\n");
                 char string[MAX_STRING_SIZE + 1];
                 copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
                 synchConsole->SynchPutString(string);
@@ -252,7 +250,9 @@ ExceptionHandler(ExceptionType which) {
                 break;
 
             case SC_Exit:
-                machine->WriteRegister(2, machine->ReadRegister(4));
+                char str[50];
+                sprintf(str, "Return value : %d ", machine->ReadRegister(4)); 
+                DEBUG('s', str);        
                 interrupt->Halt();
                 break;
 
