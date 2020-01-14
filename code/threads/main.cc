@@ -100,12 +100,14 @@ main (int argc, char **argv)
 	  if (!strcmp (*argv, "-x"))
 	    {			// run a user program
 		ASSERT (argc > 1);
+		//synchConsole = new SynchConsole(NULL,NULL);
 		StartProcess (*(argv + 1));
 		argCount = 2;
 			
 	    }
 	  else if (!strcmp (*argv, "-c"))
 	    {			// test the console
+	    		delete synchConsole;
 		if (argc == 1)
 		    ConsoleTest (NULL, NULL);
 		else
@@ -120,6 +122,7 @@ main (int argc, char **argv)
 	    } 
 
 	    else if (!strcmp (*argv, "-sc"))
+	   	delete synchConsole;
 	    {			// test the console
 		if (argc == 1)
 		    SynchConsoleTest (NULL, NULL);
