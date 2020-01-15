@@ -63,6 +63,7 @@ extern void StartProcess (char *file), ConsoleTest (char *in, char *out);
 extern void MailTest (int networkID);
 extern void ConsoleTest (char *in, char *out);
 extern void SynchConsoleTest(char *readFile, char *writeFile);
+extern int testList();
 
 ///
 /// main
@@ -95,7 +96,17 @@ main (int argc, char **argv)
       {
 	  argCount = 1;
 	  if (!strcmp (*argv, "-z"))	// print copyright
-	      printf ("%s", copyright);
+	    	printf ("%s", copyright);
+	  if(!strcmp(*argv, "-tl")){
+	  		int resTestList = testList();
+
+	  		if(resTestList != 0){
+	  			printf("Test failed.. error %d\n", resTestList);
+	  		} else {
+	  			printf("test passed\n");
+	  		}
+	  		interrupt->Halt ();
+	  	}
 #ifdef USER_PROGRAM
 	  if (!strcmp (*argv, "-x"))
 	    {			// run a user program
