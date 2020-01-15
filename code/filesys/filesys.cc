@@ -129,11 +129,11 @@ FileSystem::FileSystem(bool format) {
         directory->WriteBack(root_directory_file);
 
         //create . and ..
-        Create(".", 0, d);
+        this->create_dot_and_doubledot("", DirectorySector, true);
+       /* Create(".", 0, d);
         Create("..", 0, d);
 
         directory->FetchFrom(root_directory_file); // get update from disk
-        freeMap->FetchFrom(freeMapFile); // get freeMap update from disk
 
         //create file header for . and ..
         FileHeader *dot_fh = new FileHeader();
@@ -154,6 +154,10 @@ FileSystem::FileSystem(bool format) {
         dot_fh->WriteBack(dot_sector);
         double_dot_fh->WriteBack(double_dot_sector);
 
+        directory->WriteBack(root_directory_file); //commit update on root_directory_file*/
+
+       printf("root %i", this->root_directory_file->get_sector());
+
         if (DebugIsEnabled('f')) {
             freeMap->Print();
             directory->Print();
@@ -163,6 +167,7 @@ FileSystem::FileSystem(bool format) {
             delete mapHdr;
             delete dirHdr;
         }
+        this->current_sector_file = DirectorySector;
         return;
     }
 
@@ -170,9 +175,9 @@ FileSystem::FileSystem(bool format) {
     // the bitmap and directory; these are left open while Nachos is running
     freeMapFile = new OpenFile(FreeMapSector);
     root_directory_file = new OpenFile(DirectorySector);
-    current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
+    this->current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
 
-
+    this->current_sector_file = DirectorySector;
 }
 
 ///
@@ -245,6 +250,47 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     delete directory;
     return success;
 }
+/// create_dot_and_doubledot
+/// @brief create the "." and ".." directory in the directory
+///
+/// @param  the directory where . and .. will be created
+void FileSystem::create_dot_and_doubledot(const char *name, int parent_sector, bool root_file){
+    if(!root_file)this->change_directory(name); // go into son directory
+
+    //create . and ..
+    Create(".", 0, d);
+    Create("..", 0, d);
+
+    Directory *directory = new Directory(NumDirEntries);
+
+    directory->FetchFrom(this->current_directory_file); // get update from disk
+
+    //create file header for . and ..
+    FileHeader *dot_fh = new FileHeader();
+    FileHeader *double_dot_fh = new FileHeader();
+
+    //get sector
+    int dot_sector = directory->Find(".");
+    int double_dot_sector = directory->Find("..");
+
+    //get file header of . and ..
+    dot_fh->FetchFrom(dot_sector);
+    double_dot_fh->FetchFrom(double_dot_sector);
+
+    //set dot and double dot on root sector
+    dot_fh->set_sector(0, this->current_directory_file->get_sector()); //point to the current file
+    double_dot_fh->set_sector(0, parent_sector);
+
+    //write modifications on disk
+    dot_fh->WriteBack(dot_sector);
+    double_dot_fh->WriteBack(double_dot_sector);
+
+    if(!root_file)this->change_directory(".."); // rollback into parent directory
+
+    delete dot_fh;
+    delete double_dot_fh;
+    delete directory;
+}
 
 ///
 /// FileSystem::Create_new_folder
@@ -261,21 +307,38 @@ bool FileSystem::create_new_directory(const char *directory_name) {
 
     OpenFile *open_new_directory = this->Open(directory_name); // open new directory
     new_directory->WriteBack(open_new_directory); // write new directory on disk
-    delete open_new_directory; // delete open_new_directory
 
     //update current directory
     Directory *current_directory = new Directory(NumDirEntries); // init the new directory
     current_directory->FetchFrom(current_directory_file); //Fetch current directory
     current_directory->WriteBack(current_directory_file); //write modifications of current directory into disk
 
+    printf("%i", this->current_directory_file->get_sector());
+    this->create_dot_and_doubledot(directory_name, this->current_sector_file);
+
+    delete open_new_directory;
     delete current_directory;
     return true;
 }
-/*
+
+/// change_directory
+/// @brief change the current directory point by the filesys
+/// \param name
+/// \return true if success false otherwise
 bool FileSystem::change_directory(const char *name){
+    if(name[0] == '.' && name[1] == '\0') return true; // if the name is "." return true, nothing to do
+
     Directory *current_directory = new Directory(NumDirEntries);
+    current_directory->FetchFrom(this->current_directory_file);
+    int sector = current_directory->Find(name);
+
+    if ( sector == -1) return false;            // directory doesn't exist
+
+    OpenFile *openFile = this->Open(name);
+    this->current_directory_file = openFile;
+    this->current_sector_file = current_directory->Find(name);
     return true;
-}*/
+}
 ///
 /// FileSystem::Open
 /// 	Open a file for reading and writing.
@@ -285,14 +348,13 @@ bool FileSystem::change_directory(const char *name){
 ///
 ///	@param "name" -- the text name of the file to be opened
 ///
-
 OpenFile * FileSystem::Open(const char *name) {
     Directory *directory = new Directory(NumDirEntries);
     OpenFile *openFile = NULL;
     int sector;
 
     DEBUG('f', "Opening file %s\n", name);
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(this->current_directory_file);
     sector = directory->Find(name);
     if (sector >= 0)
         openFile = new OpenFile(sector);    // name was found in directory
@@ -312,7 +374,8 @@ OpenFile * FileSystem::Open(const char *name) {
 ///
 ///	@param "name" -- the text name of the file to be removed
 ///
-
+/// \param name
+/// \return
 bool FileSystem::Remove(const char *name) {
     Directory *directory;
     BitMap *freeMap;
@@ -320,7 +383,7 @@ bool FileSystem::Remove(const char *name) {
     int sector;
 
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(current_directory_file);
     sector = directory->Find(name);
     if (sector == -1) {
         delete directory;
@@ -337,7 +400,7 @@ bool FileSystem::Remove(const char *name) {
     directory->Remove(name);
 
     freeMap->WriteBack(freeMapFile);        // flush to disk
-    directory->WriteBack(root_directory_file);        // flush to disk
+    directory->WriteBack(current_directory_file);        // flush to disk
     delete fileHdr;
     delete directory;
     delete freeMap;
@@ -349,10 +412,9 @@ bool FileSystem::Remove(const char *name) {
 /// 	List all the files in the file system directory.
 ///
 
-void
-FileSystem::List() {
+void FileSystem::List() {
     Directory *directory = new Directory(NumDirEntries);
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(current_directory_file);
     directory->List();
     delete directory;
 }
@@ -385,7 +447,7 @@ FileSystem::Print() {
     freeMap->FetchFrom(freeMapFile);
     freeMap->Print();
 
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(current_directory_file);
     directory->Print();
 
     delete bitHdr;

@@ -157,7 +157,18 @@ main(int argc, char **argv) {
         else if (!strcmp (*argv, "-mkdir"))
           {			// print a Nachos file
           ASSERT (argc > 1);
-          fileSystem->create_new_directory(*(argv + 1));
+          if(!fileSystem->create_new_directory(*(argv + 1))) printf("already exist");
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-cd"))
+          {			// print a Nachos file
+          ASSERT (argc > 1);
+          fileSystem->change_directory(*(argv + 1));
+          fileSystem->List();
+          printf("-----------------\n");
+          fileSystem->change_directory("..");
+          fileSystem->List();
+          printf("-----------------");
           argCount = 2;
           }
         else if (!strcmp (*argv, "-r"))

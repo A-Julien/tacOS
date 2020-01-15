@@ -198,3 +198,7 @@ OpenFile::Length()
 { 
     return hdr->FileLength(); 
 }
+
+int OpenFile::get_sector() {
+    return this->hdr->get_sector(0);
+}

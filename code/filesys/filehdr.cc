@@ -117,7 +117,6 @@ int FileHeader::FileLength()
 /// 	Print the contents of the file header, and the contents of all
 ///	the data blocks pointed to by the file header.
 ///
-
 void FileHeader::Print()
 {
     int i, j, k;

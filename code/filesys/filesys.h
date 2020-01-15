@@ -79,7 +79,10 @@ public:
     bool Create(const char *name, int initialSize, File_type type = f);
 
     bool create_new_directory(const char *name);
-    // Create a file (UNIX creat)
+
+
+
+    bool change_directory(const char *name);
 
     OpenFile *Open(const char *name);    // Open a file (UNIX open)
 
@@ -93,6 +96,8 @@ private:
     OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
     OpenFile *root_directory_file;  // "Root" directory -- list of file names, represented as a file
     OpenFile *current_directory_file; // "current" directory -- list of file names, represented as a file
+    int current_sector_file;
+    void create_dot_and_doubledot(const char * name, int parent_sector, bool root= false);
 };
 
 #endif // FILESYS
