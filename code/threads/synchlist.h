@@ -37,6 +37,10 @@ class SynchList
     // apply function to every item in the list
     void Mapcar (VoidFunctionPtr func);
 
+
+    void * get(unsigned int index);
+    unsigned int size();
+
   private:
       List * list;		// the unsynchronized list
     Lock *lock;			// enforce mutual exclusive access to the list

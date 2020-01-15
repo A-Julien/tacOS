@@ -1,9 +1,24 @@
+/// @file synchlisttest.                                            
+/// @brief  Test the list and synchlist after modification by our team
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo         
+///
+
+
 #include "copyright.h"
 #include "system.h"
 #include "synch.h"
 #include "list.h"
 
-
+///
+/// testList
+/// @return "int" : 
+/// 0 : no error
+/// 1 : list is said empty but is not;
+/// 2 : list is not empty but is said it is;
+/// 3 : Append do not add in the right order
+/// 4 : Get do not return the right objet
+/// 6 : Get with a no good index don't return NULL
+///
 
 int testList (void){
 	List * l = new List;
@@ -67,25 +82,8 @@ int testList (void){
 	if( !(l->get(4) == NULL || 	l->get(5) == NULL || l->get(-1) == NULL)){
 		return 6;
 	}
-
-
-	
-
-
-
-
-	
-	
-
-
-	
 	return 0;
-	// 1 list is said empty but is not
-	// 2 list is not empty but is said it is
-	// 3 Append n'ajoute pas dans le bon ordre
-	// 4 Prepend n'ajout pas dans le bon ordre
-	// 5 On ne Get pas le bon objet
-	// 6 get sur un objet avec un mauvaise index ne retourne pas null
+
 
 }
 
