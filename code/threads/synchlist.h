@@ -41,6 +41,15 @@ class SynchList
     void * get(unsigned int index);
     unsigned int size();
 
+
+    // Acquire the current Lock
+    void GetTheLock();
+    // Release the current Lock
+    void FreeTheLock();
+    // Return the list
+    List * getList();
+
+
   private:
       List * list;		// the unsynchronized list
     Lock *lock;			// enforce mutual exclusive access to the list

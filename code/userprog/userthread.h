@@ -16,7 +16,7 @@ class UserThread {
 	public:
 
 		// Create the user Thread with the function to start and the adresses of the structure object to pass to the thread.
-		UserThread(void * f (void *),void * arg);
+		UserThread(VoidFunctionPtr f,void * arg);
 
 		// Delete the user thread structure. 
 		~UserThread();
@@ -58,7 +58,11 @@ class UserThread {
 		// Make all the childdrens survive after the parent died (impossible if the parrent is the main UserThread)
 		void makeAllChildSurvive();
 
+		// Return the child list;
+		List * getChildList();
 
+	
+		void DoneWithTheChildList();
 
 
 	private: 
@@ -71,10 +75,11 @@ class UserThread {
 		Thread * thread;
 		unsigned int ID;
 		// The parent's thread
-		Thread * parent;
+		UserThread * parent;
 		// List of Child
-		SynchList child;
-		SynchList SurivorID;
+		SynchList * child;
+		SynchList * SurivorID;
+		VoidFunctionPtr fun;
 		
 
 		// Free the structure of UserThread, return the arg's adresse (if the void * returned is different of the thread's kernel adresse)

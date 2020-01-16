@@ -132,3 +132,33 @@ SynchList::size(){
     lock->Release ();
     return res;
 }
+
+
+///
+/// SynchList::GetTheLock
+/// Execute an acquire to the lock, then the kernel could use the list for thread management;
+///
+void
+SynchList::GetTheLock(){
+    lock->Acquire();
+}
+
+///
+/// SynchList::FreeTheLock
+/// Execute a release to the lock, then the kernel stop use the list for thread management;
+///
+
+void 
+SynchList::FreeTheLock(){
+    lock->Release();
+}
+
+///
+/// SynchList::getList
+/// Return the list, for thread management utilisation
+/// @return list : a List
+
+List * 
+SynchList::getList(){
+    return list;
+}

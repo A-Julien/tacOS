@@ -8,26 +8,55 @@
 
 #include "userthread.h"
 
-UserThread::UserThread(void * f (void *),void * arg){
+UserThread::UserThread(VoidFunctionPtr f,void * arg){
 	thread = new Thread("User's thread");
 	args = arg;
+	fun = f;
+	ID  = 1; // MODIFY WHEN ID ALLOCATOR;
+}
+
+List * UserThread::getChildList(){
+	child->GetTheLock();
+	return child->getList();
+}
+
+void UserThread::DoneWithTheChildList(){
+	child->FreeTheLock();
 }
 
 void
 UserThread::Run(){
-
+	// Be careful, i casted there in int but in the documentation it's void*
+	thread->Fork(fun, (int) args);
 }
 
 UserThread::~UserThread(){
+
 }
 
 unsigned int 
 UserThread::getId(){
-	return 0;
+	return ID;
 }
 
 void 
 UserThread::exit(void * returnAdress){
+	if(parent == NULL){
+		// CHECK IF GOOD IN DOCUMENTATION
+		thread->Finish();
+		return;
+	}
+	List * l = parent->getChildList();
+	for(unsigned int i = 0; i < l->size(); i++){
+		if( l->get(i) == (void * ) this){
+			// Plus qu'à modifier l'élément de retour ici...
+		}
+	}
+	
+
+	parent->DoneWithTheChildList();
+	thread->Finish();
+
 
 }
 
