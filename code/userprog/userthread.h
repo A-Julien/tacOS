@@ -11,6 +11,13 @@
 #include "thread.h"
 #include "utility.h"
 #include "synchlist.h"
+typedef struct UserThreadState UserThreadState;
+
+struct UserThreadState{
+	void * returnValue = NULL;
+	bool ended = false;
+	unsigned int ID;
+};
 
 class ManagerUserThreadID{
 	public:
