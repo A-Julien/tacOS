@@ -154,10 +154,25 @@ main(int argc, char **argv) {
           Print (*(argv + 1));
           argCount = 2;
           }
-        else if (!strcmp (*argv, "-mkdir"))
-          {			// print a Nachos file
+        else if (!strcmp (*argv, "-cd"))
+          {
           ASSERT (argc > 1);
-          fileSystem->create_new_directory(*(argv + 1));
+          fileSystem->CdDir(*(argv + 1));
+          fileSystem->List();
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-mkdir"))
+          {
+          ASSERT (argc > 1);
+          fileSystem->MkDir(*(argv + 1));
+          fileSystem->List();
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-rm"))
+          {
+          ASSERT (argc > 1);
+          fileSystem->RmDir(*(argv + 1));
+          fileSystem->List();
           argCount = 2;
           }
         else if (!strcmp (*argv, "-r"))

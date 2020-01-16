@@ -153,6 +153,16 @@ Directory::Remove(const char *name) {
     return TRUE;
 }
 
+/// Directory::isEmpty
+/// 	Check if the folder is empty.
+///
+bool Directory::isEmpty(){
+    for (int i = 2; i < tableSize; i++){
+        if(table[i].inUse) return FALSE;
+    }
+    return TRUE;
+}
+
 
 /// Directory::List
 /// 	List all the file names in the directory.

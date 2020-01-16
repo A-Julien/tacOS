@@ -77,9 +77,9 @@ public:
     // and the bitmap of free blocks.
 
     bool Create(const char *name, int initialSize, File_type type = f);
-
-    bool create_new_directory(const char *name);
-    // Create a file (UNIX creat)
+    bool MkDir(const char *directory_name);
+    bool CdDir(const char *directory_name);
+    bool RmDir(const char *directory_name);
 
     OpenFile *Open(const char *name);    // Open a file (UNIX open)
 
