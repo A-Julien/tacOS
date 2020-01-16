@@ -12,6 +12,20 @@
 #include "utility.h"
 #include "synchlist.h"
 
+class ManagerUserThreadID{
+	public:
+		// Create the class
+		ManagerUserThreadID();
+		// Delete the class
+		~ManagerUserThreadID();
+		unsigned int GetNewId();
+		void addIdFreed(unsigned int ID);
+	private:
+		SynchList * freeID;
+		int compteur;
+		Lock *lock;
+};
+
 class UserThread {
 	public:
 

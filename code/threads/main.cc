@@ -64,6 +64,7 @@ extern void MailTest (int networkID);
 extern void ConsoleTest (char *in, char *out);
 extern void SynchConsoleTest(char *readFile, char *writeFile);
 extern int testList();
+extern int testUTMmono();
 
 ///
 /// main
@@ -102,6 +103,16 @@ main (int argc, char **argv)
 
 	  		if(resTestList != 0){
 	  			printf("Test failed.. error %d\n", resTestList);
+	  		} else {
+	  			printf("test passed\n");
+	  		}
+	  		interrupt->Halt ();
+	  	}
+	  	if(!strcmp(*argv, "-utmmono")){
+	  		int resUserThreadManagertest = testUTMmono();
+
+	  		if(resUserThreadManagertest != 0){
+	  			printf("Test failed.. error %d\n", resUserThreadManagertest);
 	  		} else {
 	  			printf("test passed\n");
 	  		}

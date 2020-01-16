@@ -88,4 +88,74 @@ int testList (void){
 }
 
 
+///
+/// testUTMmono test the UserThreamManager in monothreading
+/// @return "int" : 
+/// 0 : no error
+/// 1 : Don't give the ID in the good order.
+/// 2: Don't reUse ID.
+/// 3 Reuse id that allready have been associated
+/// 4 Don't reuse in the good order
+///
+
+int testUTMmono(){
+	unsigned int zero = managerUserThreadID->GetNewId();
+	unsigned int un = managerUserThreadID->GetNewId();
+	unsigned int deux = managerUserThreadID->GetNewId();
+	
+	if (zero != 0 ||
+	 	un != 1 || 
+	 	deux != 2 ){
+		return 1;
+	 }	
+
+	managerUserThreadID->addIdFreed(un);
+	
+	unsigned int test = managerUserThreadID->GetNewId(); 
+
+	if(test != 1){
+		return 2;
+	}
+
+	unsigned int trois = managerUserThreadID->GetNewId();
+	unsigned int quatre = managerUserThreadID->GetNewId();
+
+	if(trois != 3 || quatre != 4){
+		return 3;
+	}
+
+	managerUserThreadID->addIdFreed(quatre);
+	managerUserThreadID->addIdFreed(trois);
+	managerUserThreadID->addIdFreed(deux);
+	managerUserThreadID->addIdFreed(test);
+	managerUserThreadID->addIdFreed(zero);
+
+	quatre = 0;
+	trois = 0;
+	deux = 0;
+	un = 0;
+	zero = 1;
+
+	quatre = managerUserThreadID->GetNewId();
+	trois = managerUserThreadID->GetNewId();
+	deux = managerUserThreadID->GetNewId();
+	un = managerUserThreadID->GetNewId();
+	zero = managerUserThreadID->GetNewId();
+
+	if (zero != 0 ||
+	 	un != 1 || 
+	 	deux != 2 ||
+	 	trois != 3 ||
+	 	quatre != 4 
+	 	 ){
+		return 4;
+	 }	
+	
+
+
+
+	return 0;
+}
+
+
 

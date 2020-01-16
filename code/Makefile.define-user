@@ -85,7 +85,7 @@ USER_FLAVORS=thread-dev
 
 
  $(eval $(call define-flavor,thread-dev,userprog filesys-stub,\
-     synchconsole.cc userthread.cc synchlisttest.cc))
+     synchconsole.cc userthread.cc testImplem.cc))
  #(eval $(call define-flavor,step5,userprog filesys,\
      synchconsole.cc userthread.cc ))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \

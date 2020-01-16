@@ -22,6 +22,7 @@
 #include "timer.h"
 
 
+
 extern void Initialize (int argc, char **argv);	// Initialization,
 						// called before anything else
 extern void Cleanup ();		// Cleanup, called when
@@ -55,5 +56,8 @@ extern SynchDisk *synchDisk;
 #include "post.h"
 extern PostOffice *postOffice;
 #endif
+
+#include "userthread.h"
+extern ManagerUserThreadID * managerUserThreadID;
 
 #endif // SYSTEM_H

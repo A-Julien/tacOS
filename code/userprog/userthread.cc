@@ -8,6 +8,57 @@
 
 #include "userthread.h"
 
+
+ManagerUserThreadID::ManagerUserThreadID(){
+	freeID = new SynchList;
+	compteur = 0;
+	lock = new Lock ("ManagerUserThreadID lock");
+   
+}
+
+ManagerUserThreadID::~ManagerUserThreadID(){
+	void * adressToFree;
+	
+	List * l = freeID->getList();
+	freeID->GetTheLock();
+	for(unsigned int i = 0; i < freeID->size(); i++){
+		adressToFree = l->Remove();
+		free(adressToFree);
+	} 
+	freeID->FreeTheLock();
+
+	delete lock;
+	delete freeID;
+}
+
+unsigned int 
+ManagerUserThreadID::GetNewId(){
+	int res;
+	void * adressInt;
+	lock->Acquire();
+	if(freeID->size() > 0){
+		adressInt = freeID->Remove();
+		res = *((int *) adressInt);
+		free(adressInt);
+	} else {
+		res = compteur;
+		compteur++;
+	}
+	lock->Release();
+	return res;
+}
+
+void 
+ManagerUserThreadID::addIdFreed(unsigned int ID){
+	
+	void * adressInt = malloc(sizeof(unsigned int));
+	*((unsigned int *) adressInt) = ID;
+	freeID->Append(adressInt);
+
+	
+
+}
+
 UserThread::UserThread(VoidFunctionPtr f,void * arg){
 	thread = new Thread("User's thread");
 	args = arg;
