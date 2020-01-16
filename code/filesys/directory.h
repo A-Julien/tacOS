@@ -63,7 +63,7 @@ public:
 
     void List();            // Print the names of all the files in the directory
     void Print();            // Verbose print of the contents of the directory -- all the file names and their contents.
-
+    bool isEmpty();         // check if the folder is empty
 private:
     int tableSize;            // Number of directory entries
     DirectoryEntry *table;        // Table of pairs: <file name, file header location>
