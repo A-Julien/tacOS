@@ -1,0 +1,87 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[dvipsnames]{xcolor}
+
+\title{TACOS}
+\author{Julien ALAIMO, Hugo FEYDEL, Olivier HUREAU }
+\date{2019-2020}
+
+\begin{document}
+
+\maketitle
+
+\section{Fonctionnalités intéressante/importante}
+\textif{
+une (courte) partie présentant rapidement les fonctionnalitésintéressante/importante de votre noyau (ce qui vous démarque de vos concurrents, ce qu'on peut faire avec votre logiciel, ...)
+}
+
+\vspace{5mm}
+
+
+Un de nos points majeurs de dévloppement a était la robustesse du noyaux. En effet, nous avons essayé au maximum de prévoir quels seraient les erreurs utilisateurs possible afin de pouvoir relever des exceptions ou continuer le programme sans problème tout en vérifiant certaines mesures de sécurités (pas d'overflow)
+
+\section{Spécifications}
+
+\textit{
+une partie "spécifications" listant ce qui est disponible pour les programmes utilisateurs. Il faut mettre ici le genre d'information que vous trouvez dans les pages man. On doit donc trouver tous les appels systèmes implémentés avec leur prototype, la description des arguments, la description du fonctionnement (fonctionnalités utilisateurs, pas implémentation) de l'appel système, de la valeur de retour éventuelle, la signalisation des erreurs, ... Si vous avez également une bibliothèque utilisateur, vous devez décrire ses fonctions de la même manière que les appels systèmes.
+}
+
+
+
+\subsection{Entrées/Sorties}
+\begin{itemize}
+    \item 
+    \textbf{void PutChar( char c);}
+    Ecris le charactère "char c" sur la sortie standard
+    
+    \item 
+    \textbf{void PutString(char * string);}
+    Ecris le chaine de caractère "char * string" sur la sortie standard.
+    La chaine de caractère doit finir par '\textbackslash0'.
+    La taille maximal de la chaine de caractère est de 
+    \colorbox{BurntOrange}{JULIEN MODIFIE ICI STP}.
+    L'apel système \textbf{PutString} est moins coûteux que plusieurs appels système \textbf{PutChar}
+    
+     \item 
+    \textbf{int GetChar();}
+    Retourne la valeur ascii d'un caractère rentré dans l'entrée standard.
+    La fonction attend qu'un charactère soit disponnible. Attention il peux y avoir blocage.
+    
+    
+     \item 
+    \textbf{void GetString(char * string, int taille);}
+    Ecris la chaine de caractère rentrée dans l'entrée standart à l'adresse de la chaine de caractère en paramètre \textbf{char * string}. La taille de cette chaîne de caractère sera inférieur ou égal au paramètre \textbf{int taille}.
+    \colorbox{BurntOrange}{JULIEN MODIFIE ICI, c'est peut etre faux}.
+    
+      \item 
+    \textbf{void GetInt(int * n);}
+    Ecris l'entier rentrée dans l'entrée standart à l'adresse pointé par le paramètre \textbf{n}.
+    L'entier peux être positif comme négatif.
+    La valeur absolue de lentier ne dois pas êre supérieur a \[abs(10^{10}-1)\] (valeur absolue). Sinon une erreur est levée.
+    
+    
+    
+      \item 
+    \textbf{void PutInt(int n);}
+     Ecris l'entier en paramètre \textbf{int n} sur la sortie standard
+    L'entier peux être positif comme négatif.
+    La valeur absolue de l'entier ne dois pas êre supérieur a \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
+    
+    
+\end{itemize}
+
+
+\section{Tests Utilisateurs}
+\textit{une partie "tests utilisateurs" décrivant les programmes de test que vous avez réalisés, ce qu'ils montrent, ...}
+\vspace{5mm}
+
+\section{Implémentation}
+\textit{une partie "implémentation" qui explique les points importants de votre implémentation. C'est donc la seule partie qui parle du détail du code que vous avez écrit. Expliquez vos choix d'implémentation.
+}
+\vspace{5mm}
+
+\section{Scolaire}
+\textit{une partie plus "scolaire" où vous décrivez l'organisation de votre travail (planning, ...), commentaires constructifs sur le déroulement du projet, ...}
+\vspace{5mm}
+
+\end{document}
