@@ -158,12 +158,6 @@ int testUTMmono(){
 }
 
 int testUserThreadState(){
-	UserThreadState * state = (UserThreadState *) malloc(sizeof(UserThreadState));
-	state->ended = true;
-	state->returnValue = malloc(sizeof(int));
-	state->ID = 7;
-
-	printf("%d %d %d\n", state->ended, (int) state->returnValue, state->ID);
 	return 0;
 
 }

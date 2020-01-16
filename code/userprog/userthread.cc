@@ -8,6 +8,57 @@
 
 #include "userthread.h"
 
+UserThreadData::UserThreadData(unsigned int tid, UserThread * UT){
+	ID = tid;
+	userthread = UT;
+	sem = new Semaphore("UserThreadSemaphore", 0);
+}
+
+UserThreadData::~UserThreadData(){
+	delete sem;
+}
+
+void
+UserThreadData::setReturn(void * ret){
+	returnValue = ret;
+}
+
+void
+UserThreadData::setEnd(){
+	ended = true;
+}
+
+void
+UserThreadData::P(){
+	sem->P();
+}
+
+void
+UserThreadData::V(){
+	sem->V();
+}
+
+bool UserThreadData::isEnded(){
+	return ended;
+}
+
+unsigned int 
+UserThreadData::getID(){
+	return ID;
+}
+
+void * 
+UserThreadData::getReturnValue(){
+	return returnValue;
+}
+
+UserThread * 
+UserThreadData::getUserThread(){
+	return userthread;
+}
+
+
+
 
 ManagerUserThreadID::ManagerUserThreadID(){
 	freeID = new SynchList;
@@ -82,7 +133,8 @@ UserThread::Run(){
 }
 
 UserThread::~UserThread(){
-
+	delete child;
+	delete SurivorID;
 }
 
 unsigned int 
@@ -92,6 +144,7 @@ UserThread::getId(){
 
 void 
 UserThread::exit(void * returnAdress){
+	UserThreadData * state;
 	if(parent == NULL){
 		// CHECK IF GOOD IN DOCUMENTATION
 		thread->Finish();
@@ -99,8 +152,11 @@ UserThread::exit(void * returnAdress){
 	}
 	List * l = parent->getChildList();
 	for(unsigned int i = 0; i < l->size(); i++){
-		if( l->get(i) == (void * ) this){
-			// Plus qu'à modifier l'élément de retour ici...
+		state = (UserThreadData *) l->get(i);
+		if( state->getID() == ID){
+			state->setReturn(returnAdress);
+			state->setEnd();
+			break;
 		}
 	}
 	
@@ -113,7 +169,31 @@ UserThread::exit(void * returnAdress){
 
 void * 
 UserThread::WaitForChildExited(int CID){
-	return NULL;
+	void * res;
+	UserThreadData * state;
+	List * l = parent->getChildList();
+	for(unsigned int i = 0; i < l->size(); i++){
+		state = (UserThreadData *) l->get(i);
+		if( state->getID() == ID){
+			break;
+		}
+	}
+	parent->DoneWithTheChildList();
+	if(state == NULL){
+		// Ce n'était pas le bon enfant
+		// Raise exception ?
+		return (void *) this;
+	} 
+	state->P();
+	res = state->getReturnValue();
+	// TODO REMOVE DE LA LIST DES CHILDS
+	//addIdFreed() ? 
+
+	// Remove le userThread
+	delete (state->getUserThread());
+	delete state;
+	
+	return res; 
 }
 
 // EXPERT MODE :
