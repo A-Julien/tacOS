@@ -37,6 +37,7 @@ PostOffice *postOffice;
 #endif
 
 ManagerUserThreadID * managerUserThreadID;
+UserThread * mainUserThread;
 
 // External definition, to allow us to take a pointer to this function
 extern void Cleanup ();
@@ -139,6 +140,9 @@ Initialize (int argc, char **argv)
 #endif
       }
 
+     managerUserThreadID = new ManagerUserThreadID();
+     mainUserThread = new UserThread(NULL, NULL, managerUserThreadID->GetNewId());
+
     DebugInit (debugArgs);	// initialize DEBUG messages
     stats = new Statistics ();	// collect statistics
     interrupt = new Interrupt;	// start up interrupt handling
@@ -151,7 +155,8 @@ Initialize (int argc, char **argv)
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
-    currentThread = new Thread ("main");
+    //currentThread = new Thread ("main");
+    currentThread = mainUserThread->getThread();
     currentThread->setStatus (RUNNING);
 
     interrupt->Enable ();
@@ -175,7 +180,7 @@ Initialize (int argc, char **argv)
     postOffice = new PostOffice (netname, rely, 10);
 #endif
 
-    managerUserThreadID = new ManagerUserThreadID();
+   
 }
 
 //----------------------------------------------------------------------
