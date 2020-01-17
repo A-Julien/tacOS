@@ -252,3 +252,40 @@ List::SortedRemove (long long *keyPtr)
     delete element;
     return thing;
 }
+
+///
+/// List::get
+/// Get an object at the place "i"
+/// @param "int index"  : the place where it should be
+/// @return "void *" : return the adress of the object, null if impossible
+///
+
+ void * 
+ List::get(unsigned int index){
+  if( index >= size() || index < 0){
+    return NULL;
+  }
+  ListElement * element = first;
+  for (unsigned int i = 0; i < index; i++){
+    element = element->next;
+  }
+  return element->item;
+ }
+
+///
+/// List::size
+/// Return the size of the current list
+/// @return "unsigned int"  : the size of the list
+///
+
+unsigned int 
+List::size(){
+  unsigned size = 0;
+  ListElement * element = first;
+  for (element = first; element != NULL; element = element->next){
+    size++; 
+  
+  }
+  return size;
+
+}

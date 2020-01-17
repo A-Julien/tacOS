@@ -28,6 +28,7 @@
 #|
 #└─── ...
 
+
 lauch_test() {
   if test -f "$1"input_test/"$2"_input; then #check if test need input
     RESULT=$(../build/nachos-step2 -x ../build/"$1$2" <"$1""input_test/$2"_input)
@@ -79,7 +80,7 @@ ci_main_loop() {
   for d in */; do #for all step test folder
     if [ "${d::9}" == "test_step" ]; then
       echo "-----------------------"
-      echo "| TESTING STEP"${d:9}
+      echo "| TESTING STEP" ${d:5}
       echo "-----------------------"
 
       for file in "$d"*.c; do # for all unit test in step

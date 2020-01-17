@@ -98,3 +98,67 @@ SynchList::Mapcar (VoidFunctionPtr func)
     list->Mapcar (func);
     lock->Release ();
 }
+
+
+///
+/// SynchList::get
+/// Get an object at the place "i"
+/// @param "int index"  : the place where it should be
+/// @return "void *" : return the adress of the object, null if impossible
+///
+
+void * 
+SynchList::get(unsigned int index){
+    void * res;
+    lock->Acquire ();
+    res = list->get(index);
+    lock->Release ();
+    return res;
+}
+
+
+///
+/// SynchList::size
+/// Return the size of the current list
+/// @return "unsigned int"  : the size of the list
+///
+
+
+unsigned int 
+SynchList::size(){
+    unsigned int res;
+    lock->Acquire ();
+    res = list->size();
+    lock->Release ();
+    return res;
+}
+
+
+///
+/// SynchList::GetTheLock
+/// Execute an acquire to the lock, then the kernel could use the list for thread management;
+///
+void
+SynchList::GetTheLock(){
+    lock->Acquire();
+}
+
+///
+/// SynchList::FreeTheLock
+/// Execute a release to the lock, then the kernel stop use the list for thread management;
+///
+
+void 
+SynchList::FreeTheLock(){
+    lock->Release();
+}
+
+///
+/// SynchList::getList
+/// Return the list, for thread management utilisation
+/// @return list : a List
+
+List * 
+SynchList::getList(){
+    return list;
+}

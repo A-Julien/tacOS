@@ -36,6 +36,7 @@ SynchConsole *synchConsole;
 PostOffice *postOffice;
 #endif
 
+ManagerUserThreadID * managerUserThreadID;
 
 // External definition, to allow us to take a pointer to this function
 extern void Cleanup ();
@@ -173,6 +174,8 @@ Initialize (int argc, char **argv)
 #ifdef NETWORK
     postOffice = new PostOffice (netname, rely, 10);
 #endif
+
+    managerUserThreadID = new ManagerUserThreadID();
 }
 
 //----------------------------------------------------------------------
