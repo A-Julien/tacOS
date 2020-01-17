@@ -22,7 +22,7 @@ before_install:
 
 script:
   - docker exec -it guacamole bash -c 'cd /tacos/code && make' #make nachOS
-  - docker exec -it guacamole bash -c 'cd /tacos/code/test && ./test_unit.sh' # Execute unit Test
+  - docker exec -it guacamole bash -c 'cd /tacos/code/test && chmod +x test_unit.sh && ./test_unit.sh' # Execute unit Test
   - gcov /tacos/code/test/halt.c
 
 after_success:
