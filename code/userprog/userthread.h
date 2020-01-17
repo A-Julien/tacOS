@@ -19,7 +19,7 @@ class UserThread {
 	public:
 
 		// Create the user Thread with the function to start and the adresses of the structure object to pass to the thread.
-		UserThread(VoidFunctionPtr f,void * arg);
+		UserThread(VoidFunctionPtr f,void * arg, unsigned int tid);
 
 		// Delete the user thread structure. 
 		~UserThread();
@@ -67,6 +67,8 @@ class UserThread {
 	
 		void DoneWithTheChildList();
 
+		Thread * getThread();
+
 
 	private: 
 		// Initialized with the thread's Kernel adresse. Then if it not the same, we know it have return value. 
@@ -74,7 +76,6 @@ class UserThread {
 		void * args = NULL;
 		// Before entering in sleep mode when waiting for child
 		bool WaitingForChild = false;
-
 		Thread * thread;
 		unsigned int ID;
 		// The parent's thread
