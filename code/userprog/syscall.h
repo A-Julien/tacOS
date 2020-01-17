@@ -43,6 +43,7 @@
 #define SC_PutInt 16
 #define SC_Feof 17
 
+// ID Reservé pour Olivier et les threads de 20 à 40 
 
 #ifdef IN_USER_MODE
 

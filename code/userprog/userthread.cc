@@ -110,11 +110,16 @@ ManagerUserThreadID::addIdFreed(unsigned int ID){
 
 }
 
-UserThread::UserThread(VoidFunctionPtr f,void * arg){
+UserThread::UserThread(VoidFunctionPtr f,void * arg, unsigned int tid){
 	thread = new Thread("User's thread");
 	args = arg;
 	fun = f;
-	ID  = 1; // MODIFY WHEN ID ALLOCATOR;
+	ID  = tid; // MODIFY WHEN ID ALLOCATOR;
+}
+
+Thread * 
+UserThread::getThread(){
+	return thread;
 }
 
 List * UserThread::getChildList(){
