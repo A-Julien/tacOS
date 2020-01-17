@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage[dvipsnames]{xcolor}
+
 
 \title{TACOS}
 \author{Julien ALAIMO, Hugo FEYDEL, Olivier HUREAU }
@@ -11,15 +11,27 @@
 \maketitle
 
 \section{Fonctionnalités intéressante/importante}
-\textif{
-une (courte) partie présentant rapidement les fonctionnalitésintéressante/importante de votre noyau (ce qui vous démarque de vos concurrents, ce qu'on peut faire avec votre logiciel, ...)
+\textit{
+Le système a était pensé simple d'utilisation mais avec certaines possibilités pour aller plus loins. En effet, il nous tenais à coeur d'avoir un environnement de développement permissif où certaines erreurs habituels arrètes l'execution du processus. Nous avons alors décider que le système fonctionnerai tout à fait correctement pour un utilisateur non avancé. Cependant pour un utilisateur avancé, il est possible d'utiliser autrement le système d'exploitation, à ses risques et périls.
 }
 
+\subsection{Le Multithreading}
+
+D'après notre motivation, nous avons décidé de penser autrement les threads. Un mode classique st un mode avancé. Dans le mode classique on retrouvera les mécanismes classiques des threads
+
+Le mode avancé n'est pas recommandée pour les personnes ne maîtrisants pas bien le language tacOS. Il peux engendrer des deadlocks ou fuites de mémoires. Ces outils restent
+ néanmoins à disposition pour les utilisateurs avancé
+ 
 \vspace{5mm}
 
 
-Un de nos points majeurs de dévloppement a était la robustesse du noyaux. En effet, nous avons essayé au maximum de prévoir quels seraient les erreurs utilisateurs possible afin de pouvoir relever des exceptions ou continuer le programme sans problème tout en vérifiant certaines mesures de sécurités (pas d'overflow)
+Initialement, lors de l'exit d'un thread parent une interruption système va être enclenché pour attendre que tout les threads enfants soit finis afin d'éviter des deadlocks ou autres. Il sera néanmoins possible par la suite de ne pas suivre se système.
+En effet, il est possible de transformer des threads en \textbf{"mode survivor"}.
 
+Lorsque le thread est en \textbf{"mode survivor"}, celui-ci ne vas pas mourrir avant son père mais survivre. Il vas par la suite être adopté par le thread parent de son ancien parent. 
+Cette manipulation est impossible lorsque le thread parent est le thread principal du programme.
+
+\newpage
 \section{Spécifications}
 
 \textit{
@@ -32,37 +44,43 @@ une partie "spécifications" listant ce qui est disponible pour les programmes u
 \begin{itemize}
     \item 
     \textbf{void PutChar( char c);}
+    
     Ecris le charactère "char c" sur la sortie standard
     
     \item 
     \textbf{void PutString(char * string);}
+    
     Ecris le chaine de caractère "char * string" sur la sortie standard.
     La chaine de caractère doit finir par '\textbackslash0'.
     La taille maximal de la chaine de caractère est de 
-    \colorbox{BurntOrange}{JULIEN MODIFIE ICI STP}.
+    \textbf{ MODIFIE ICI STP}.
     L'apel système \textbf{PutString} est moins coûteux que plusieurs appels système \textbf{PutChar}
     
      \item 
     \textbf{int GetChar();}
+    
     Retourne la valeur ascii d'un caractère rentré dans l'entrée standard.
     La fonction attend qu'un charactère soit disponnible. Attention il peux y avoir blocage.
     
     
      \item 
     \textbf{void GetString(char * string, int taille);}
+    
     Ecris la chaine de caractère rentrée dans l'entrée standart à l'adresse de la chaine de caractère en paramètre \textbf{char * string}. La taille de cette chaîne de caractère sera inférieur ou égal au paramètre \textbf{int taille}.
-    \colorbox{BurntOrange}{JULIEN MODIFIE ICI, c'est peut etre faux}.
+    \textbf{JULIEN MODIFIE ICI, c'est peut etre faux}.
     
       \item 
     \textbf{void GetInt(int * n);}
+    
     Ecris l'entier rentrée dans l'entrée standart à l'adresse pointé par le paramètre \textbf{n}.
     L'entier peux être positif comme négatif.
-    La valeur absolue de lentier ne dois pas êre supérieur a \[abs(10^{10}-1)\] (valeur absolue). Sinon une erreur est levée.
+    La valeur absolue de lentier ne dois pas êre supérieur a \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
     
     
     
       \item 
     \textbf{void PutInt(int n);}
+    
      Ecris l'entier en paramètre \textbf{int n} sur la sortie standard
     L'entier peux être positif comme négatif.
     La valeur absolue de l'entier ne dois pas êre supérieur a \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
@@ -70,10 +88,90 @@ une partie "spécifications" listant ce qui est disponible pour les programmes u
     
 \end{itemize}
 
+\subsection{Threads}
+En cours de développement
+\begin{itemize}
+
+    \item 
+    \textbf{unsigned int CreateThread(void * f (void * arg), void * arg;}
+    
+    Crée un thread utilisateur et lance la routine \textbf{f}. Le deuxième argument 
+    \textbf{void * arg} est passé en argument a la fonction f.
+    Retourne l'identifiant du thread.
+   
+   \item 
+   \textbf{void ExitThread(void * obj)} 
+   
+   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Doit absolument être utiliser à la fin de l'execution d'un thread (mise à part les utilisateurs avancés, 2.3
+   
+   \item 
+   \textbf{unsigned int ThreadId();}
+   
+	Retourne l'identifiant du thread courant.   
+   
+   \item
+   \textbf{void * WaitForChildExited(int CID);} 
+   
+   Attente passif que le thread d'identifiant \textbf{CID} termine. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente <trouver une valeur>, alors l'identifiant \textbf{CID} n'as pas était reconnu où le thread n'est pas enfant.
+   Cette fonction détruit le thread système. Il faut donc veiller à l'utiliser.
+   
+    
+\end{itemize}
+
+\subsection{Threads mode avancé}
+
+
+\begin{itemize}
+	\item 
+	\textbf{void WaitForAllChildExited();}
+	
+	Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution
+	
+	\item 
+	\textbf{int StopChild(int CID)}
+	
+	Met en pause le thread enfant d'identifiant \textbf{CID}. 
+	La fonction retourne :		
+		\begin{itemize}
+			\item \textbf{0} Si succès
+			\item \textbf{-1} Si l'arrêt à échoué
+			\item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
+		\end{itemize}				
+		
+	
+	\item 
+	\textbf{int WakeUpChild(int CID);}
+	
+		
+	Reveil le thread enfant d'identifiant \textbf{CID}. 
+	La fonction retourne :		
+		\begin{itemize}
+			\item \textbf{0} Si succès
+			\item \textbf{-1} Si l'identifiant n'est pas celui d'un de ses enfants
+			\item \textbf{-2} Si le thread n'est pas en pause
+		\end{itemize}	
+	
+	\item 
+	\textbf{int makeChildSurvive(int CID);}
+	
+	Met le thread enfant d'identifiant \textbf{CID} en \textbf{mode survivor}
+	
+	\item 
+	\textbf{void makeAllChildSurvive();}
+	
+	Met tout les threads enfant en \textbf{mode survivor}
+\end{itemize}
+
+\subsection{Système de fichiers}
+JULIEN AND HUGO
 
 \section{Tests Utilisateurs}
 \textit{une partie "tests utilisateurs" décrivant les programmes de test que vous avez réalisés, ce qu'ils montrent, ...}
 \vspace{5mm}
+
+
+Ici je veux bien que t'explique vite faire que la CI execute ton script, ce que fait ton script. J'écrirais les tests pour step2 et threads.
+
 
 \section{Implémentation}
 \textit{une partie "implémentation" qui explique les points importants de votre implémentation. C'est donc la seule partie qui parle du détail du code que vous avez écrit. Expliquez vos choix d'implémentation.
