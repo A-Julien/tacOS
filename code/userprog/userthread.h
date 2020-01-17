@@ -124,7 +124,7 @@ class ManagerUserThreadID{
 		void addIdFreed(unsigned int ID);
 	private:
 		SynchList * freeID;
-		int compteur;
+		unsigned int compteur;
 		Lock *lock;
 };
 
