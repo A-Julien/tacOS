@@ -172,7 +172,7 @@ void ProcedureGetInt(int *n) {
 }
 
 
-///----------------------------------------------------------------------
+///
 /// ExceptionHandler
 ///      Entry point into the Nachos kernel.  Called when a user program
 ///      is executing, and either does a syscall, or generates an addressing
@@ -192,7 +192,7 @@ void ProcedureGetInt(int *n) {
 /// loop making the same system call forever!
 ///
 /// @param which is the kind of exception.  The list of possible exceptions are in machine.h.
-///----------------------------------------------------------------------
+///
 
 void
 ExceptionHandler(ExceptionType which) {
@@ -204,12 +204,10 @@ ExceptionHandler(ExceptionType which) {
     if (which == SyscallException) {
         switch (type) {
             case SC_PutChar:
-                DEBUG('p', "Putting char\n");
                 synchConsole->SynchPutChar(machine->ReadRegister(4));
                 break;
 
             case SC_PutString:
-                DEBUG('p', "Putting String\n");
                 char string[MAX_STRING_SIZE + 1];
                 copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
                 synchConsole->SynchPutString(string);
@@ -252,7 +250,9 @@ ExceptionHandler(ExceptionType which) {
                 break;
 
             case SC_Exit:
-                machine->WriteRegister(2, machine->ReadRegister(4));
+                char str[50];
+                sprintf(str, "Return value : %d ", machine->ReadRegister(4)); 
+                DEBUG('s', str);        
                 interrupt->Halt();
                 break;
 

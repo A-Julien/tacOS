@@ -107,7 +107,7 @@ En cours de développement
    \item 
    \textbf{unsigned int ThreadId();}
    
-	Retourne l'identifiant du thread courant.   
+  Retourne l'identifiant du thread courant.   
    
    \item
    \textbf{void * WaitForChildExited(int CID);} 
@@ -122,44 +122,44 @@ En cours de développement
 
 
 \begin{itemize}
-	\item 
-	\textbf{void WaitForAllChildExited();}
-	
-	Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution
-	
-	\item 
-	\textbf{int StopChild(int CID)}
-	
-	Met en pause le thread enfant d'identifiant \textbf{CID}. 
-	La fonction retourne :		
-		\begin{itemize}
-			\item \textbf{0} Si succès
-			\item \textbf{-1} Si l'arrêt à échoué
-			\item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
-		\end{itemize}				
-		
-	
-	\item 
-	\textbf{int WakeUpChild(int CID);}
-	
-		
-	Reveil le thread enfant d'identifiant \textbf{CID}. 
-	La fonction retourne :		
-		\begin{itemize}
-			\item \textbf{0} Si succès
-			\item \textbf{-1} Si l'identifiant n'est pas celui d'un de ses enfants
-			\item \textbf{-2} Si le thread n'est pas en pause
-		\end{itemize}	
-	
-	\item 
-	\textbf{int makeChildSurvive(int CID);}
-	
-	Met le thread enfant d'identifiant \textbf{CID} en \textbf{mode survivor}
-	
-	\item 
-	\textbf{void makeAllChildSurvive();}
-	
-	Met tout les threads enfant en \textbf{mode survivor}
+  \item 
+  \textbf{void WaitForAllChildExited();}
+  
+  Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution
+  
+  \item 
+  \textbf{int StopChild(int CID)}
+  
+  Met en pause le thread enfant d'identifiant \textbf{CID}. 
+  La fonction retourne :    
+    \begin{itemize}
+      \item \textbf{0} Si succès
+      \item \textbf{-1} Si l'arrêt à échoué
+      \item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
+    \end{itemize}       
+    
+  
+  \item 
+  \textbf{int WakeUpChild(int CID);}
+  
+    
+  Reveil le thread enfant d'identifiant \textbf{CID}. 
+  La fonction retourne :    
+    \begin{itemize}
+      \item \textbf{0} Si succès
+      \item \textbf{-1} Si l'identifiant n'est pas celui d'un de ses enfants
+      \item \textbf{-2} Si le thread n'est pas en pause
+    \end{itemize} 
+  
+  \item 
+  \textbf{int makeChildSurvive(int CID);}
+  
+  Met le thread enfant d'identifiant \textbf{CID} en \textbf{mode survivor}
+  
+  \item 
+  \textbf{void makeAllChildSurvive();}
+  
+  Met tout les threads enfant en \textbf{mode survivor}
 \end{itemize}
 
 \subsection{Système de fichiers}

@@ -14,11 +14,11 @@
 #include "synch.h"
 #include "synchconsole.h"
 
-//----------------------------------------------------------------------
+//
 // StartProcess
 //      Run a user program.  Open the executable, load it into
 //      memory, and jump to it.
-//----------------------------------------------------------------------
+//
 
 void StartProcess (char *filename)
 {
@@ -51,10 +51,10 @@ static Console *console;
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 
-//----------------------------------------------------------------------
+//
 // ConsoleInterruptHandlers
 //      Wake up the thread that requested the I/O.
-//----------------------------------------------------------------------
+//
 
 static void
 ReadAvail (int arg)
@@ -67,7 +67,7 @@ WriteDone (int arg)
     writeDone->V ();
 }
 
-//----------------------------------------------------------------------
+//
 // ConsoleTest
 //      Test the Console by echoing characters typed at the input onto
 //      the output.  Stop when the user types a ctrl+d command.
@@ -76,7 +76,7 @@ WriteDone (int arg)
 //   @param *out The output file  (NULL for STDOUT)
 // This function is implemented to test a the Console class.
 // ! An error may occur : the first or the second char may be lost for when STDIN is the input !
-//----------------------------------------------------------------------
+//
 
 void
 ConsoleTest (char *in, char *out)
@@ -121,7 +121,7 @@ ConsoleTest (char *in, char *out)
 	}
 }
 
-//----------------------------------------------------------------------
+//
 // SynchConsoleTest
 //      Test the SynchConsole by echoing characters typed at the input onto
 //      the output.  Stop when the user types a ctrl+d command.
@@ -130,7 +130,7 @@ ConsoleTest (char *in, char *out)
 //   @param *out The output file  (NULL for STDOUT)
 // This function is implemented to test a the SynchConsole class.
 // ! An error may occur : the first or the second char may be lost for when STDIN is the input for the first input !
-//----------------------------------------------------------------------
+//
 
 
 void SynchConsoleTest (char *readFile, char *writeFile){
