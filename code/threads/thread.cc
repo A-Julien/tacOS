@@ -419,3 +419,8 @@ Thread::setUserThread(void * userThreadAdress){
 #endif
 
 
+void Thread::setUserThread(void * userThreadAdress);
+void * Thread::getUserThreadAdress(){
+    return (void *) userthread;
+}
+

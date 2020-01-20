@@ -69,6 +69,11 @@ class UserThread {
 
 		Thread * getThread();
 
+		bool removeChild(UserThread * UTC);
+		void addChildren(UserThread * UTC);
+		void setParrent(UserThread * UTP);
+		void * getUserThreadDataChild(unsigned int CID);
+
 
 	private: 
 		// Initialized with the thread's Kernel adresse. Then if it not the same, we know it have return value. 

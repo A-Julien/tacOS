@@ -30,6 +30,8 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+#include "../threads/system.h"
+#include "userthread.h"
 
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
@@ -169,6 +171,43 @@ void ProcedureGetInt(int *n) {
     // Write the int into the expetected adresses
     *n = res;
 
+}
+
+unsigned int  createUserThread(VoidFunctionPtr f,void * arg){
+    UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
+    UserThread * child = new UserThread(f, arg, managerUserThreadID->GetNewId());
+    parrent->addChildren(child);
+    child->setParrent(parrent);
+    child->Run();
+    return child->getId();
+}
+
+// RETURN -1 if no child founded
+void * WaitForChildExited(unsigned int CID) {
+    void  * res;
+    UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
+    UserThreadData * childData = (UserThreadData * ) currentUserThread->getUserThreadDataChild(CID);
+    if (childData == FLAG_ERROR_FOR_VOID) {
+        return FLAG_ERROR_FOR_VOID;
+    }
+    childData->P();
+    res = childData->getReturnValue();
+    currentUserThread->removeChild(childData->getUserThread());
+    delete childData->getUserThread();
+    delete childData;
+    return res;
+}
+
+
+void ExitThread(void * object){
+    UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
+    userThread->exit(object);
+    bool haveChild = userThread->getChildList()->IsEmpty();
+    if(haveChild){
+        // Proccss with the child;
+        // Kill it ? wait it ?
+    }
+    userThread->DoneWithTheChildList();
 }
 
 

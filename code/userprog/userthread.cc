@@ -159,14 +159,18 @@ UserThread::exit(void * returnAdress){
 	for(unsigned int i = 0; i < l->size(); i++){
 		state = (UserThreadData *) l->get(i);
 		if( state->getID() == ID){
-			state->setReturn(returnAdress);
-			state->setEnd();
 			break;
 		}
 	}
 	
 
 	parent->DoneWithTheChildList();
+	if(state->getID() != ID){
+	    // TRAITER L'ERREUR
+	}
+    state->setReturn(returnAdress);
+    state->setEnd();
+    state->V();
 	thread->Finish();
 
 
@@ -232,4 +236,23 @@ void *
 UserThread::FreeChild(int CID){
 	return NULL;
 
+}
+
+
+bool UserThread::removeChild(UserThread * UTC){
+    return false;
+}
+void UserThread::addChildren(UserThread * UTC){
+    child->Append((void *) UTC);
+}
+
+void UserThread::setParrent(UserThread * UTP){
+    parent = UTP;
+}
+
+
+
+void * UserThread::getUserThreadDataChild(unsigned int CID){
+    // TO IMPLEMENT;
+    return NULL;
 }
