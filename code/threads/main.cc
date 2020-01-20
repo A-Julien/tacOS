@@ -145,13 +145,14 @@ main (int argc, char **argv)
 	    } 
 
 	    else if (!strcmp (*argv, "-sc"))
-	   	delete synchConsole;
-	    {			// test the console
+	    {
+	        delete synchConsole;
+	        // test the console
 		if (argc == 1)
 		    SynchConsoleTest (NULL, NULL);
 		else if (argc == 2){
 			SynchConsoleTest (*(argv + 1), NULL);
-		}
+		} else
 		  {
 		      ASSERT (argc > 2);
 		      SynchConsoleTest (*(argv + 1), *(argv + 2));

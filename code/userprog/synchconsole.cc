@@ -47,6 +47,7 @@ static void WriteDone(int arg) { writeDone->V(); }
 SynchConsole::SynchConsole(char *readFile, char *writeFile){
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
+	//delete console;
 	console =  new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
 }
 

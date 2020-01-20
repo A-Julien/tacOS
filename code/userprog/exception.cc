@@ -180,8 +180,10 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
         parrent->addChildren(child);
     }
 
+
     child->setParrent(parrent);
     child->Run();
+    //child->getThread()->status;
     return child->getId();
 }
 
@@ -211,6 +213,20 @@ void SYSExitThread(void * object){
         // Kill it ? wait it ?
     }
     userThread->DoneWithTheChildList();
+}
+
+
+void StartUserThread(int data) {
+    thread_init * dataFork = (thread_init *) data;
+    currentThread->space->InitRegisters();
+    currentThread->space->RestoreState();
+    machine->WriteRegister(PCReg, (int) dataFork->f);
+    machine->WriteRegister(NextPCReg, ((int) dataFork->f) + 4);
+    machine->WriteRegister(4, (int) dataFork->arg);
+    //Adresse de retour ?
+    machine->Run();
+
+    return;
 }
 
 
@@ -305,7 +321,7 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WaitForChildExited:
-
+                SYSWaitForChildExited(machine->ReadRegister(4));
             break;
 
             case SC_ExitThread:

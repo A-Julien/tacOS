@@ -13,6 +13,16 @@
 #include "synchlist.h"
 
 
+extern void StartUserThread(int data);
+
+
+typedef struct
+{
+    void * f;
+    void * arg;
+} thread_init;
+
+
 
 
 class UserThread {
@@ -67,7 +77,7 @@ class UserThread {
 	
 		void DoneWithTheChildList();
 
-		Thread * getThread();
+		Thread *  getThread();
 
 		bool removeChild(UserThread * UTC);
 		void addChildren(UserThread * UTC);
@@ -78,7 +88,7 @@ class UserThread {
 	private: 
 		// Initialized with the thread's Kernel adresse. Then if it not the same, we know it have return value. 
 		void * returnObject;		
-		void * args = NULL;
+
 		// Before entering in sleep mode when waiting for child
 		bool WaitingForChild = false;
 		Thread * thread;
@@ -88,8 +98,8 @@ class UserThread {
 		// List of Child
 		SynchList * child;
 		SynchList * SurivorID;
-		VoidFunctionPtr fun;
-		
+
+        thread_init dataFork;
 
 		// Free the structure of UserThread, return the arg's adresse (if the void * returned is different of the thread's kernel adresse)
 		void * FreeChild(int CID);

@@ -7,22 +7,22 @@
 #include "../../userprog/syscall.h"
 
 void handler(void * arg){
-//    PutString("Deuxieme thread");
+    PutString("Je suis l'enfant ;)");
     ExitThread(0);
 }
 
-void handler2(void){
-    PutString("Deuxieme thread");
-    ExitThread(0);
-}
 
 
 
 int main(void){
     unsigned int TID = createUserThread((void *) handler, 0);
-    PutInt((int) TID);
-    PutInt((int) TID);
-    Halt();
+    PutString("Naissance de l'enfant");
+   WaitForChildExited(TID);
+    int i = 0;
+    i++;
+    i++;
+    i++;
+    //Halt();
 
     return 0;
 }

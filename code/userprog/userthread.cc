@@ -8,6 +8,8 @@
 
 #include "userthread.h"
 
+
+
 UserThreadData::UserThreadData(unsigned int tid, UserThread * UT){
 	ID = tid;
 	userthread = UT;
@@ -42,17 +44,17 @@ bool UserThreadData::isEnded(){
 	return ended;
 }
 
-unsigned int 
+unsigned int
 UserThreadData::getID(){
 	return ID;
 }
 
-void * 
+void *
 UserThreadData::getReturnValue(){
 	return returnValue;
 }
 
-UserThread * 
+UserThread *
 UserThreadData::getUserThread(){
 	return userthread;
 }
@@ -114,9 +116,10 @@ UserThread::UserThread(void * f, void * arg, unsigned int tid){
     char * buffer = (char *) malloc(50*sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
 	thread = new Thread(buffer);
-	args = arg;
-	fun = (VoidFunctionPtr) f;
+	dataFork.arg = arg;
+	dataFork.f = f;
 	ID  = tid; // MODIFY WHEN ID ALLOCATOR;
+	child = new SynchList();
 }
 
 Thread * 
@@ -133,10 +136,16 @@ void UserThread::DoneWithTheChildList(){
 	child->FreeTheLock();
 }
 
+
+
+
 void
 UserThread::Run(){
 	// Be careful, i casted there in int but in the documentation it's void*
-	thread->Fork(fun, (int) args);
+
+	thread->Fork(StartUserThread, (int) &dataFork);
+
+
 }
 
 UserThread::~UserThread(){
@@ -173,7 +182,7 @@ UserThread::exit(void * returnAdress){
     state->setReturn(returnAdress);
     state->setEnd();
     state->V();
-	thread->Finish();
+	//thread->Finish();
 
 
 }
@@ -245,7 +254,8 @@ bool UserThread::removeChild(UserThread * UTC){
     return false;
 }
 void UserThread::addChildren(UserThread * UTC){
-    child->Append((void *) UTC);
+    UserThreadData * childData = new UserThreadData(UTC->getId(), UTC);
+    child->Append((void *) childData);
 }
 
 void UserThread::setParrent(UserThread * UTP){
@@ -255,6 +265,14 @@ void UserThread::setParrent(UserThread * UTP){
 
 
 void * UserThread::getUserThreadDataChild(unsigned int CID){
-    // TO IMPLEMENT;
+   List * l = getChildList();
+   for(unsigned int i = 0; i < l->size(); i++){
+       UserThreadData * UTD = (UserThreadData *) l->get(i);
+       if (UTD->getID() == CID){
+           DoneWithTheChildList();
+           return (void * ) UTD;
+       }
+   }
+    DoneWithTheChildList();
     return NULL;
 }
