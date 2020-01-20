@@ -63,20 +63,27 @@ class OpenFile {
 #else // FILESYS
 class FileHeader;
 
+typedef struct tuple {
+    int seekPosition;
+    unsigned int tid;
+    struct tuple *head;
+    struct tuple *next;
+}tuple_t;
+
 class OpenFile {
   public:
     OpenFile(int sector);		// Open a file whose header is located
 					// at "sector" on the disk
     ~OpenFile();			// Close the file
 
-    void Seek(int position); 		// Set the position from which to 
+    void Seek(int position, unsigned int tid = 0); 		// Set the position from which to
 					// start reading/writing -- UNIX lseek
 
-    int Read(char *into, int numBytes); // Read/write bytes from the file,
+    int Read(char *into, int numBytes, unsigned int tid = 0); // Read/write bytes from the file,
 					// starting at the implicit position.
 					// Return the # actually read/written,
 					// and increment position in file.
-    int Write(const char *from, int numBytes);
+    int Write(const char *from, int numBytes, unsigned int tid = 0);
 
     int ReadAt(char *into, int numBytes, int position);
     					// Read/write bytes from the file,
@@ -90,8 +97,14 @@ class OpenFile {
 
     int get_sector();
   private:
-    FileHeader *hdr;			// Header for this file 
-    int seekPosition;			// Current position within the file
+	void set_seek_position(unsigned int tid, int seekPosition);
+	int get_seek_position(unsigned int tid);
+
+
+
+	FileHeader *hdr;			// Header for this file
+    tuple_t *seek_tid_list;
+
 };
 
 #endif // FILESYS

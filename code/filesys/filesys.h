@@ -72,6 +72,12 @@ public:
 
 #else // FILESYS
 
+typedef struct file_table{
+    struct file_table* head;
+    OpenFile** thread_table;
+    struct file_table* next;
+}file_table_t;
+
 class FileSystem {
 public:
     FileSystem(bool format);        // Initialize the file system.
@@ -99,17 +105,21 @@ private:
     OpenFile* get_open_file_by_sector(int sector);
     bool remove_open_file(OpenFile* openFile);
 
-    static OpenFile* open_files_table[];
+    OpenFile* open_kernel_files_table[MAX_OPEN_FILE];
 
-    static void close_open_files(OpenFile** open_files_table, int table_length=MAX_OPEN_FILE){
-        for (int i = 0; i < table_length; ++i) if(open_files_table[i] != NULL) delete open_files_table[i];
-    }
-
-    static void init_open_files_table(){
-        for(int i = 0; i < MAX_OPEN_FILE; i++) FileSystem::open_files_table[i] = NULL;
+    void init_open_kernel_files_table(){
+        for(int i = 0; i < MAX_OPEN_FILE; i++) FileSystem::open_kernel_files_table[i] = NULL;
     }
 
     OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
+
+    file_table_t* ThreadsFilesTable;
+
+    void init_ThreadsFilesTable(){
+        ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t)); //TODO MWWWOUAIS
+    }
+
+
     //OpenFile *root_directory_file;  // "Root" directory -- list of file names, represented as a file
     //OpenFile *current_directory_file; // "current" directory -- list of file names, represented as a file
 

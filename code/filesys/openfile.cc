@@ -33,7 +33,9 @@ OpenFile::OpenFile(int sector)
 { 
     hdr = new FileHeader;
     hdr->FetchFrom(sector);
-    seekPosition = 0;
+    this->seek_tid_list = (tuple_t *) malloc(sizeof(tuple_t));
+    this->seek_tid_list->tid = 0;
+    this->seek_tid_list->seekPosition = 0;
 }
 
 ///
@@ -54,11 +56,9 @@ OpenFile::~OpenFile()
 ///	@param "position" -- the location within the file for the next Read/Write
 ///
 
-void
-OpenFile::Seek(int position)
-{
-    seekPosition = position;
-}	
+void OpenFile::Seek(int position, unsigned int tid) {
+    this->set_seek_position(tid, position);
+}
 
 ///
 /// OpenFile::Read/Write
@@ -73,20 +73,35 @@ OpenFile::Seek(int position)
 ///	@param "numBytes" -- the number of bytes to transfer
 ///
 
-int
-OpenFile::Read(char *into, int numBytes)
-{
-   int result = ReadAt(into, numBytes, seekPosition);
-   seekPosition += result;
+int OpenFile::Read(char *into, int numBytes, unsigned int tid){
+   int result = ReadAt(into, numBytes, this->get_seek_position(tid));
+   this->set_seek_position(tid, this->get_seek_position(tid)+result);
    return result;
 }
 
-int
-OpenFile::Write(const char *into, int numBytes)
-{
-   int result = WriteAt(into, numBytes, seekPosition);
-   seekPosition += result;
-   return result;
+void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
+    tuple_t *list = seek_tid_list;
+
+    while (list->next != NULL){
+        if(list->tid == tid) list->seekPosition = seekPosition;
+        list = list->next;
+    }
+}
+
+int OpenFile::get_seek_position(unsigned int tid){
+    tuple_t *list = seek_tid_list;
+
+    while (list->next != NULL){
+        if(list->tid == tid) return list->seekPosition;
+        list = list->next;
+    }
+    return -1;
+}
+
+int OpenFile::Write(const char *into, int numBytes, unsigned int tid){
+    int result = WriteAt(into, numBytes, this->get_seek_position(tid));
+    this->set_seek_position(tid, this->get_seek_position(tid)+result);
+    return result;
 }
 
 //
@@ -115,9 +130,7 @@ OpenFile::Write(const char *into, int numBytes)
 ///			read/written
 ///
 
-int
-OpenFile::ReadAt(char *into, int numBytes, int position)
-{
+int OpenFile::ReadAt(char *into, int numBytes, int position){
 
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
@@ -146,9 +159,7 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
     return numBytes;
 }
 
-int
-OpenFile::WriteAt(const char *from, int numBytes, int position)
-{
+int OpenFile::WriteAt(const char *from, int numBytes, int position){
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
@@ -193,9 +204,7 @@ OpenFile::WriteAt(const char *from, int numBytes, int position)
 /// 	@return Return the number of bytes in the file.
 ///
 
-int
-OpenFile::Length() 
-{ 
+int OpenFile::Length() {
     return hdr->FileLength(); 
 }
 
