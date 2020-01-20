@@ -55,15 +55,18 @@
 /// Sectors containing the file headers for the bitmap of free sectors,
 /// and the directory of files.  These file headers are placed in well-known 
 /// sectors, so that they can be located on boot-up.
-#define FreeMapSector        0
+#define FreeMapSector      0
 #define DirectorySector    1
 
 /// Initial file sizes for the bitmap and directory; until the file system
 /// supports extensible files, the directory size sets the maximum number 
 /// of files that can be loaded onto the disk.
 #define FreeMapFileSize    (NumSectors / BitsInByte)
-#define NumDirEntries        10
-#define DirectoryFileSize    (sizeof(DirectoryEntry) * NumDirEntries)
+#define NumDirEntries       10
+#define DirectoryFileSize   (sizeof(DirectoryEntry) * NumDirEntries)
+
+OpenFile* FileSystem::open_files_table[MAX_OPEN_FILE];
+
 
 ///
 /// FileSystem::FileSystem
@@ -79,6 +82,11 @@
 ///
 
 FileSystem::FileSystem(bool format) {
+
+    //init static table
+    //for(int i = 0; i < MAX_OPEN_FILE; i++) this->open_files_table[i] = NULL;
+    init_open_files_table();
+
     DEBUG('f', "Initializing the file system.\n");
     if (format) {
         BitMap *freeMap = new BitMap(NumSectors);
@@ -119,8 +127,8 @@ FileSystem::FileSystem(bool format) {
         // while Nachos is running.
 
         freeMapFile = new OpenFile(FreeMapSector);
-        root_directory_file = new OpenFile(DirectorySector);
-        current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
+        open_files_table[ROOT_DIRECTORY_FILE] = new OpenFile(DirectorySector);
+        open_files_table[CURRENT_DIRECTORY_FILE] = open_files_table[ROOT_DIRECTORY_FILE]; //At the beginning currentDirectoryFile is the root_directory_file
 
         // Once we have the files "open", we can write the initial version
         // of each file back to disk.  The directory at this point is completely
@@ -130,7 +138,8 @@ FileSystem::FileSystem(bool format) {
 
         DEBUG('f', "Writing bitmap and directory back to disk.\n");
         freeMap->WriteBack(freeMapFile);     // flush changes to disk
-        directory->WriteBack(root_directory_file);
+        directory->WriteBack(open_files_table[CURRENT_DIRECTORY_FILE]);
+
 
         if (DebugIsEnabled('f')) {
             freeMap->Print();
@@ -147,9 +156,8 @@ FileSystem::FileSystem(bool format) {
     // if we are not formatting the disk, just open the files representing
     // the bitmap and directory; these are left open while Nachos is running
     freeMapFile = new OpenFile(FreeMapSector);
-    root_directory_file = new OpenFile(DirectorySector);
-    current_directory_file = root_directory_file; //At the beginning currentDirectoryFile is the root_directory_file
-
+    open_files_table[ROOT_DIRECTORY_FILE] = new OpenFile(DirectorySector);
+    open_files_table[CURRENT_DIRECTORY_FILE] = open_files_table[ROOT_DIRECTORY_FILE]; //At the beginning currentDirectoryFile is the root_directory_file
 
 }
 
@@ -192,7 +200,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(current_directory_file);
+    directory->FetchFrom(open_files_table[CURRENT_DIRECTORY_FILE]);
 
     if (directory->Find(name) != -1)
         success = FALSE;            // file is already in directory
@@ -213,7 +221,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
                 // everything worked, flush all changes back to disk
                 hdr->type = type;
                 hdr->WriteBack(sector);
-                directory->WriteBack(current_directory_file);
+                directory->WriteBack(open_files_table[CURRENT_DIRECTORY_FILE]);
                 freeMap->WriteBack(freeMapFile);
             }
             delete hdr;
@@ -223,6 +231,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     delete directory;
     return success;
 }
+
 ///
 /// FileSystem::CdDir
 /// 	Come in folder given.
@@ -235,14 +244,14 @@ bool FileSystem::CdDir(const char *directory_name) {
 
     if( (new_dir_f=Open(directory_name)) == NULL ) return FALSE; //folder doesn't exist
 
-    delete current_directory_file;
+    delete open_files_table[CURRENT_DIRECTORY_FILE];
 
     if(directory_name[0]=='/' and directory_name[1]=='\0') { // folder "/" is root
-        current_directory_file=root_directory_file;
+        open_files_table[CURRENT_DIRECTORY_FILE]=open_files_table[ROOT_DIRECTORY_FILE];
         return TRUE;
     }
 
-    current_directory_file=new_dir_f;
+    open_files_table[CURRENT_DIRECTORY_FILE]=new_dir_f;
     return TRUE;
 }
 
@@ -263,7 +272,7 @@ bool FileSystem::MkDir(const char *directory_name) {
 
     //Get current directory
     current_dir = new Directory(NumDirEntries);
-    current_dir->FetchFrom(current_directory_file);
+    current_dir->FetchFrom(open_files_table[CURRENT_DIRECTORY_FILE]);
 
     if (current_dir->Find(directory_name) != -1) return FALSE;  // folder already exists
 
@@ -291,7 +300,7 @@ bool FileSystem::MkDir(const char *directory_name) {
     freeMap->WriteBack(freeMapFile);
     new_dir_f = new OpenFile(new_sector);
     new_dir->WriteBack(new_dir_f);
-    current_dir->WriteBack(current_directory_file);
+    current_dir->WriteBack(open_files_table[CURRENT_DIRECTORY_FILE]);
 
     delete freeMap;
     delete new_dir_hdr;
@@ -319,7 +328,7 @@ bool FileSystem::RmDir(const char *directory_name){
 
     // Get the current directory
     current_dir = new Directory(NumDirEntries);
-    current_dir->FetchFrom(current_directory_file);
+    current_dir->FetchFrom(open_files_table[CURRENT_DIRECTORY_FILE]);
 
     // Find sector
     sector = current_dir->Find(directory_name);
@@ -332,7 +341,10 @@ bool FileSystem::RmDir(const char *directory_name){
 
     // Get the directory to remove
     to_be_rm_dir = new Directory(NumDirEntries);
-    to_be_rm_file = new OpenFile(sector);
+    to_be_rm_file = this->get_open_file_by_sector(sector);
+    if(!to_be_rm_file){
+        to_be_rm_file = new OpenFile(sector);
+    }
     to_be_rm_dir->FetchFrom(to_be_rm_file);
 
     if(!to_be_rm_dir->isEmpty()) { //directory not empty
@@ -353,7 +365,10 @@ bool FileSystem::RmDir(const char *directory_name){
 
     // Write changes
     freemap->WriteBack(freeMapFile);        // flush to disk
-    current_dir->WriteBack(current_directory_file);        // flush to disk
+    current_dir->WriteBack(open_files_table[CURRENT_DIRECTORY_FILE]);        // flush to disk
+
+    //remove to_be_rm_file to the openfile_table
+    this->remove_open_file(to_be_rm_file);
 
     delete to_be_rm_dir;
     delete file_hdr;
@@ -362,6 +377,28 @@ bool FileSystem::RmDir(const char *directory_name){
     delete freemap;
     return TRUE;
 }
+
+OpenFile* FileSystem::get_open_file_by_sector(int sector){
+    for (int i = 2; i < MAX_OPEN_FILE; ++i) if(open_files_table[i]->get_sector() == sector) return open_files_table[i];
+    return NULL;
+}
+
+/// Remove an OpenFile from the table
+/// Be carefull, this function does not close the openfile
+/// \param openFile the openfile
+/// \return true fi succeed, false of openfile is not found in the table
+bool FileSystem::remove_open_file(OpenFile* openFile){
+    for (int i = 2; i < MAX_OPEN_FILE; ++i) {
+        if(open_files_table[i] == openFile){
+            open_files_table[i] = NULL;
+            return true;
+        }
+    }
+    return false;
+}
+
+void FileSystem::close
+
 
 ///
 /// FileSystem::Open
@@ -372,6 +409,7 @@ bool FileSystem::RmDir(const char *directory_name){
 ///
 ///	@param "name" -- the text name of the file to be opened
 ///
+/// \return openfile, or NULL if error
 
 OpenFile * FileSystem::Open(const char *name) {
     Directory *directory = new Directory(NumDirEntries);
@@ -379,12 +417,34 @@ OpenFile * FileSystem::Open(const char *name) {
     int sector;
 
     DEBUG('f', "Opening file %s\n", name);
-    directory->FetchFrom(current_directory_file);
+    directory->FetchFrom(open_files_table[CURRENT_DIRECTORY_FILE]);
     sector = directory->Find(name);
-    if (sector >= 0)
-        openFile = new OpenFile(sector);    // name was found in directory
+    if (sector >= 0){ // name was found in directory
+        openFile = this->get_open_file_by_sector(sector);
+
+        if(!openFile)openFile = new OpenFile(sector);
+
+        if(!this->add_to_openFile_table(openFile)){
+            delete openFile;
+            delete directory;
+            return NULL;
+        }
+    }
     delete directory;
     return openFile;                // return NULL if not found
+}
+
+/// Add an openfile to the open_files_table
+/// \param openFile the openfile to add
+/// \return true if succeed, false if MAX_OPEN_FILE reached
+bool FileSystem::add_to_openFile_table(OpenFile* openFile){
+    for(int i = 2; i < MAX_OPEN_FILE; i++){
+        if(open_files_table[i] == NULL){
+            open_files_table[i] = openFile;
+            return true;
+        }
+    }
+    return false;
 }
 
 ///
@@ -407,7 +467,7 @@ bool FileSystem::Remove(const char *name) {
     int sector;
 
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(open_files_table[ROOT_DIRECTORY_FILE]);
     sector = directory->Find(name);
     if (sector == -1) {
         delete directory;
@@ -424,7 +484,7 @@ bool FileSystem::Remove(const char *name) {
     directory->Remove(name);
 
     freeMap->WriteBack(freeMapFile);        // flush to disk
-    directory->WriteBack(root_directory_file);        // flush to disk
+    directory->WriteBack(open_files_table[ROOT_DIRECTORY_FILE]);        // flush to disk
     delete fileHdr;
     delete directory;
     delete freeMap;
@@ -439,7 +499,7 @@ bool FileSystem::Remove(const char *name) {
 void
 FileSystem::List() {
     Directory *directory = new Directory(NumDirEntries);
-    directory->FetchFrom(current_directory_file);
+    directory->FetchFrom(open_files_table[CURRENT_DIRECTORY_FILE]);
     directory->List();
     delete directory;
 }
@@ -472,7 +532,7 @@ FileSystem::Print() {
     freeMap->FetchFrom(freeMapFile);
     freeMap->Print();
 
-    directory->FetchFrom(root_directory_file);
+    directory->FetchFrom(open_files_table[ROOT_DIRECTORY_FILE]);
     directory->Print();
 
     delete bitHdr;

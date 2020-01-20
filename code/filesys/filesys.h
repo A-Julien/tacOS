@@ -39,10 +39,15 @@
 #include "copyright.h"
 #include "openfile.h"
 #include "filehdr.h"
+#define MAX_OPEN_FILE 10
+#define ROOT_DIRECTORY_FILE 0
+#define CURRENT_DIRECTORY_FILE 1
 
 #ifdef FILESYS_STUB        // Temporarily implement file system calls as
 // calls to UNIX, until the real file system
 // implementation is available
+
+
 class FileSystem {
 public:
     FileSystem(bool format) {}
@@ -90,9 +95,20 @@ public:
     void Print();            // List all the files and their contents
 
 private:
+    bool add_to_openFile_table(OpenFile* openFile);
+    OpenFile* get_open_file_by_sector(int sector);
+    bool remove_open_file(OpenFile* openFile);
+
+    static OpenFile* open_files_table[];
+
+    static void init_open_files_table(){
+        for(int i = 0; i < MAX_OPEN_FILE; i++) FileSystem::open_files_table[i] = NULL;
+    }
+
     OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
-    OpenFile *root_directory_file;  // "Root" directory -- list of file names, represented as a file
-    OpenFile *current_directory_file; // "current" directory -- list of file names, represented as a file
+    //OpenFile *root_directory_file;  // "Root" directory -- list of file names, represented as a file
+    //OpenFile *current_directory_file; // "current" directory -- list of file names, represented as a file
+
 };
 
 #endif // FILESYS
