@@ -1,5 +1,5 @@
 /**
- * @file getint.c
+ * @file test1.c
  * @brief Test if the exception is correctly raised
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */

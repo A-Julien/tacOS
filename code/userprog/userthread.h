@@ -19,7 +19,7 @@ class UserThread {
 	public:
 
 		// Create the user Thread with the function to start and the adresses of the structure object to pass to the thread.
-		UserThread(VoidFunctionPtr f,void * arg, unsigned int tid);
+		UserThread(void * ,void * arg, unsigned int tid);
 
 		// Delete the user thread structure. 
 		~UserThread();

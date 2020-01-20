@@ -91,7 +91,7 @@ main (int argc, char **argv)
     (void) Initialize (argc, argv);
 
 #if defined(THREADS) && !defined(NETWORK)
-    ThreadTest ();
+        ThreadTest ();
 #endif
 
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount)

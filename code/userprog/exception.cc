@@ -173,17 +173,20 @@ void ProcedureGetInt(int *n) {
 
 }
 
-unsigned int  createUserThread(VoidFunctionPtr f,void * arg){
+unsigned int  SYScreateUserThread(void * f,void * arg){
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
-    UserThread * child = new UserThread(f, arg, managerUserThreadID->GetNewId());
-    parrent->addChildren(child);
+    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+    if(parrent != NULL){
+        parrent->addChildren(child);
+    }
+
     child->setParrent(parrent);
     child->Run();
     return child->getId();
 }
 
 // RETURN -1 if no child founded
-void * WaitForChildExited(unsigned int CID) {
+void * SYSWaitForChildExited(unsigned int CID) {
     void  * res;
     UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
     UserThreadData * childData = (UserThreadData * ) currentUserThread->getUserThreadDataChild(CID);
@@ -199,7 +202,7 @@ void * WaitForChildExited(unsigned int CID) {
 }
 
 
-void ExitThread(void * object){
+void SYSExitThread(void * object){
     UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
     userThread->exit(object);
     bool haveChild = userThread->getChildList()->IsEmpty();
@@ -267,6 +270,7 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_PutInt:
                 ProcedurePutInt(machine->ReadRegister(4));
+                DEBUG('t', "TestDebug\n");
                 break;
 
             case SC_GetInt:
@@ -294,6 +298,19 @@ ExceptionHandler(ExceptionType which) {
                 DEBUG('s', str);        
                 interrupt->Halt();
                 break;
+
+            case SC_createUserThread:
+                resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
+                machine->WriteRegister(2,(int) resultat);
+            break;
+
+            case SC_WaitForChildExited:
+
+            break;
+
+            case SC_ExitThread:
+                SYSExitThread( (void *)  machine->ReadRegister(4));
+            break;
 
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);

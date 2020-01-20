@@ -40,6 +40,32 @@ __start:
  * 	convention on the MIPS.
  * -------------------------------------------------------------
  */
+ .globl createUserThread
+ 	.ent	createUserThread
+ createUserThread:
+ 	addiu $2,$0,SC_createUserThread
+ 	syscall
+ 	j	$31
+ 	.end createUserThread
+
+ .globl WaitForChildExited
+	.ent	WaitForChildExited
+WaitForChildExited:
+	addiu $2,$0,SC_WaitForChildExited
+	syscall
+	j	$31
+	.end WaitForChildExited
+
+
+
+ .globl ExitThread
+ 	.ent	ExitThread
+ ExitThread:
+ 	addiu $2,$0,SC_ExitThread
+ 	syscall
+ 	j	$31
+ 	.end ExitThread
+
 
    	.globl Feof
 	.ent	Feof
