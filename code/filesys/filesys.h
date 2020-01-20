@@ -101,6 +101,10 @@ private:
 
     static OpenFile* open_files_table[];
 
+    static void close_open_files(OpenFile* open_files_table, int table_length=MAX_OPEN_FILE){
+        for (int i = 0; i < table_length; ++i) if(open_files_table[i]) delete open_files_table[i]
+    }
+
     static void init_open_files_table(){
         for(int i = 0; i < MAX_OPEN_FILE; i++) FileSystem::open_files_table[i] = NULL;
     }
