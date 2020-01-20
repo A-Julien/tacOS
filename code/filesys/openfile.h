@@ -66,7 +66,7 @@ class FileHeader;
 typedef struct tuple {
     int seekPosition;
     unsigned int tid;
-    struct tuple *head;
+    //struct tuple *head;
     struct tuple *next;
 }tuple_t;
 
@@ -96,7 +96,10 @@ class OpenFile {
 					// end of file, tell, lseek back 
 
     int get_sector();
-  private:
+
+    void add_seek(unsigned int tid);
+
+        private:
 	void set_seek_position(unsigned int tid, int seekPosition);
 	int get_seek_position(unsigned int tid);
 

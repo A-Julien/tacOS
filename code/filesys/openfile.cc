@@ -79,19 +79,32 @@ int OpenFile::Read(char *into, int numBytes, unsigned int tid){
    return result;
 }
 
-void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
-    tuple_t *list = seek_tid_list;
+void OpenFile::add_seek(unsigned int tid){
+    tuple_t * list = this->seek_tid_list;
 
-    while (list->next != NULL){
+    while(list->next != NULL){
+        list = list->next;
+    }
+
+    list->next = (tuple_t*) malloc(sizeof(tuple_t));
+    list->next->tid = tid;
+    list->next->seekPosition = 0;
+
+}
+
+void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
+    tuple_t *list = this->seek_tid_list;
+
+    while (list != NULL){
         if(list->tid == tid) list->seekPosition = seekPosition;
         list = list->next;
     }
 }
 
 int OpenFile::get_seek_position(unsigned int tid){
-    tuple_t *list = seek_tid_list;
+    tuple_t *list = this->seek_tid_list;
 
-    while (list->next != NULL){
+    while (list != NULL){
         if(list->tid == tid) return list->seekPosition;
         list = list->next;
     }

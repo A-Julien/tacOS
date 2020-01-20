@@ -73,7 +73,8 @@ public:
 #else // FILESYS
 
 typedef struct file_table{
-    struct file_table* head;
+    //struct file_table* head;
+    unsigned int tid;
     OpenFile** thread_table;
     struct file_table* next;
 }file_table_t;
@@ -92,7 +93,7 @@ public:
     bool CdDir(const char *directory_name); // Change the current folder
     bool RmDir(const char *directory_name);// Remove a folder
 
-    OpenFile *Open(const char *name);    // Open a file (UNIX open)
+    OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
     bool Remove(const char *name);    // Delete a file (UNIX unlink)
 
@@ -101,22 +102,29 @@ public:
     void Print();            // List all the files and their contents
 
 private:
-    bool add_to_openFile_table(OpenFile* openFile);
+    bool add_to_openFile_table(OpenFile* openFile, OpenFile** table = NULL);
     OpenFile* get_open_file_by_sector(int sector);
     bool remove_open_file(OpenFile* openFile);
+    OpenFile** get_thread_file_table(unsigned int tid);
 
-    OpenFile* open_kernel_files_table[MAX_OPEN_FILE];
 
-    void init_open_kernel_files_table(){
-        for(int i = 0; i < MAX_OPEN_FILE; i++) FileSystem::open_kernel_files_table[i] = NULL;
-    }
+    //OpenFile* open_kernel_files_table[MAX_OPEN_FILE];
+
+    /*void init_open_kernel_files_table(){
+        for(int i = 0; i < MAX_OPEN_FILE; i++) open_kernel_files_table[i] = NULL;
+    }*/
 
     OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
 
     file_table_t* ThreadsFilesTable;
 
+    void init_table(OpenFile** table);
+
     void init_ThreadsFilesTable(){
-        ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t)); //TODO MWWWOUAIS
+        this->ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t));
+        this->ThreadsFilesTable->thread_table = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
+        this->ThreadsFilesTable->tid = 0;
+        this->init_table(this->ThreadsFilesTable->thread_table);
     }
 
 

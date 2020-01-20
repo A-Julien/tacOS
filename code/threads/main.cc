@@ -130,11 +130,11 @@ main(int argc, char **argv) {
           else if (argc == 2){
               SynchConsoleTest (*(argv + 1), NULL);
           }
-            {
+
                 ASSERT (argc > 2);
                 SynchConsoleTest (*(argv + 1), *(argv + 2));
                 argCount = 3;
-            }
+
           interrupt->Halt ();	// once we start the console, then
           // Nachos will loop forever waiting
           // for console input
