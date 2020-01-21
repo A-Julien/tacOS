@@ -182,6 +182,7 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
 
 
     child->setParrent(parrent);
+    ((Thread *) child->getThread())->setUserThread(child);
     child->Run();
     //child->getThread()->status;
     return child->getId();
@@ -273,7 +274,6 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_GetChar:
                 machine->WriteRegister(2, synchConsole->SynchGetChar());
-
                 break;
 
             case SC_GetString:
@@ -334,6 +334,9 @@ ExceptionHandler(ExceptionType which) {
 
         }
         UpdatePC();
+        // POUR NE PAS GARDER LA MAIN APRES UN SYSCALL
+        currentThread->Yield();
+
     } else if (which == CharInsteadOfInt) {
         puts("Il fallais rentrer un caractère..");
         interrupt->Halt();

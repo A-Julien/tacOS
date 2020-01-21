@@ -7,7 +7,8 @@
 #include "../../userprog/syscall.h"
 
 void handler(void * arg){
-    PutString("Je suis l'enfant ;)");
+    PutString("Je suis l'enfant ;)\n");
+    PutString("Et je ne me suis pas encore fais avorté\n");
     ExitThread(0);
 }
 
@@ -15,14 +16,16 @@ void handler(void * arg){
 
 
 int main(void){
+    int i;
     unsigned int TID = createUserThread((void *) handler, 0);
-    PutString("Naissance de l'enfant");
+    PutString("Naissance de l'enfant\n");
+    for(i = 0; i < 10000; i++){
+        i++;
+    }
+    PutString("#Effondrement\n");
    WaitForChildExited(TID);
-    int i = 0;
-    i++;
-    i++;
-    i++;
-    //Halt();
+    PutString("L'enfant est mort\n");
+    Halt();
 
     return 0;
 }

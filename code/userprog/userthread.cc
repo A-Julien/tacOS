@@ -64,7 +64,7 @@ UserThreadData::getUserThread(){
 
 ManagerUserThreadID::ManagerUserThreadID(){
 	freeID = new SynchList;
-	compteur = 0;
+	compteur = 1;
 	lock = new Lock ("ManagerUserThreadID lock");
    
 }
@@ -182,7 +182,7 @@ UserThread::exit(void * returnAdress){
     state->setReturn(returnAdress);
     state->setEnd();
     state->V();
-	//thread->Finish();
+	thread->Finish();
 
 
 }
