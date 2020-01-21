@@ -100,6 +100,8 @@ public:
 
     void Print();            // List all the files and their contents
 
+    void registerOpenFileTable(OpenFile** table,  unsigned int tid);
+
 private:
     bool add_to_openFile_table(OpenFile* openFile, OpenFile** table = NULL);
     OpenFile* get_open_file_by_sector(int sector);

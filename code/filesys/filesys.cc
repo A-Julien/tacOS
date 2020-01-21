@@ -558,3 +558,15 @@ void FileSystem::Print() {
 void FileSystem::init_table(OpenFile **table) {
     for (int i = 0; i < MAX_OPEN_FILE; i++) table[i] = NULL;
 }
+
+void FileSystem::registerOpenFileTable(OpenFile** table, unsigned int tid){
+    this->init_table(table);
+
+    file_table_t * fileTable =  this->ThreadsFilesTable; // get head
+
+    while(fileTable->next != NULL) fileTable = fileTable->next;// go at the end of linked list
+
+    fileTable->next = (file_table_t*) malloc(sizeof(file_table_t));
+    fileTable->next->thread_table = table;
+    fileTable->next->tid = tid;
+}

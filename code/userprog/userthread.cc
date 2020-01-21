@@ -7,16 +7,19 @@
 /// of liability and disclaimer of warranty provisions.
 
 #include "userthread.h"
+#include "../filesys/openfile.h"
 
 
 UserThreadData::UserThreadData(unsigned int tid, UserThread *UT) {
-    ID = tid;
-    userthread = UT;
-    sem = new Semaphore("UserThreadSemaphore", 0);
+    this->ID = tid;
+    this->userthread = UT;
+    this->sem = new Semaphore("UserThreadSemaphore", 0);
+    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
 }
 
 UserThreadData::~UserThreadData() {
-    delete sem;
+    delete this->sem;
+    delete this->TableOfOpenfile;
 }
 
 void UserThreadData::setReturn(void *ret) {
@@ -97,6 +100,10 @@ void ManagerUserThreadID::addIdFreed(unsigned int ID) {
     freeID->Append(adressInt);
 
 
+}
+
+OpenFile** UserThreadData::getTableOfOpenfile(){
+    return this->TableOfOpenfile;
 }
 
 UserThread::UserThread(void *f, void *arg, unsigned int tid) {

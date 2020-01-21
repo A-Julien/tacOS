@@ -176,10 +176,14 @@ void ProcedureGetInt(int *n) {
 unsigned int  SYScreateUserThread(void * f,void * arg){
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
     UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+
+    //#épilépsy
+    fileSystem->registerOpenFileTable(
+            ((UserThreadData *)parrent->getChildList()->get(child->getId()))->getTableOfOpenfile(),child->getId());
+
     if(parrent != NULL){
         parrent->addChildren(child);
     }
-
 
     child->setParrent(parrent);
     ((Thread *) child->getThread())->setUserThread(child);
