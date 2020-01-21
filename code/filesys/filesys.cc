@@ -315,6 +315,7 @@ bool FileSystem::MkDir(const char *directory_name) {
 ///	@param "name" -- name of folder to be removed
 ///
 bool FileSystem::RmDir(const char *directory_name) {
+    if(strcmp(directory_name, ".") || strcmp(directory_name, "..") || strcmp(directory_name, "/")) return false;
     Directory *current_dir, *to_be_rm_dir;
     BitMap *freemap;
     FileHeader *file_hdr;
