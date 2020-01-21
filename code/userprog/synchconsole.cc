@@ -12,9 +12,11 @@
 #include "system.h"
 #include "synchconsole.h"
 #include "synch.h"
+#include "../threads/synch.h"
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
+static Semaphore *writeAvail;
 
 
 
@@ -47,7 +49,9 @@ static void WriteDone(int arg) { writeDone->V(); }
 SynchConsole::SynchConsole(char *readFile, char *writeFile){
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
+    writeAvail = new Semaphore ("can write", 1);
 	console =  new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
+
 }
 
 ///
@@ -59,6 +63,7 @@ SynchConsole::~SynchConsole(){
 	delete console;
 	delete writeDone;
 	delete readAvail;
+    delete writeAvail;
 }
 
 ///
@@ -71,8 +76,10 @@ void SynchConsole::SynchPutChar(const char ch){
 	// Do the work there for the synch for user.
 	// PutChar will automaticly wait for a character to be written.
 	// ie - the console had to call WriteDone Handler to continue the execution.
+
 	 console->PutChar(ch);
      writeDone->P();
+
 }
 
 ///
@@ -85,8 +92,13 @@ int SynchConsole::SynchGetChar(){
 	// Do the work there for the synch for user.
 	// GetChar will automaticly wait for a charactere to be available.
 	// ie - the console had to call ReadHavailbe Handler to continue the execution.
-	 readAvail->P();
-	 return console->GetChar();
+	int res;
+
+
+	readAvail->P();
+	 res = console->GetChar();
+
+	 return res;
 }
 ///
 /// SynchConsole::SynchPutString
@@ -98,10 +110,15 @@ int SynchConsole::SynchGetChar(){
 void SynchConsole::SynchPutString(const char s[]){
 	// While there is no end of String ('\0'), put the current char
 	int i = 0;
+
 	while(s[i] != '\0'){
-		this->SynchPutChar(s[i]);
+        writeAvail->P();
+        console->PutChar(s[i]);
+        writeDone->P();
+        writeAvail->V();
 		i++;
 	}
+
 
 }
 
@@ -116,15 +133,18 @@ void SynchConsole::SynchPutString(const char s[]){
 
 void SynchConsole::SynchGetString(char *s, int n){
 	// For n time, get a character
-	// If c is '\n' or EOF or '\0' we assume it the end of the string. 
+	// If c is '\n' or EOF or '\0' we assume it the end of the string.
+
 	for(int i = 0; i < n; i++){
-		char c = this->SynchGetChar();
+		readAvail->P();
+        char c = console->GetChar();
 		if(c == '\n' || c == EOF || c == '\0'){
 			s[i] = '\0'; return;
 		}
 		s[i] = c ;
 	}
 	s[n] = '\0';
+
 }
 
 ///

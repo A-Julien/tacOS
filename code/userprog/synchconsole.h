@@ -23,7 +23,9 @@ class SynchConsole {
 		void SynchGetString(char *s, int n); // Unix fgets(3S)
 		bool Feof(); // Unix Feof
 
+
 	private:
-		Console *console;
+
+    Console *console;
 };
 #endif // SYNCHCONSOLE_H

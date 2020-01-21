@@ -64,6 +64,8 @@ class List
 
     void * get(unsigned int index);
     unsigned int size();
+// A Tester
+    bool removeElement(void * ElementAdress);
 
   private:
       ListElement * first;	// Head of the list, NULL if list is empty
