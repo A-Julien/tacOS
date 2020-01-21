@@ -24,7 +24,7 @@
 	.ent	__start
 __start:
 	jal	main
-	move	$4,$0		
+	move	$4,$2	
 	jal	Exit	 /* if we return from main, exit(0) */
 	.end __start
 
@@ -40,6 +40,43 @@ __start:
  * 	convention on the MIPS.
  * -------------------------------------------------------------
  */
+
+  .globl WaitForAllChildExited
+  	.ent	WaitForAllChildExited
+  WaitForAllChildExited:
+  	addiu $2,$0,SC_WaitForAllChildExited
+  	syscall
+  	j	$31
+  	.end WaitForAllChildExited
+
+
+
+ .globl createUserThread
+ 	.ent	createUserThread
+ createUserThread:
+ 	addiu $2,$0,SC_createUserThread
+ 	syscall
+ 	j	$31
+ 	.end createUserThread
+
+ .globl WaitForChildExited
+	.ent	WaitForChildExited
+WaitForChildExited:
+	addiu $2,$0,SC_WaitForChildExited
+	syscall
+	j	$31
+	.end WaitForChildExited
+
+
+
+ .globl ExitThread
+ 	.ent	ExitThread
+ ExitThread:
+ 	addiu $2,$0,SC_ExitThread
+ 	syscall
+ 	j	$31
+ 	.end ExitThread
+
 
    	.globl Feof
 	.ent	Feof

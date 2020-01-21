@@ -59,17 +59,15 @@
 
 // External functions used by this file
 
-extern void ThreadTest(void), Copy(const char *unixFile, const char *nachosFile);
-
-extern void Print(char *file), PerformanceTest(void);
-
-extern void StartProcess(char *file), ConsoleTest(char *in, char *out);
-
-extern void MailTest(int networkID);
-
-extern void ConsoleTest(char *in, char *out);
-
+extern void ThreadTest (void), Copy (const char *unixFile, const char *nachosFile);
+extern void Print (char *file), PerformanceTest (void);
+extern void StartProcess (char *file), ConsoleTest (char *in, char *out);
+extern void MailTest (int networkID);
+extern void ConsoleTest (char *in, char *out);
 extern void SynchConsoleTest(char *readFile, char *writeFile);
+extern int testList();
+extern int testUTMmono();
+
 
 ///
 /// main
@@ -93,52 +91,77 @@ main(int argc, char **argv) {
     (void) Initialize(argc, argv);
 
 #if defined(THREADS) && !defined(NETWORK)
-    ThreadTest ();
+        ThreadTest ();
 #endif
 
-    for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
-        argCount = 1;
-        if (!strcmp(*argv, "-z"))    // print copyright
-            printf("%s", copyright);
+    for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount)
+      {
+	  argCount = 1;
+	  if (!strcmp (*argv, "-z"))	// print copyright
+	    	printf ("%s", copyright);
+	  if(!strcmp(*argv, "-tl")){
+	  		int resTestList = testList();
+
+	  		if(resTestList != 0){
+	  			printf("Test failed.. error %d\n", resTestList);
+	  		} else {
+	  			printf("test passed\n");
+	  		}
+	  		interrupt->Halt ();
+	  	}
+	  	if(!strcmp(*argv, "-utmmono")){
+	  		int resUserThreadManagertest = testUTMmono();
+
+	  		if(resUserThreadManagertest != 0){
+	  			printf("Test failed.. error %d\n", resUserThreadManagertest);
+	  		} else {
+	  			printf("test passed\n");
+	  		}
+	  		interrupt->Halt ();
+	  	}
 #ifdef USER_PROGRAM
-        if (!strcmp (*argv, "-x"))
-          {			// run a user program
-          ASSERT (argc > 1);
-          StartProcess (*(argv + 1));
-          argCount = 2;
+	  if (!strcmp (*argv, "-x"))
+	    {			// run a user program
+		ASSERT (argc > 1);
+		//synchConsole = new SynchConsole(NULL,NULL);
+		StartProcess (*(argv + 1));
+		argCount = 2;
 
-          }
-        else if (!strcmp (*argv, "-c"))
-          {			// test the console
-          if (argc == 1)
-              ConsoleTest (NULL, NULL);
-          else
-            {
-                ASSERT (argc > 2);
-                ConsoleTest (*(argv + 1), *(argv + 2));
-                argCount = 3;
-            }
-          interrupt->Halt ();	// once we start the console, then
-          // Nachos will loop forever waiting
-          // for console input
-          }
+	    }
+	  else if (!strcmp (*argv, "-c"))
+	    {			// test the console
+	    		delete synchConsole;
+		if (argc == 1)
+		    ConsoleTest (NULL, NULL);
+		else
+		  {
+		      ASSERT (argc > 2);
+		      ConsoleTest (*(argv + 1), *(argv + 2));
+		      argCount = 3;
+		  }
+		interrupt->Halt ();	// once we start the console, then 
+		// Nachos will loop forever waiting 
+		// for console input
+	    } 
 
-          else if (!strcmp (*argv, "-sc"))
-          {			// test the console
-          if (argc == 1)
-              SynchConsoleTest (NULL, NULL);
-          else if (argc == 2){
-              SynchConsoleTest (*(argv + 1), NULL);
-          }
-
-                ASSERT (argc > 2);
-                SynchConsoleTest (*(argv + 1), *(argv + 2));
-                argCount = 3;
-
-          interrupt->Halt ();	// once we start the console, then
-          // Nachos will loop forever waiting
-          // for console input
-          }
+	    else if (!strcmp (*argv, "-sc"))
+	    {
+	        delete synchConsole;
+	        // test the console
+		if (argc == 1)
+		    SynchConsoleTest (NULL, NULL);
+		else if (argc == 2){
+			SynchConsoleTest (*(argv + 1), NULL);
+		} else
+		  {
+		      ASSERT (argc > 2);
+		      SynchConsoleTest (*(argv + 1), *(argv + 2));
+		      argCount = 3;
+		  }
+		interrupt->Halt ();	// once we start the console, then 
+		// Nachos will loop forever waiting 
+		// for console input
+	    } 
 
 #endif // USER_PROGRAM
 #ifdef FILESYS

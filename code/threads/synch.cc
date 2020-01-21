@@ -26,6 +26,7 @@
 #include "copyright.h"
 #include "synch.h"
 #include "system.h"
+#include "../userprog/userthread.h"
 
 ///
 /// Semaphore::Semaphore
@@ -104,18 +105,41 @@ Semaphore::V ()
 /// the test case in the network assignment won't work!
 Lock::Lock (const char *debugName)
 {
+    WaitingForLock = new List();
 }
 
 Lock::~Lock ()
 {
+   delete WaitingForLock;
 }
+
 void
 Lock::Acquire ()
 {
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        if(currentThreadHolding == NULL){
+            currentThreadHolding = currentThread;
+            DEBUG('t', "Thread %d take the Lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
+
+        } else {
+            DEBUG('t', "Thread %d have been blocked by the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
+            WaitingForLock->Append((void *) currentThread);
+            currentThread->setStatus(BLOCKED);
+            currentThread->Yield();
+        }
+    (void) interrupt->SetLevel (oldLevel);
 }
 void
 Lock::Release ()
 {
+    Thread * next = NULL;
+    //IntStatus oldLevel = interrupt->SetLevel (IntOff);
+        if(!WaitingForLock->IsEmpty()){
+            next = (Thread *) WaitingForLock->Remove();
+            scheduler->ReadyToRun(next);
+        }
+    currentThreadHolding = next;
+    //(void) interrupt->SetLevel (oldLevel);
 }
 
 Condition::Condition (const char *debugName)

@@ -12,6 +12,7 @@
 #define SYSTEM_H
 
 #define MAX_STRING_SIZE 512
+#define FLAG_ERROR_FOR_VOID ((void*) -1)
 
 #include "copyright.h"
 #include "utility.h"
@@ -20,6 +21,7 @@
 #include "interrupt.h"
 #include "stats.h"
 #include "timer.h"
+
 
 
 extern void Initialize (int argc, char **argv);	// Initialization,
@@ -55,5 +57,8 @@ extern SynchDisk *synchDisk;
 #include "post.h"
 extern PostOffice *postOffice;
 #endif
+
+#include "userthread.h"
+extern ManagerUserThreadID * managerUserThreadID;
 
 #endif // SYSTEM_H

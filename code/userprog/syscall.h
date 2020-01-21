@@ -43,6 +43,12 @@
 #define SC_PutInt 16
 #define SC_Feof 17
 
+// ID Reservé pour Olivier et les threads de 20 à 40
+
+#define SC_createUserThread 20
+#define SC_WaitForChildExited 21
+#define SC_ExitThread 22
+#define SC_WaitForAllChildExited 23
 
 #ifdef IN_USER_MODE
 
@@ -214,6 +220,13 @@ void PutInt(int n);
 //
 
 int Feof();
+
+unsigned int  createUserThread(void * f,void * arg);
+void * WaitForChildExited(unsigned int CID);
+void ExitThread(void * object);
+void WaitForAllChildExited();
+
+
 
 #endif // IN_USER_MODE
 

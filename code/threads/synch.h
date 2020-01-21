@@ -88,8 +88,11 @@ class Lock
     // checking in Release, and in
     // Condition variable ops below.
 
+
   private:
     const char *name;		// for debugging
+    Thread * currentThreadHolding = NULL;
+    List * WaitingForLock;
     // plus some other stuff you'll need to define
 };
 
