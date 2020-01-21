@@ -73,7 +73,6 @@ public:
 #else // FILESYS
 
 typedef struct file_table{
-    //struct file_table* head;
     unsigned int tid;
     OpenFile** thread_table;
     struct file_table* next;
@@ -106,20 +105,6 @@ private:
     OpenFile* get_open_file_by_sector(int sector);
     bool remove_open_file(OpenFile* openFile);
     OpenFile** get_thread_file_table(unsigned int tid);
-
-
-    //OpenFile* open_kernel_files_table[MAX_OPEN_FILE];
-
-    /*void init_open_kernel_files_table(){
-        for(int i = 0; i < MAX_OPEN_FILE; i++) open_kernel_files_table[i] = NULL;
-    }*/
-
-    OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
-
-    file_table_t* ThreadsFilesTable;
-
-    void init_table(OpenFile** table);
-
     void init_ThreadsFilesTable(){
         this->ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t));
         this->ThreadsFilesTable->thread_table = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
@@ -127,9 +112,9 @@ private:
         this->init_table(this->ThreadsFilesTable->thread_table);
     }
 
-
-    //OpenFile *root_directory_file;  // "Root" directory -- list of file names, represented as a file
-    //OpenFile *current_directory_file; // "current" directory -- list of file names, represented as a file
+    OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
+    file_table_t* ThreadsFilesTable;
+    void init_table(OpenFile** table);
 
 };
 

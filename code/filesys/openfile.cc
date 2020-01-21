@@ -55,7 +55,6 @@ OpenFile::~OpenFile()
 ///
 ///	@param "position" -- the location within the file for the next Read/Write
 ///
-
 void OpenFile::Seek(int position, unsigned int tid) {
     this->set_seek_position(tid, position);
 }
@@ -72,13 +71,15 @@ void OpenFile::Seek(int position, unsigned int tid) {
 ///	@param "from" -- the buffer containing the data to be written to disk
 ///	@param "numBytes" -- the number of bytes to transfer
 ///
-
 int OpenFile::Read(char *into, int numBytes, unsigned int tid){
    int result = ReadAt(into, numBytes, this->get_seek_position(tid));
    this->set_seek_position(tid, this->get_seek_position(tid)+result);
    return result;
 }
-
+/// OpenFile::add_seek add a seek to a openfile
+/// Allow multi threads to access to the same openfile with separated pointer
+/// \param tid the thread tid
+//
 void OpenFile::add_seek(unsigned int tid){
     tuple_t * list = this->seek_tid_list;
 
@@ -91,7 +92,10 @@ void OpenFile::add_seek(unsigned int tid){
     list->next->seekPosition = 0;
 
 }
-
+/// OpenFile::set_seek_position
+/// set the seek positon.
+/// \param tid the thread tid
+/// \param seekPosition the new seek position
 void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
     tuple_t *list = this->seek_tid_list;
 
@@ -101,6 +105,9 @@ void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
     }
 }
 
+/// OpenFile::get_seek_position
+/// \param tid the thread tid
+/// \return the seek positon
 int OpenFile::get_seek_position(unsigned int tid){
     tuple_t *list = this->seek_tid_list;
 
@@ -111,6 +118,11 @@ int OpenFile::get_seek_position(unsigned int tid){
     return -1;
 }
 
+/// OpenFile::Write into a file
+/// \param into
+/// \param numBytes
+/// \param tid
+/// \return
 int OpenFile::Write(const char *into, int numBytes, unsigned int tid){
     int result = WriteAt(into, numBytes, this->get_seek_position(tid));
     this->set_seek_position(tid, this->get_seek_position(tid)+result);

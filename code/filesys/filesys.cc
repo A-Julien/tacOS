@@ -65,7 +65,6 @@
 #define NumDirEntries       10
 #define DirectoryFileSize   (sizeof(DirectoryEntry) * NumDirEntries)
 
-//OpenFile* FileSystem::this->ThreadsFilesTable->thread_table[MAX_OPEN_FILE];
 
 ///
 /// FileSystem::FileSystem
@@ -82,10 +81,8 @@
 
 FileSystem::FileSystem(bool format) {
 
-    //init static table
-    //for(int i = 0; i < MAX_OPEN_FILE; i++) this->this->ThreadsFilesTable->thread_table[i] = NULL;
-    //init_this->ThreadsFilesTable->thread_table();
-    init_ThreadsFilesTable();
+    //init table
+    this->init_ThreadsFilesTable();
 
     DEBUG('f', "Initializing the file system.\n");
     if (format) {
@@ -120,7 +117,7 @@ FileSystem::FileSystem(bool format) {
 
         // Adding the special directories "." and ".."
         directory->Add(".", DirectorySector);
-        directory->Add("..",DirectorySector); //special case for root : ".." is itself
+        directory->Add("..", DirectorySector); //special case for root : ".." is itself
 
         // OK to open the bitmap and directory files now
         // The file system operations assume these two files are left open
@@ -242,16 +239,16 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
 bool FileSystem::CdDir(const char *directory_name) {
     OpenFile *new_dir_f;
 
-    if( (new_dir_f=Open(directory_name)) == NULL ) return FALSE; //folder doesn't exist
+    if ((new_dir_f = Open(directory_name)) == NULL) return FALSE; //folder doesn't exist
 
     delete this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE];
 
-    if(directory_name[0]=='/' and directory_name[1]=='\0') { // folder "/" is root
+    if (directory_name[0] == '/' and directory_name[1] == '\0') { // folder "/" is root
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
         return TRUE;
     }
 
-    this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE]=new_dir_f;
+    this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = new_dir_f;
     return TRUE;
 }
 
@@ -319,7 +316,7 @@ bool FileSystem::MkDir(const char *directory_name) {
 ///	@param "name" -- name of folder to be removed
 ///
 
-bool FileSystem::RmDir(const char *directory_name){
+bool FileSystem::RmDir(const char *directory_name) {
     Directory *current_dir, *to_be_rm_dir;
     BitMap *freemap;
     FileHeader *file_hdr;
@@ -333,7 +330,7 @@ bool FileSystem::RmDir(const char *directory_name){
     // Find sector
     sector = current_dir->Find(directory_name);
 
-    if(sector == -1) return FALSE;
+    if (sector == -1) return FALSE;
 
     // Get the header
     file_hdr = new FileHeader;
@@ -342,12 +339,12 @@ bool FileSystem::RmDir(const char *directory_name){
     // Get the directory to remove
     to_be_rm_dir = new Directory(NumDirEntries);
     to_be_rm_file = this->get_open_file_by_sector(sector);
-    if(!to_be_rm_file){
+    if (!to_be_rm_file) {
         to_be_rm_file = new OpenFile(sector);
     }
     to_be_rm_dir->FetchFrom(to_be_rm_file);
 
-    if(!to_be_rm_dir->isEmpty()) { //directory not empty
+    if (!to_be_rm_dir->isEmpty()) { //directory not empty
         delete to_be_rm_dir;
         delete file_hdr;
         delete to_be_rm_file;
@@ -377,14 +374,16 @@ bool FileSystem::RmDir(const char *directory_name){
     delete freemap;
     return TRUE;
 }
-
-OpenFile* FileSystem::get_open_file_by_sector(int sector){
-    /*for (int i = 2; i < MAX_OPEN_FILE; i++)
-        if(this->ThreadsFilesTable->thread_table[i]->get_sector() == sector) return this->ThreadsFilesTable->thread_table[i];*/
-    file_table_t* list = this->ThreadsFilesTable;
-    while(list != NULL){
+/// FileSystem::get_open_file_by_sector
+/// search if the openfile stored at "sector" are already open by kernel or thread
+/// \param sector the file to get
+/// \return the OpenFile* or NULL if the file are not open
+OpenFile* FileSystem::get_open_file_by_sector(int sector) {
+    file_table_t *list = this->ThreadsFilesTable;
+    while (list != NULL) {
         for (int i = 0; i < MAX_OPEN_FILE; i++)
-            if (list->thread_table[i] != NULL && list->thread_table[i]->get_sector() == sector) return list->thread_table[i];
+            if (list->thread_table[i] != NULL && list->thread_table[i]->get_sector() == sector)
+                return list->thread_table[i];
         list = list->next;
     }
     return NULL;
@@ -394,9 +393,9 @@ OpenFile* FileSystem::get_open_file_by_sector(int sector){
 /// Be carefull, this function does not close the openfile
 /// \param openFile the openfile
 /// \return true fi succeed, false of openfile is not found in the table
-bool FileSystem::remove_open_file(OpenFile* openFile){
+bool FileSystem::remove_open_file(OpenFile *openFile) {
     for (int i = 2; i < MAX_OPEN_FILE; i++) {
-        if(this->ThreadsFilesTable->thread_table[i] == openFile){
+        if (this->ThreadsFilesTable->thread_table[i] == openFile) {
             this->ThreadsFilesTable->thread_table[i] = NULL;
             return true;
         }
@@ -414,10 +413,8 @@ bool FileSystem::remove_open_file(OpenFile* openFile){
 ///	  Bring the header into memory
 ///
 ///	@param "name" -- the text name of the file to be opened
-///
 /// \return openfile, or NULL if error
-
-OpenFile * FileSystem::Open(const char *name, unsigned int tid) {
+OpenFile *FileSystem::Open(const char *name, unsigned int tid) {
     Directory *directory = new Directory(NumDirEntries);
     OpenFile *openFile = NULL;
     int sector;
@@ -425,15 +422,15 @@ OpenFile * FileSystem::Open(const char *name, unsigned int tid) {
     DEBUG('f', "Opening file %s\n", name);
     directory->FetchFrom(this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE]);
     sector = directory->Find(name);
-    if (sector >= 0){ // name was found in directory
+    if (sector >= 0) { // name was found in directory
         openFile = this->get_open_file_by_sector(sector);
 
-        if(!openFile)openFile = new OpenFile(sector);
+        if (!openFile)openFile = new OpenFile(sector);
         openFile->add_seek(tid);
 
-        OpenFile** thread_table = this->get_thread_file_table(tid);
+        OpenFile **thread_table = this->get_thread_file_table(tid);
 
-        if(!this->add_to_openFile_table(openFile, thread_table)){
+        if (!this->add_to_openFile_table(openFile, thread_table)) {
             delete openFile;
             delete directory;
             return NULL;
@@ -443,12 +440,12 @@ OpenFile * FileSystem::Open(const char *name, unsigned int tid) {
     return openFile;                // return NULL if not found
 }
 
-OpenFile** FileSystem::get_thread_file_table(unsigned int tid){
-    file_table_t* list = this->ThreadsFilesTable;
+OpenFile **FileSystem::get_thread_file_table(unsigned int tid) {
+    file_table_t *list = this->ThreadsFilesTable;
 
-    while( list != NULL ){
-        if(list->tid == tid) return list->thread_table;
-        list =  list->next;
+    while (list != NULL) {
+        if (list->tid == tid) return list->thread_table;
+        list = list->next;
     };
     return NULL;
 }
@@ -456,10 +453,10 @@ OpenFile** FileSystem::get_thread_file_table(unsigned int tid){
 /// Add an openfile to the this->ThreadsFilesTable->thread_table
 /// \param openFile the openfile to add
 /// \return true if succeed, false if MAX_OPEN_FILE reached
-bool FileSystem::add_to_openFile_table(OpenFile* openFile, OpenFile** table){
+bool FileSystem::add_to_openFile_table(OpenFile *openFile, OpenFile **table) {
     //if(table == NULL) table = this->ThreadsFilesTable->thread_table;
-    for(int i = 0; i < MAX_OPEN_FILE; i++){
-        if(table[i] == NULL){
+    for (int i = 0; i < MAX_OPEN_FILE; i++) {
+        if (table[i] == NULL) {
             table[i] = openFile;
             return true;
         }
@@ -479,7 +476,6 @@ bool FileSystem::add_to_openFile_table(OpenFile* openFile, OpenFile** table){
 ///
 ///	@param "name" -- the text name of the file to be removed
 ///
-
 bool FileSystem::Remove(const char *name) {
     Directory *directory;
     BitMap *freeMap;
@@ -515,9 +511,7 @@ bool FileSystem::Remove(const char *name) {
 /// FileSystem::List
 /// 	List all the files in the file system directory.
 ///
-
-void
-FileSystem::List() {
+void FileSystem::List() {
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE]);
     directory->List();
@@ -533,9 +527,7 @@ FileSystem::List() {
 /// 	      the contents of the file header
 /// 	      the data in the file
 ///
-
-void
-FileSystem::Print() {
+void FileSystem::Print() {
     FileHeader *bitHdr = new FileHeader;
     FileHeader *dirHdr = new FileHeader;
     BitMap *freeMap = new BitMap(NumSectors);
@@ -561,6 +553,8 @@ FileSystem::Print() {
     delete directory;
 }
 
-void FileSystem::init_table(OpenFile** table){
-    for(int i = 0; i < MAX_OPEN_FILE; i++) table[i] = NULL;
+/// Init a openfile table
+/// \param table
+void FileSystem::init_table(OpenFile **table) {
+    for (int i = 0; i < MAX_OPEN_FILE; i++) table[i] = NULL;
 }
