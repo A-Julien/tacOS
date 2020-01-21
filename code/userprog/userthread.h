@@ -79,7 +79,7 @@ class UserThread {
 
 		Thread *  getThread();
 
-		bool removeChild(UserThread * UTC);
+		bool removeChild(void * childToRemove);
 		void addChildren(UserThread * UTC);
 		void setParrent(UserThread * UTP);
 		void * getUserThreadDataChild(unsigned int CID);

@@ -191,14 +191,14 @@ void *
 UserThread::WaitForChildExited(int CID){
 	void * res;
 	UserThreadData * state;
-	List * l = parent->getChildList();
+	List * l = getChildList();
 	for(unsigned int i = 0; i < l->size(); i++){
 		state = (UserThreadData *) l->get(i);
 		if( state->getID() == ID){
 			break;
 		}
 	}
-	parent->DoneWithTheChildList();
+	DoneWithTheChildList();
 	if(state == NULL){
 		// Ce n'était pas le bon enfant
 		// Raise exception ?
@@ -206,8 +206,9 @@ UserThread::WaitForChildExited(int CID){
 	} 
 	state->P();
 	res = state->getReturnValue();
-	// TODO REMOVE DE LA LIST DES CHILDS
-	//addIdFreed() ? 
+    // return bool
+	removeChild((void *) state);
+
 
 	// Remove le userThread
 	delete (state->getUserThread());
@@ -250,7 +251,7 @@ UserThread::FreeChild(int CID){
 }
 
 
-bool UserThread::removeChild(UserThread * UTC){
+bool UserThread::removeChild(void * childToRemove){
     return false;
 }
 void UserThread::addChildren(UserThread * UTC){

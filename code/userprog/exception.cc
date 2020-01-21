@@ -188,19 +188,10 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     return child->getId();
 }
 
-// RETURN -1 if no child founded
+
 void * SYSWaitForChildExited(unsigned int CID) {
-    void  * res;
-    UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
-    UserThreadData * childData = (UserThreadData * ) currentUserThread->getUserThreadDataChild(CID);
-    if (childData == FLAG_ERROR_FOR_VOID) {
-        return FLAG_ERROR_FOR_VOID;
-    }
-    childData->P();
-    res = childData->getReturnValue();
-    currentUserThread->removeChild(childData->getUserThread());
-    delete childData->getUserThread();
-    delete childData;
+    UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
+    void * res = currentUserThread->WaitForChildExited(CID);
     return res;
 }
 
@@ -321,7 +312,8 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WaitForChildExited:
-                SYSWaitForChildExited(machine->ReadRegister(4));
+                resultat = (int) SYSWaitForChildExited(machine->ReadRegister(4));
+                machine->WriteRegister(2,(int) resultat);
             break;
 
             case SC_ExitThread:
