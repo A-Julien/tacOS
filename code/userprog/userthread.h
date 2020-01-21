@@ -85,6 +85,9 @@ public:
 
     void *getUserThreadDataChild(unsigned int CID);
 
+    OpenFile** getTableOfOpenfile();
+
+
 
 private:
     // Initialized with the thread's Kernel adresse. Then if it not the same, we know it have return value.
@@ -101,6 +104,9 @@ private:
     SynchList *SurivorID;
 
     thread_init dataFork;
+
+    OpenFile **TableOfOpenfile;
+
 
     // Free the structure of UserThread, return the arg's adresse (if the void * returned is different of the thread's kernel adresse)
     void *FreeChild(int CID);
@@ -130,15 +136,12 @@ public:
 
     UserThread *getUserThread();
 
-    OpenFile** getTableOfOpenfile();
-
 private:
     void *returnValue = this;
     bool ended = false;
     unsigned int ID;
     Semaphore *sem;
     UserThread *userthread;
-    OpenFile **TableOfOpenfile;
 };
 
 class ManagerUserThreadID {

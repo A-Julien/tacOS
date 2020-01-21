@@ -14,12 +14,10 @@ UserThreadData::UserThreadData(unsigned int tid, UserThread *UT) {
     this->ID = tid;
     this->userthread = UT;
     this->sem = new Semaphore("UserThreadSemaphore", 0);
-    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
 }
 
 UserThreadData::~UserThreadData() {
     delete this->sem;
-    delete this->TableOfOpenfile;
 }
 
 void UserThreadData::setReturn(void *ret) {
@@ -102,18 +100,20 @@ void ManagerUserThreadID::addIdFreed(unsigned int ID) {
 
 }
 
-OpenFile** UserThreadData::getTableOfOpenfile(){
-    return this->TableOfOpenfile;
-}
 
 UserThread::UserThread(void *f, void *arg, unsigned int tid) {
     char *buffer = (char *) malloc(50 * sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
-    thread = new Thread(buffer);
+    this->thread = new Thread(buffer);
     dataFork.arg = arg;
     dataFork.f = f;
-    ID = tid; // MODIFY WHEN ID ALLOCATOR;
-    child = new SynchList();
+    this->ID = tid; // MODIFY WHEN ID ALLOCATOR;
+    this->child = new SynchList();
+    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
+}
+
+OpenFile** UserThread::getTableOfOpenfile(){
+    return this->TableOfOpenfile;
 }
 
 Thread * UserThread::getThread() {
@@ -141,6 +141,8 @@ void UserThread::Run() {
 UserThread::~UserThread() {
     delete child;
     delete SurivorID;
+    delete this->TableOfOpenfile;
+
 }
 
 unsigned int UserThread::getId() {

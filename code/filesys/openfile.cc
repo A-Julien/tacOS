@@ -76,6 +76,11 @@ int OpenFile::Read(char *into, int numBytes, unsigned int tid){
    this->set_seek_position(tid, this->get_seek_position(tid)+result);
    return result;
 }
+
+bool OpenFile::isOpenByOthers(){
+    return this->seek_tid_list->next != NULL;
+}
+
 /// OpenFile::add_seek add a seek to a openfile
 /// Allow multi threads to access to the same openfile with separated pointer
 /// \param tid the thread tid
@@ -83,14 +88,29 @@ int OpenFile::Read(char *into, int numBytes, unsigned int tid){
 void OpenFile::add_seek(unsigned int tid){
     tuple_t * list = this->seek_tid_list;
 
-    while(list->next != NULL){
-        list = list->next;
-    }
+    while(list->next != NULL)list = list->next;
 
     list->next = (tuple_t*) malloc(sizeof(tuple_t));
     list->next->tid = tid;
     list->next->seekPosition = 0;
 
+}
+
+/// OpenFile::remove_seek remove a seek to a openfile
+/// Allow multi threads to access to the same openfile with separated pointer
+/// \param tid the thread tid
+//
+bool OpenFile::remove_seek(unsigned int tid){
+    tuple_t* list = this->seek_tid_list;
+
+    while(list->next != NULL && list->next->tid != tid)list = list->next;
+    if(list->next == NULL) return false;
+
+    tuple_t* nnext = list->next->next;
+    delete list->next;
+    list->next = nnext; //remove element
+
+    return true;
 }
 /// OpenFile::set_seek_position
 /// set the seek positon.

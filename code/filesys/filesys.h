@@ -78,6 +78,11 @@ typedef struct file_table{
     struct file_table* next;
 }file_table_t;
 
+typedef struct global_file_table{
+    OpenFile* openFile;
+    struct global_file_table* next;
+}global_file_table_t;
+
 class FileSystem {
 public:
     FileSystem(bool format);        // Initialize the file system.
@@ -101,22 +106,29 @@ public:
     void Print();            // List all the files and their contents
 
     void registerOpenFileTable(OpenFile** table,  unsigned int tid);
+    bool unregisterOpenFileTable(unsigned int tid);
 
-private:
+
+        private:
     bool add_to_openFile_table(OpenFile* openFile, OpenFile** table = NULL);
     OpenFile* get_open_file_by_sector(int sector);
     bool remove_open_file(OpenFile* openFile);
     OpenFile** get_thread_file_table(unsigned int tid);
-    void init_ThreadsFilesTable(){
+    void addFiletoGlobalTable(OpenFile* openFile);
+
+
+        void init_ThreadsFilesTable(){
         this->ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t));
         this->ThreadsFilesTable->thread_table = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
         this->ThreadsFilesTable->tid = 0;
         this->init_table(this->ThreadsFilesTable->thread_table);
     }
 
-    OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
+    global_file_table_t* GlobalOpenFileTable;
+    OpenFile* freeMapFile;          // Bit map of free disk blocks, represented as a file
     file_table_t* ThreadsFilesTable;
     void init_table(OpenFile** table);
+
 
 };
 

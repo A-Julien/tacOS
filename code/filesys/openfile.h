@@ -104,6 +104,11 @@ public:
 
     void add_seek(unsigned int tid);
 
+    bool remove_seek(unsigned int tid);
+
+    bool isOpenByOthers();
+
+
 private:
     void set_seek_position(unsigned int tid, int seekPosition);
 

@@ -186,7 +186,6 @@ FileSystem::FileSystem(bool format) {
 ///	@param "name" -- name of file to be created
 ///	@param "initialSize" -- size of file to be created
 ///
-
 bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     Directory *directory;
     BitMap *freeMap;
@@ -315,7 +314,6 @@ bool FileSystem::MkDir(const char *directory_name) {
 ///	@return Return TRUE if everything goes ok, otherwise, return FALSE.
 ///	@param "name" -- name of folder to be removed
 ///
-
 bool FileSystem::RmDir(const char *directory_name) {
     Directory *current_dir, *to_be_rm_dir;
     BitMap *freemap;
@@ -365,7 +363,7 @@ bool FileSystem::RmDir(const char *directory_name) {
     current_dir->WriteBack(this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE]);        // flush to disk
 
     //remove to_be_rm_file to the openfile_table
-    this->remove_open_file(to_be_rm_file);
+    //this->remove_open_file(to_be_rm_file);
 
     delete to_be_rm_dir;
     delete file_hdr;
@@ -379,11 +377,9 @@ bool FileSystem::RmDir(const char *directory_name) {
 /// \param sector the file to get
 /// \return the OpenFile* or NULL if the file are not open
 OpenFile* FileSystem::get_open_file_by_sector(int sector) {
-    file_table_t *list = this->ThreadsFilesTable;
+    global_file_table_t *list = this->GlobalOpenFileTable;
     while (list != NULL) {
-        for (int i = 0; i < MAX_OPEN_FILE; i++)
-            if (list->thread_table[i] != NULL && list->thread_table[i]->get_sector() == sector)
-                return list->thread_table[i];
+        if(list->openFile->get_sector() == sector) return list->openFile;
         list = list->next;
     }
     return NULL;
@@ -393,7 +389,7 @@ OpenFile* FileSystem::get_open_file_by_sector(int sector) {
 /// Be carefull, this function does not close the openfile
 /// \param openFile the openfile
 /// \return true fi succeed, false of openfile is not found in the table
-bool FileSystem::remove_open_file(OpenFile *openFile) {
+bool FileSystem::remove_open_file(OpenFile* openFile) {
     for (int i = 2; i < MAX_OPEN_FILE; i++) {
         if (this->ThreadsFilesTable->thread_table[i] == openFile) {
             this->ThreadsFilesTable->thread_table[i] = NULL;
@@ -403,7 +399,22 @@ bool FileSystem::remove_open_file(OpenFile *openFile) {
     return false;
 }
 
+void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 
+   if(this->GlobalOpenFileTable == NULL){ //if head is NULL
+       this->GlobalOpenFileTable = (global_file_table_t*) malloc(sizeof(global_file_table_t));
+       this->GlobalOpenFileTable->openFile = openFile;
+       return;
+   }
+
+    global_file_table_t* gfileTable = this->GlobalOpenFileTable; //get head
+
+    // go at the end of linked list
+    while(gfileTable->next != NULL) gfileTable = gfileTable->next;
+
+    gfileTable->next = (global_file_table_t*) malloc(sizeof(global_file_table_t));
+    gfileTable->openFile = openFile;
+}
 
 ///
 /// FileSystem::Open
@@ -414,7 +425,7 @@ bool FileSystem::remove_open_file(OpenFile *openFile) {
 ///
 ///	@param "name" -- the text name of the file to be opened
 /// \return openfile, or NULL if error
-OpenFile *FileSystem::Open(const char *name, unsigned int tid) {
+OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
     Directory *directory = new Directory(NumDirEntries);
     OpenFile *openFile = NULL;
     int sector;
@@ -425,13 +436,20 @@ OpenFile *FileSystem::Open(const char *name, unsigned int tid) {
     if (sector >= 0) { // name was found in directory
         openFile = this->get_open_file_by_sector(sector);
 
-        if (!openFile)openFile = new OpenFile(sector);
+        bool needDelete = false;
+        if (openFile == NULL) {
+            openFile = new OpenFile(sector);
+            needDelete = true;
+        }
+
         openFile->add_seek(tid);
 
         OpenFile **thread_table = this->get_thread_file_table(tid);
 
+        this->addFiletoGlobalTable(openFile);
+
         if (!this->add_to_openFile_table(openFile, thread_table)) {
-            delete openFile;
+            if(needDelete)delete openFile;
             delete directory;
             return NULL;
         }
@@ -453,7 +471,7 @@ OpenFile **FileSystem::get_thread_file_table(unsigned int tid) {
 /// Add an openfile to the this->ThreadsFilesTable->thread_table
 /// \param openFile the openfile to add
 /// \return true if succeed, false if MAX_OPEN_FILE reached
-bool FileSystem::add_to_openFile_table(OpenFile *openFile, OpenFile **table) {
+bool FileSystem::add_to_openFile_table(OpenFile* openFile, OpenFile **table) {
     //if(table == NULL) table = this->ThreadsFilesTable->thread_table;
     for (int i = 0; i < MAX_OPEN_FILE; i++) {
         if (table[i] == NULL) {
@@ -569,4 +587,25 @@ void FileSystem::registerOpenFileTable(OpenFile** table, unsigned int tid){
     fileTable->next = (file_table_t*) malloc(sizeof(file_table_t));
     fileTable->next->thread_table = table;
     fileTable->next->tid = tid;
+}
+
+bool FileSystem::unregisterOpenFileTable(unsigned int tid){
+    file_table_t * fileTable =  this->ThreadsFilesTable; // get head
+
+    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;// go at the end of linked list
+    if(fileTable->next == NULL) return false;
+
+    for (int i = 0; i < MAX_OPEN_FILE; i++){
+        if(fileTable->next->thread_table[i]->isOpenByOthers()) {
+            fileTable->next->thread_table[i]->remove_seek(tid);
+            continue;
+        }
+        delete fileTable->next->thread_table[i];
+    }
+
+    file_table_t* nnext = fileTable->next->next;
+    delete fileTable->next;
+    fileTable->next = nnext; //remove element
+
+    return true;
 }

@@ -177,12 +177,9 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
     UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
 
-    //#épilépsy
-    fileSystem->registerOpenFileTable(
-            ((UserThreadData *)parrent->getChildList()->get(child->getId()))->getTableOfOpenfile(),child->getId());
-
     if(parrent != NULL){
         parrent->addChildren(child);
+        fileSystem->registerOpenFileTable(child->getTableOfOpenfile(), child->getId());
     }
 
     child->setParrent(parrent);
@@ -202,6 +199,7 @@ void * SYSWaitForChildExited(unsigned int CID) {
 
 void SYSExitThread(void * object){
     UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
+    fileSystem->unregisterOpenFileTable(userThread->getId());
     userThread->exit(object);
     bool haveChild = userThread->getChildList()->IsEmpty();
     if(haveChild){
