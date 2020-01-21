@@ -30,6 +30,8 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+#include "../threads/system.h"
+#include "userthread.h"
 
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
@@ -171,6 +173,54 @@ void ProcedureGetInt(int *n) {
 
 }
 
+unsigned int  SYScreateUserThread(void * f,void * arg){
+    UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
+    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+    if(parrent != NULL){
+        parrent->addChildren(child);
+    }
+
+
+    child->setParrent(parrent);
+    ((Thread *) child->getThread())->setUserThread(child);
+    child->Run();
+    //child->getThread()->status;
+    return child->getId();
+}
+
+
+void * SYSWaitForChildExited(unsigned int CID) {
+    UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
+    void * res = currentUserThread->WaitForChildExited(CID);
+    return res;
+}
+
+
+void SYSExitThread(void * object){
+    UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
+    userThread->exit(object);
+    bool haveChild = userThread->getChildList()->IsEmpty();
+    if(haveChild){
+        // Proccss with the child;
+        // Kill it ? wait it ?
+    }
+    userThread->DoneWithTheChildList();
+}
+
+
+void StartUserThread(int data) {
+    thread_init * dataFork = (thread_init *) data;
+    currentThread->space->InitRegisters();
+    currentThread->space->RestoreState();
+    machine->WriteRegister(PCReg, (int) dataFork->f);
+    machine->WriteRegister(NextPCReg, ((int) dataFork->f) + 4);
+    machine->WriteRegister(4, (int) dataFork->arg);
+    //Adresse de retour ?
+    machine->Run();
+
+    return;
+}
+
 
 ///
 /// ExceptionHandler
@@ -215,7 +265,6 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_GetChar:
                 machine->WriteRegister(2, synchConsole->SynchGetChar());
-
                 break;
 
             case SC_GetString:
@@ -228,6 +277,7 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_PutInt:
                 ProcedurePutInt(machine->ReadRegister(4));
+                DEBUG('t', "TestDebug\n");
                 break;
 
             case SC_GetInt:
@@ -256,12 +306,33 @@ ExceptionHandler(ExceptionType which) {
                 interrupt->Halt();
                 break;
 
+            case SC_createUserThread:
+                resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
+                machine->WriteRegister(2,(int) resultat);
+            break;
+
+            case SC_WaitForChildExited:
+                resultat = (int) SYSWaitForChildExited(machine->ReadRegister(4));
+                machine->WriteRegister(2,(int) resultat);
+            break;
+
+            case SC_ExitThread:
+                SYSExitThread( (void *)  machine->ReadRegister(4));
+            break;
+
+            case SC_WaitForAllChildExited:
+                ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
+            break;
+
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
 
         }
         UpdatePC();
+        // POUR NE PAS GARDER LA MAIN APRES UN SYSCALL
+        currentThread->Yield();
+
     } else if (which == CharInsteadOfInt) {
         puts("Il fallais rentrer un caractère..");
         interrupt->Halt();

@@ -53,7 +53,7 @@
 
 #include "utility.h"
 #include "system.h"
-
+// comentaire pour git
 
 // External functions used by this file
 
@@ -91,7 +91,7 @@ main (int argc, char **argv)
     (void) Initialize (argc, argv);
 
 #if defined(THREADS) && !defined(NETWORK)
-    ThreadTest ();
+        ThreadTest ();
 #endif
 
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount)
@@ -145,13 +145,14 @@ main (int argc, char **argv)
 	    } 
 
 	    else if (!strcmp (*argv, "-sc"))
-	   	delete synchConsole;
-	    {			// test the console
+	    {
+	        delete synchConsole;
+	        // test the console
 		if (argc == 1)
 		    SynchConsoleTest (NULL, NULL);
 		else if (argc == 2){
 			SynchConsoleTest (*(argv + 1), NULL);
-		}
+		} else
 		  {
 		      ASSERT (argc > 2);
 		      SynchConsoleTest (*(argv + 1), *(argv + 2));

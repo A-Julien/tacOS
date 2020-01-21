@@ -289,3 +289,26 @@ List::size(){
   return size;
 
 }
+
+bool List::removeElement(void * ElementAdress){
+    ListElement * prec = NULL;
+    ListElement * element;
+    for (element = first; element != NULL; element = element->next){
+        if(element->item == ElementAdress ){
+            if(element == last){
+                last = prec;
+            }
+            if(element == first){
+                first = element->next;
+            } else {
+                if(prec != NULL){
+                    prec->next = element->next;
+                }
+            }
+            delete element;
+            return true;
+        }
+        prec = element;
+    }
+    return false;
+};

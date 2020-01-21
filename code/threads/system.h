@@ -12,6 +12,7 @@
 #define SYSTEM_H
 
 #define MAX_STRING_SIZE 512
+#define FLAG_ERROR_FOR_VOID ((void*) -1)
 
 #include "copyright.h"
 #include "utility.h"

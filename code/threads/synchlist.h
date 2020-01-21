@@ -48,6 +48,8 @@ class SynchList
     void FreeTheLock();
     // Return the list
     List * getList();
+    // Return true if empty
+    bool IsEmpty();
 
 
   private:

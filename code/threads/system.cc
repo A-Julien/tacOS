@@ -141,7 +141,7 @@ Initialize (int argc, char **argv)
       }
 
      managerUserThreadID = new ManagerUserThreadID();
-     mainUserThread = new UserThread(NULL, NULL, managerUserThreadID->GetNewId());
+     mainUserThread = new UserThread(NULL, NULL, 0);
 
     DebugInit (debugArgs);	// initialize DEBUG messages
     stats = new Statistics ();	// collect statistics
@@ -157,6 +157,7 @@ Initialize (int argc, char **argv)
     // object to save its state. 
     //currentThread = new Thread ("main");
     currentThread = mainUserThread->getThread();
+    currentThread->setUserThread((void *) mainUserThread);
     currentThread->setStatus (RUNNING);
 
     interrupt->Enable ();

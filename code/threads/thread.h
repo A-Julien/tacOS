@@ -118,7 +118,7 @@ class Thread
     }
 
     void setUserThread(void * userThreadAdress);
-
+    void * getUserThreadAdress();
   private:
     // some of the private data for this class is listed above
 

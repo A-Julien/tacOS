@@ -8,6 +8,8 @@
 
 #include "userthread.h"
 
+
+
 UserThreadData::UserThreadData(unsigned int tid, UserThread * UT){
 	ID = tid;
 	userthread = UT;
@@ -42,17 +44,17 @@ bool UserThreadData::isEnded(){
 	return ended;
 }
 
-unsigned int 
+unsigned int
 UserThreadData::getID(){
 	return ID;
 }
 
-void * 
+void *
 UserThreadData::getReturnValue(){
 	return returnValue;
 }
 
-UserThread * 
+UserThread *
 UserThreadData::getUserThread(){
 	return userthread;
 }
@@ -62,7 +64,7 @@ UserThreadData::getUserThread(){
 
 ManagerUserThreadID::ManagerUserThreadID(){
 	freeID = new SynchList;
-	compteur = 0;
+	compteur = 1;
 	lock = new Lock ("ManagerUserThreadID lock");
    
 }
@@ -110,11 +112,14 @@ ManagerUserThreadID::addIdFreed(unsigned int ID){
 
 }
 
-UserThread::UserThread(VoidFunctionPtr f,void * arg, unsigned int tid){
-	thread = new Thread("User's thread");
-	args = arg;
-	fun = f;
+UserThread::UserThread(void * f, void * arg, unsigned int tid){
+    char * buffer = (char *) malloc(50*sizeof(char));
+    sprintf(buffer, "Thread NO : %d", tid);
+	thread = new Thread(buffer);
+	dataFork.arg = arg;
+	dataFork.f = f;
 	ID  = tid; // MODIFY WHEN ID ALLOCATOR;
+	child = new SynchList();
 }
 
 Thread * 
@@ -131,10 +136,16 @@ void UserThread::DoneWithTheChildList(){
 	child->FreeTheLock();
 }
 
+
+
+
 void
 UserThread::Run(){
 	// Be careful, i casted there in int but in the documentation it's void*
-	thread->Fork(fun, (int) args);
+
+	thread->Fork(StartUserThread, (int) &dataFork);
+
+
 }
 
 UserThread::~UserThread(){
@@ -159,14 +170,18 @@ UserThread::exit(void * returnAdress){
 	for(unsigned int i = 0; i < l->size(); i++){
 		state = (UserThreadData *) l->get(i);
 		if( state->getID() == ID){
-			state->setReturn(returnAdress);
-			state->setEnd();
 			break;
 		}
 	}
 	
 
 	parent->DoneWithTheChildList();
+	if(state->getID() != ID){
+	    // TRAITER L'ERREUR
+	}
+    state->setReturn(returnAdress);
+    state->setEnd();
+    state->V();
 	thread->Finish();
 
 
@@ -176,14 +191,14 @@ void *
 UserThread::WaitForChildExited(int CID){
 	void * res;
 	UserThreadData * state;
-	List * l = parent->getChildList();
+	List * l = getChildList();
 	for(unsigned int i = 0; i < l->size(); i++){
 		state = (UserThreadData *) l->get(i);
 		if( state->getID() == ID){
 			break;
 		}
 	}
-	parent->DoneWithTheChildList();
+	DoneWithTheChildList();
 	if(state == NULL){
 		// Ce n'était pas le bon enfant
 		// Raise exception ?
@@ -191,8 +206,9 @@ UserThread::WaitForChildExited(int CID){
 	} 
 	state->P();
 	res = state->getReturnValue();
-	// TODO REMOVE DE LA LIST DES CHILDS
-	//addIdFreed() ? 
+    // return bool
+	removeChild((void *) state);
+
 
 	// Remove le userThread
 	delete (state->getUserThread());
@@ -205,7 +221,10 @@ UserThread::WaitForChildExited(int CID){
 
 void 
 UserThread::WaitForAllChildExited(){
-
+    while(!child->IsEmpty()){
+        UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
+        WaitForChildExited(WaitedChild->getID());
+    }
 }
 
 int 
@@ -232,4 +251,36 @@ void *
 UserThread::FreeChild(int CID){
 	return NULL;
 
+}
+
+
+bool UserThread::removeChild(void * childToRemove){
+    bool res;
+    List * childList = getChildList();
+    res = childList->removeElement(childToRemove);
+    DoneWithTheChildList();
+    return res;
+}
+void UserThread::addChildren(UserThread * UTC){
+    UserThreadData * childData = new UserThreadData(UTC->getId(), UTC);
+    child->Append((void *) childData);
+}
+
+void UserThread::setParrent(UserThread * UTP){
+    parent = UTP;
+}
+
+
+
+void * UserThread::getUserThreadDataChild(unsigned int CID){
+   List * l = getChildList();
+   for(unsigned int i = 0; i < l->size(); i++){
+       UserThreadData * UTD = (UserThreadData *) l->get(i);
+       if (UTD->getID() == CID){
+           DoneWithTheChildList();
+           return (void * ) UTD;
+       }
+   }
+    DoneWithTheChildList();
+    return NULL;
 }
