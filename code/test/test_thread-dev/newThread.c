@@ -31,8 +31,10 @@ int main(void){
         PutInt((int) retour);
         PutChar('\n');
     } else {
-        PutString("C'est le bon retour");
+        PutString("C'est le bon retour\n");
     }
+    WaitForAllChildExited();
+    PutString("Plus aucun thread à attendre\n");
     Halt();
 
     return 0;

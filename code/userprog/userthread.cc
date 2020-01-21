@@ -221,7 +221,10 @@ UserThread::WaitForChildExited(int CID){
 
 void 
 UserThread::WaitForAllChildExited(){
-
+    while(!child->IsEmpty()){
+        UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
+        WaitForChildExited(WaitedChild->getID());
+    }
 }
 
 int 
@@ -252,7 +255,11 @@ UserThread::FreeChild(int CID){
 
 
 bool UserThread::removeChild(void * childToRemove){
-    return false;
+    bool res;
+    List * childList = getChildList();
+    res = childList->removeElement(childToRemove);
+    DoneWithTheChildList();
+    return res;
 }
 void UserThread::addChildren(UserThread * UTC){
     UserThreadData * childData = new UserThreadData(UTC->getId(), UTC);

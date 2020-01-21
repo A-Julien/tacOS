@@ -320,6 +320,10 @@ ExceptionHandler(ExceptionType which) {
                 SYSExitThread( (void *)  machine->ReadRegister(4));
             break;
 
+            case SC_WaitForAllChildExited:
+                ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
+            break;
+
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);

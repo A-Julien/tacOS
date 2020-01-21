@@ -162,3 +162,11 @@ List *
 SynchList::getList(){
     return list;
 }
+
+bool SynchList::IsEmpty(){
+    bool res;
+    lock->Acquire();
+    res = list->IsEmpty();
+    lock->Release();
+    return res;
+}
