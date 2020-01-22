@@ -96,8 +96,10 @@ public:
     bool MkDir(const char *directory_name); // Create a folder
     bool CdDir(const char *directory_name); // Change the current folder
     bool RmDir(const char *directory_name);// Remove a folder
+    bool CdFromPathName(const char *directory_name);
 
-    OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
+
+        OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
     bool Remove(const char *name);    // Delete a file (UNIX unlink)
 
@@ -128,9 +130,10 @@ public:
     OpenFile* freeMapFile;          // Bit map of free disk blocks, represented as a file
     file_table_t* ThreadsFilesTable;
     void init_table(OpenFile** table);
+    char ** parse(char *path_name);
 
 
-};
+    };
 
 #endif // FILESYS
 

@@ -228,6 +228,38 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     return success;
 }
 
+char ** FileSystem::parse(char *path_name) {
+
+    int count = 0;
+    char * str = path_name;
+    while ((str = strchr(str, '/')) != NULL){
+        count++;
+        str++;
+    }
+
+    if(path_name[0] != '/') count++;
+    if(path_name[strlen(path_name)-1] == '/') count--;
+
+    char * token = strtok(path_name, "/");
+    char ** result = (char **) malloc(sizeof(char *) * count);
+    result[0] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
+    int i = 0;
+    while(token != NULL){
+        strcpy(result[i], token);
+        i++;
+        result[i] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
+        token = strtok(NULL, "/");
+    }
+    return result;
+}
+bool FileSystem::CdFromPathName(const char *directory_name) {
+    char *path = (char *) malloc(sizeof(char) * (strlen(directory_name) + 1));
+    strcpy(path, directory_name);
+    char **path_split = parse(path);
+    for (int i = 0; path_split[i] != NULL; i++)
+        if(!CdDir(path_split[i])) return FALSE;
+    return TRUE;
+}
 ///
 /// FileSystem::CdDir
 /// 	Come in folder given.
@@ -245,6 +277,7 @@ bool FileSystem::CdDir(const char *directory_name) {
     if (directory_name[0] == '/' and directory_name[1] == '\0') { // folder "/" is root
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
         return TRUE;
+
     }
 
     this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = new_dir_f;
