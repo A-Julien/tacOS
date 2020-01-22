@@ -48,6 +48,8 @@ Thread::Thread (const char *threadName)
     for (int r=NumGPRegs; r<NumTotalRegs; r++)
       userRegisters[r] = 0;
 #endif
+
+
 }
 
 ///
@@ -261,6 +263,7 @@ Thread::Sleep ()
 static void
 ThreadFinish ()
 {
+
     machine->RaiseException(SyscallException, 28);
     currentThread->Finish ();
 }
@@ -273,10 +276,13 @@ InterruptEnable ()
 /// LB: This function has to be called on starting  a new thread to set
 /// up the pagetable correctly. This was missing from the original
 /// version. Credits to Clement Menier for finding this bug!
-
+void niquetamere(){
+    machine->RaiseException(IntOutOfBounds, 0);
+}
 void 
 SetupThreadState ()
 {
+
 
   // LB: Similar to the second part of Scheduler::Run. This has to be
   // done each time a thread is scheduled, either by SWITCH, or by
@@ -371,10 +377,12 @@ Thread::StackAllocate (VoidFunctionPtr func, int arg)
     // machineState[StartupPCState] = (int) InterruptEnable;
     machineState[StartupPCState] = (int) SetupThreadState;
     // End of modification
-    
+
     machineState[InitialPCState] = (int) func;
     machineState[InitialArgState] = arg;
     machineState[WhenDonePCState] = (int) ThreadFinish;
+    //machineState[WhenDonePCState] = 42;
+
 }
 
 #ifdef USER_PROGRAM

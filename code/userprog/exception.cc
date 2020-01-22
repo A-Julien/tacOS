@@ -33,6 +33,7 @@
 #include "../threads/system.h"
 #include "userthread.h"
 
+extern void ExitThread(void * object);
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
  * the user program immediately after the "syscall" instruction.
@@ -249,7 +250,8 @@ void StartUserThread(int data) {
     machine->WriteRegister(NextPCReg, ((int) dataFork->f) + 4);
     machine->WriteRegister(4, (int) dataFork->arg);
     //Adresse de retour ?
-    machine->Run();
+
+    machine->Run((void *) 0x666);
 
     return;
 }
@@ -283,7 +285,7 @@ ExceptionHandler(ExceptionType which) {
     int size;
     int resultat;
     void *getString;
-
+    DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
         switch (type) {
             case SC_PutChar:
@@ -334,14 +336,19 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_Exit:
                 char str[50];
-                sprintf(str, "Return value : %d ", machine->ReadRegister(4)); 
-                DEBUG('s', str);        
-                interrupt->Halt();
-                break;
+                sprintf(str, "Return value : %d ", machine->ReadRegister(4));
+                DEBUG('s', str);
+                currentThread->Finish();
+                currentThread->Yield();
+                SYSExitThread( (void *)  0);
+
+
+               break;
 
             case SC_createUserThread:
                 resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
                 machine->WriteRegister(2,(int) resultat);
+
             break;
 
             case SC_WaitForChildExited:
@@ -350,6 +357,7 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_ExitThread:
+                printf("\nReg 31 = %d\n", machine->ReadRegister(31));
                 SYSExitThread( (void *)  machine->ReadRegister(4));
             break;
 
@@ -379,6 +387,7 @@ ExceptionHandler(ExceptionType which) {
                 puts("Exited without exit");
             break;
             default:
+
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
 

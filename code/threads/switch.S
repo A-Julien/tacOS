@@ -70,6 +70,7 @@ ThreadRoot:
 	jal	StartupPC	# call startup procedure
 	move	a0, InitialArg
 	jal	InitialPC	# call main procedure
+
 	jal 	WhenDonePC	# when we re done, call clean up procedure
 
 	# NEVER REACHED
