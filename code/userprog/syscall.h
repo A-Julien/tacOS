@@ -53,6 +53,7 @@
 #define SC_makeChildSurvive 25
 #define SC_WakeUpChild 26
 #define SC_StopChild 27
+#define SC_ThreadEndedWithoutExit 28
 
 #ifdef IN_USER_MODE
 

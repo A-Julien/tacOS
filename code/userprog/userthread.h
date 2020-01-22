@@ -11,6 +11,9 @@
 #include "thread.h"
 #include "utility.h"
 #include "synchlist.h"
+#include "ManagerUserThreadID.h"
+#include "UserThreadMetadata.h"
+
 
 
 extern void StartUserThread(int data);
@@ -68,39 +71,9 @@ class UserThread {
 };
 
 
-class UserThreadData{
-	public:
-		UserThreadData(unsigned int ID, UserThread * UT);
-		~UserThreadData();
-		void setReturn(void * ret);
-		void setEnd();
-		void P();
-		void V();
-		bool isEnded();
-		unsigned int getID();
-		void * getReturnValue();
-		UserThread * getUserThread();
 
-	private:
-		void * returnValue = this;
-		bool ended = false;
-		unsigned int ID;
-		Semaphore * sem;
-		UserThread * userthread;
-		bool Dosurvive = false;
-};
 
-class ManagerUserThreadID{
-	public:
-        ManagerUserThreadID();
-		~ManagerUserThreadID();
-		unsigned int GetNewId();
-		void addIdFreed(unsigned int ID);
-	private:
-		SynchList * freeID;
-		unsigned int compteur;
-		Lock *lock;
-};
+
 
 
 #endif // USERTHREAD_H

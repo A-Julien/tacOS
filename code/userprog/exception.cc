@@ -214,7 +214,7 @@ void SYSExitThread(void * object){
     List * l = userThread->getChildList();
     while(!l->IsEmpty()){
         UserThreadData * enfantMeta = (UserThreadData *) l->get(0);
-        UserThread * enfant = enfantMeta->getUserThread();
+        UserThread * enfant = (UserThread *) enfantMeta->getUserThread();
         if(enfant->isSurvivor()){
             UserThread * Grandpa = userThread->getParrent();
             if(Grandpa != NULL){
@@ -374,6 +374,10 @@ ExceptionHandler(ExceptionType which) {
             case SC_StopChild:
                 resultat =  ((UserThread *) currentThread->getUserThreadAdress())->StopChild((unsigned int) machine->ReadRegister(4));
                 machine->WriteRegister(2,resultat);
+
+            case SC_ThreadEndedWithoutExit:
+                puts("Exited without exit");
+            break;
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);

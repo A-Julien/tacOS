@@ -16,20 +16,12 @@
 Le système a était pensé simple d'utilisation mais avec certaines possibilités pour aller plus loin. En effet, il nous tenais à cœur d'avoir un environnement de développement permissif où certaines erreurs habituels n'arrêterons pas l'exécution du processus. Nous avons alors décidé que le système fonctionnerai permissivement pour un utilisateur non avancé. Cependant pour un utilisateur avancé, il est possible d'utiliser autrement le système d'exploitation, à ses risques et périls.
 }
 
+
 \subsection{Le Multithreading}
 
-D'après notre motivation, nous avons décidé de penser autrement les threads :un mode classique et un mode avancé. Dans le mode classique on retrouvera les mécanismes classiques des threads (création de threads, exit de threads et récupération d'adresse pour "retourner" un objet.
+Le multiThreading permet à un utilisateur de faire tourner plusieurs instructions en parallèle. Similaire au processus dans un environement linux, les threads partagent le même espace mémoire.
 
-Le mode avancé n'est pas recommandée pour les personnes ne maîtrisant pas bien le language tacOS. Il peux engendrer des deadlocks ou fuites de mémoires. Ces outils restent néanmoins à disposition pour les utilisateurs avancé
- 
-\vspace{5mm}
-
-
-Initialement, lors de l'exit d'un thread parent une interruption système va être enclenché pour attendre que tout les threads enfants soit finis afin d'éviter des deadlocks ou autres. Il sera néanmoins possible par la suite de ne pas suivre se système.
-En effet, il est possible de transformer des threads en \textbf{"mode survivor"}.
-
-Lorsque le thread est en \textbf{"mode survivor"}, celui-ci ne vas pas mourir avant son père mais survivre. Il vas par la suite être adopté par le thread parent de son ancien parent. 
-Cette manipulation est impossible lorsque le thread parent est le thread principal du programme.
+Notre réalisation permet une utilisation simpliste du multithreading d'une façon permissive : si certaines mécaniques de fermeture sont oublié, le système le fera lui même. A contrario, il est possible pour un utilisateur avancé de manipuler plus en détail ses structures.
 
 \newpage
 \section{Spécifications}

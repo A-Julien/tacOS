@@ -261,6 +261,7 @@ Thread::Sleep ()
 static void
 ThreadFinish ()
 {
+    machine->RaiseException(SyscallException, 28);
     currentThread->Finish ();
 }
 static void

@@ -1,148 +1,17 @@
 /// @file userthread.cc
 /// @brief  User thread implementation
-/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo         
+/// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
 ///
 /// Copyright (c) 1992-1993 The Regents of the University of California.
-/// All rights reserved.  See copyright.h for copyright notice and limitation 
+/// All rights reserved.  See copyright.h for copyright notice and limitation
 /// of liability and disclaimer of warranty provisions.
 
 #include "userthread.h"
 
-///
-/// UserThreadData::UserThreadData Constructor for UserThreadData
-/// \param tid Unsigned int id of the thread
-/// \param UT Adress of the UserThread
-UserThreadData::UserThreadData(unsigned int tid, UserThread * UT){
-	ID = tid;
-	userthread = UT;
-	sem = new Semaphore("UserThreadSemaphore", 0);
-}
 
 
-///
-/// UserThreadData::~UserThreadData Destructor for UserThreadData
 
 
-UserThreadData::~UserThreadData(){
-	delete sem;
-}
-///
-/// UserThreadData::setReturn Set a return adress for the thread
-/// \param ret
-
-void UserThreadData::setReturn(void * ret){
-	returnValue = ret;
-}
-
-///
-/// UserThreadData::setEnd Indicate that the thread is over
-///
-
-void UserThreadData::setEnd(){
-	ended = true;
-}
-
-///
-/// UserThreadData::P Take a token
-
-void UserThreadData::P(){
-	sem->P();
-}
-
-///
-/// UserThreadData::V put a token
-
-void
-UserThreadData::V(){
-	sem->V();
-}
-
-///
-/// UserThreadData::isEnded Boolean function information
-/// \return true if the thread is over, false otherwise
-bool UserThreadData::isEnded(){
-	return ended;
-}
-/// UserThreadData::getID get the thread ID
-/// \return unsigned int TID
-unsigned int UserThreadData::getID(){
-	return ID;
-}
-
-///
-///  UserThreadData::getReturnValue get the adress of the returned object of the thread
-/// \return void *
-void * UserThreadData::getReturnValue(){
-	return returnValue;
-}
-
-///
-///  UserThreadData::getUserThread() Get the userThread pointer
-/// \return UserThread *
-UserThread * UserThreadData::getUserThread(){
-	return userthread;
-}
-
-
-///
-/// ManagerUserThreadID::ManagerUserThreadID() Constructor for the ManagerThreadId
-/// The main thread id is 0, else it begin at 1
-ManagerUserThreadID::ManagerUserThreadID(){
-	freeID = new SynchList;
-	compteur = 1;
-	lock = new Lock ("ManagerUserThreadID lock");
-   
-}
-
-///
-///ManagerUserThreadID::~ManagerUserThreadID delete the class
-
-ManagerUserThreadID::~ManagerUserThreadID(){
-	void * adressToFree;
-	
-	List * l = freeID->getList();
-	freeID->GetTheLock();
-	for(unsigned int i = 0; i < freeID->size(); i++){
-		adressToFree = l->Remove();
-		free(adressToFree);
-	} 
-	freeID->FreeTheLock();
-
-	delete lock;
-	delete freeID;
-}
-///
-///  ManagerUserThreadID::GetNewId Return a ID for a new thread
-/// The Id may be re-use
-/// \return unsigned int TID
-unsigned int ManagerUserThreadID::GetNewId(){
-	int res;
-	void * adressInt;
-	lock->Acquire();
-	if(freeID->size() > 0){
-		adressInt = freeID->Remove();
-		res = *((int *) adressInt);
-		free(adressInt);
-	} else {
-		res = compteur;
-		compteur++;
-	}
-	lock->Release();
-	return res;
-}
-
-///
-/// ManagerUserThreadID::addIdFreed The TID is'nt currently used, get back to the pool.
-/// \param ID unsigned int
-void ManagerUserThreadID::addIdFreed(unsigned int ID){
-	
-	void * adressInt = malloc(sizeof(unsigned int));
-	*((unsigned int *) adressInt) = ID;
-	freeID->Append(adressInt);
-
-	
-
-}
 ///
 /// UserThread::UserThread
 /// \param f The function where the thread will begin
@@ -256,7 +125,7 @@ void * UserThread::WaitForChildExited(int CID){
 
 
 	// Remove le userThread
-	delete (state->getUserThread());
+	delete ( (UserThread *) state->getUserThread());
 	delete state;
 	
 	return res; 
@@ -329,7 +198,7 @@ int UserThread::makeChildSurvive(unsigned int CID){
 void UserThread::makeAllChildSurvive(){
     List * l = getChildList();
     for(unsigned int i = 0; i < l->size(); i++){
-        UserThread * enfant = ((UserThreadData *) l->get(i))->getUserThread();
+        UserThread * enfant = (UserThread *) ((UserThreadData *) l->get(i))->getUserThread();
         enfant->setSurvivor(true);
     }
     DoneWithTheChildList();
