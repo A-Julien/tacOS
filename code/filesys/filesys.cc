@@ -250,8 +250,8 @@ char ** FileSystem::parse(char *path_name) {
     if(path_name[0] != '/') count++;
     if(path_name[strlen(path_name)-1] == '/') count--;
 
-    char * token = strtok(path_name, "/");
-    char ** result = (char **) malloc(sizeof(char *) * count);
+    char* token = strtok(path_name, "/");
+    char** result = (char **) malloc(sizeof(char *) * count);
     result[0] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
     int i = 0;
     while(token != NULL){
@@ -262,14 +262,18 @@ char ** FileSystem::parse(char *path_name) {
     }
     return result;
 }
-bool FileSystem::CdFromPathName(const char *directory_name) {
-    char *path = (char *) malloc(sizeof(char) * (strlen(directory_name) + 1));
+
+bool FileSystem::CdFromPathName(const char* directory_name) {
+    if(!strcmp(directory_name, "/")) {
+        return this->CdDir(directory_name);
+    }
+    char* path = (char *) malloc(sizeof(char) * (strlen(directory_name) + 1));
     strcpy(path, directory_name);
-    char **path_split = parse(path);
-    for (int i = 0; path_split[i] != NULL; i++)
-        if(!CdDir(path_split[i])) return FALSE;
+    char** path_split = parse(path);
+    for (int i = 0; path_split[i] != NULL; i++) if(!CdDir(path_split[i])) return FALSE;
     return TRUE;
 }
+
 ///
 /// FileSystem::CdDir
 /// 	Come in folder given.
@@ -280,7 +284,7 @@ bool FileSystem::CdFromPathName(const char *directory_name) {
 bool FileSystem::CdDir(const char *directory_name) {
     OpenFile *new_dir_f;
 
-    if (strcmp(directory_name, "/") == 0){//directory_name[0] == '/' and directory_name[1] == '\0') { // folder "/" is root //
+    if (strcmp(directory_name, "/") == 0){
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = NULL;
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
         return TRUE;

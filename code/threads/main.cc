@@ -217,10 +217,10 @@ main(int argc, char **argv) {
           PerformanceTest ();
           }
         else if (!strcmp (*argv, "-test")){
-            fileSystem->MkDir("cc");
+            fileSystem->MkDir("ccroot");
             fileSystem->List();
             printf("-------\n");
-            fileSystem->CdDir("cc");
+            fileSystem->CdDir("ccroot");
             fileSystem->List();
             printf("-------\n");
             fileSystem->MkDir("cc2");
@@ -229,10 +229,7 @@ main(int argc, char **argv) {
             fileSystem->CdDir("cc2");
             fileSystem->List();
             printf("-------\n");
-            fileSystem->CdDir("..");
-            fileSystem->List();
-            printf("-------\n");
-            fileSystem->CdDir("..");
+            fileSystem->CdFromPathName("/");
             fileSystem->List();
           }
 #endif // FILESYS

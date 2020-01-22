@@ -107,8 +107,7 @@ int FileHeader::ByteToSector(int offset)
 ///  @return Return the number of bytes in the file.
 ///
 
-int FileHeader::FileLength()
-{
+int FileHeader::FileLength(){
     return numBytes;
 }
 
