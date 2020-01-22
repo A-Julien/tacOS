@@ -290,6 +290,11 @@ List::size(){
 
 }
 
+///
+///  List::removeElemen Remove the element where the index is equal to the ElementAdress parameter
+/// \param ElementAdress void *
+/// \return
+
 bool List::removeElement(void * ElementAdress){
     ListElement * prec = NULL;
     ListElement * element;

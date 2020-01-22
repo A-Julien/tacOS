@@ -163,6 +163,9 @@ SynchList::getList(){
     return list;
 }
 
+///
+/// SynchList::IsEmpty Know if the synchlist is empty or not
+/// \return Boolean true or false
 bool SynchList::IsEmpty(){
     bool res;
     lock->Acquire();

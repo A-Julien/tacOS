@@ -261,6 +261,7 @@ Thread::Sleep ()
 static void
 ThreadFinish ()
 {
+    machine->RaiseException(SyscallException, 28);
     currentThread->Finish ();
 }
 static void
@@ -404,22 +405,32 @@ Thread::SaveUserState ()
 ///      while executing kernel code.  This routine restores the former.
 ///
 
-void
-Thread::RestoreUserState ()
+void Thread::RestoreUserState ()
 {
     for (int i = 0; i < NumTotalRegs; i++)
 	machine->WriteRegister (i, userRegisters[i]);
 }
 
-void 
-Thread::setUserThread(void * userThreadAdress){
+
+/// Thread::setUserThread Link the Thread with his own UserThreadAdress
+/// \param userThreadAdress void * UserThreadAdress
+
+void Thread::setUserThread(void * userThreadAdress){
   userthread = userThreadAdress;
 }
 
+///
+///  Thread::getUserThreadAdress : Return the adress of the UserThread correspondig to the thread
+/// \return void *
 void * Thread::getUserThreadAdress(){
     return (void *) userthread;
 }
-
+///
+/// Thread::getStatus : Get the status of the Thread.
+/// \return ThreaStatus : The status of the current Thread
+ThreadStatus Thread::getStatus(){
+    return status;
+}
 #endif
 
 

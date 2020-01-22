@@ -103,18 +103,27 @@ Semaphore::V ()
 /// Dummy functions -- so we can compile our later assignments
 /// Note -- without a correct implementation of Condition::Wait(),
 /// the test case in the network assignment won't work!
+///
+/// Lock::Lock Constructeur of the Lock clss
+/// \param debugName String name for debug
 Lock::Lock (const char *debugName)
 {
     WaitingForLock = new List();
 }
+
+///
+/// Lock::~Lock Destructor of the Lock class
+
 
 Lock::~Lock ()
 {
    delete WaitingForLock;
 }
 
-void
-Lock::Acquire ()
+///
+/// Lock::Acquire the lock
+/// If it's allready locked, put in a "waiting list" and sleep, FIFO order
+void Lock::Acquire ()
 {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
         if(currentThreadHolding == NULL){
@@ -129,17 +138,21 @@ Lock::Acquire ()
         }
     (void) interrupt->SetLevel (oldLevel);
 }
-void
-Lock::Release ()
+
+
+///
+/// Lock::Release Release the lock
+
+void Lock::Release ()
 {
     Thread * next = NULL;
-    //IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
         if(!WaitingForLock->IsEmpty()){
             next = (Thread *) WaitingForLock->Remove();
             scheduler->ReadyToRun(next);
         }
     currentThreadHolding = next;
-    //(void) interrupt->SetLevel (oldLevel);
+    (void) interrupt->SetLevel (oldLevel);
 }
 
 Condition::Condition (const char *debugName)
