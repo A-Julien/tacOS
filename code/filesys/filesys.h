@@ -96,7 +96,7 @@ public:
     bool MkDir(const char *directory_name); // Create a folder
     bool CdDir(const char *directory_name); // Change the current folder
     bool RmDir(const char *directory_name);// Remove a folder
-    bool CdFromPathName(const char *directory_name);
+    bool CdFromPathName(const char *path_name);
 
 
         OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)

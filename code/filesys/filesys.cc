@@ -263,14 +263,19 @@ char ** FileSystem::parse(char *path_name) {
     return result;
 }
 
-bool FileSystem::CdFromPathName(const char* directory_name) {
-    if(!strcmp(directory_name, "/")) {
-        return this->CdDir(directory_name);
-    }
-    char* path = (char *) malloc(sizeof(char) * (strlen(directory_name) + 1));
-    strcpy(path, directory_name);
+/// CdFromPathName can jump into the directory with a path
+/// \param path_name the path name
+/// \return
+bool FileSystem::CdFromPathName(const char* path_name) {
+    //check for the root path
+    if(!strcmp(path_name, "/")) return this->CdDir(path_name);
+
+    char* path = (char *) malloc(sizeof(char) * (strlen(path_name) + 1));
+    strcpy(path, path_name);
     char** path_split = parse(path);
+
     for (int i = 0; path_split[i] != NULL; i++) if(!CdDir(path_split[i])) return FALSE;
+
     return TRUE;
 }
 
@@ -286,7 +291,8 @@ bool FileSystem::CdDir(const char *directory_name) {
 
     if (strcmp(directory_name, "/") == 0){
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = NULL;
-        this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
+        this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] =
+                this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
         return TRUE;
     }
 
@@ -445,6 +451,7 @@ bool FileSystem::remove_open_file(OpenFile* openFile) {
     }
     return false;
 }
+
 
 void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 

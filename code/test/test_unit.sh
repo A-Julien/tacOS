@@ -19,7 +19,7 @@
 #|   │    │   test2_input
 #|   │    │   ...
 #|   └──results_test
-#|   │    │   test1_result
+#|   │    │   cd_result
 #|   │    │   test2_input
 #|   │    │   ...
 #│
