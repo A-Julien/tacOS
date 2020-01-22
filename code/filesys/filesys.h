@@ -117,16 +117,10 @@ public:
     bool remove_open_file(OpenFile* openFile);
     OpenFile** get_thread_file_table(unsigned int tid);
     void addFiletoGlobalTable(OpenFile* openFile);
+    void init_ThreadsFilesTable();
 
 
-        void init_ThreadsFilesTable(){
-        this->ThreadsFilesTable = (file_table_t*)malloc(sizeof(file_table_t));
-        this->ThreadsFilesTable->thread_table = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
-        this->ThreadsFilesTable->tid = 0;
-        this->init_table(this->ThreadsFilesTable->thread_table);
-    }
-
-    global_file_table_t* GlobalOpenFileTable;
+        global_file_table_t* GlobalOpenFileTable;
     OpenFile* freeMapFile;          // Bit map of free disk blocks, represented as a file
     file_table_t* ThreadsFilesTable;
     void init_table(OpenFile** table);

@@ -158,6 +158,16 @@ FileSystem::FileSystem(bool format) {
 
 }
 
+void FileSystem::init_ThreadsFilesTable(){
+    this->ThreadsFilesTable = (file_table_t* ) malloc(sizeof(file_table_t));
+
+    this->ThreadsFilesTable->thread_table = (OpenFile** ) malloc(sizeof(OpenFile* ) * MAX_OPEN_FILE);
+
+    this->ThreadsFilesTable->tid = 0;
+    this->init_table(this->ThreadsFilesTable->thread_table);
+    this->ThreadsFilesTable->next = NULL;
+}
+
 ///
 /// FileSystem::Create
 /// 	Create a file in the Nachos file system (similar to UNIX create).
@@ -270,16 +280,15 @@ bool FileSystem::CdFromPathName(const char *directory_name) {
 bool FileSystem::CdDir(const char *directory_name) {
     OpenFile *new_dir_f;
 
-    if ((new_dir_f = Open(directory_name)) == NULL) return FALSE; //folder doesn't exist
-
-    delete this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE];
-
-    if (directory_name[0] == '/' and directory_name[1] == '\0') { // folder "/" is root
+    if (strcmp(directory_name, "/") == 0){//directory_name[0] == '/' and directory_name[1] == '\0') { // folder "/" is root //
+        this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = NULL;
         this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = this->ThreadsFilesTable->thread_table[ROOT_DIRECTORY_FILE];
         return TRUE;
-
     }
 
+    if ((new_dir_f = Open(directory_name)) == NULL) return FALSE; //folder doesn't exist
+
+    this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = NULL;
     this->ThreadsFilesTable->thread_table[CURRENT_DIRECTORY_FILE] = new_dir_f;
     return TRUE;
 }
@@ -348,7 +357,7 @@ bool FileSystem::MkDir(const char *directory_name) {
 ///	@param "name" -- name of folder to be removed
 ///
 bool FileSystem::RmDir(const char *directory_name) {
-    if(strcmp(directory_name, ".") || strcmp(directory_name, "..") || strcmp(directory_name, "/")) return false;
+    if(!strcmp(directory_name, ".") || !strcmp(directory_name, "..") || !strcmp(directory_name, "/")) return false;
     Directory *current_dir, *to_be_rm_dir;
     BitMap *freemap;
     FileHeader *file_hdr;
@@ -436,8 +445,9 @@ bool FileSystem::remove_open_file(OpenFile* openFile) {
 void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 
    if(this->GlobalOpenFileTable == NULL){ //if head is NULL
-       this->GlobalOpenFileTable = (global_file_table_t*) malloc(sizeof(global_file_table_t));
+       this->GlobalOpenFileTable = (global_file_table_t* ) malloc(sizeof(global_file_table_t));
        this->GlobalOpenFileTable->openFile = openFile;
+       this->GlobalOpenFileTable->next = NULL;
        return;
    }
 
@@ -446,8 +456,9 @@ void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
     // go at the end of linked list
     while(gfileTable->next != NULL) gfileTable = gfileTable->next;
 
-    gfileTable->next = (global_file_table_t*) malloc(sizeof(global_file_table_t));
-    gfileTable->openFile = openFile;
+    gfileTable->next = (global_file_table_t* ) malloc(sizeof(global_file_table_t));
+    gfileTable->next->openFile = openFile;
+    gfileTable->next->next = NULL;
 }
 
 ///
@@ -477,16 +488,15 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
         }
 
         openFile->add_seek(tid);
+        OpenFile** thread_table = this->get_thread_file_table(tid);
 
-        OpenFile **thread_table = this->get_thread_file_table(tid);
-
-        this->addFiletoGlobalTable(openFile);
 
         if (!this->add_to_openFile_table(openFile, thread_table)) {
-            if(needDelete)delete openFile;
+            if(needDelete) delete openFile;
             delete directory;
             return NULL;
         }
+        this->addFiletoGlobalTable(openFile);
     }
     delete directory;
     return openFile;                // return NULL if not found
@@ -505,7 +515,7 @@ OpenFile **FileSystem::get_thread_file_table(unsigned int tid) {
 /// Add an openfile to the this->ThreadsFilesTable->thread_table
 /// \param openFile the openfile to add
 /// \return true if succeed, false if MAX_OPEN_FILE reached
-bool FileSystem::add_to_openFile_table(OpenFile* openFile, OpenFile **table) {
+bool FileSystem::add_to_openFile_table(OpenFile* openFile, OpenFile** table) {
     //if(table == NULL) table = this->ThreadsFilesTable->thread_table;
     for (int i = 0; i < MAX_OPEN_FILE; i++) {
         if (table[i] == NULL) {

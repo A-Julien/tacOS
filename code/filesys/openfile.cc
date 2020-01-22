@@ -36,6 +36,7 @@ OpenFile::OpenFile(int sector)
     this->seek_tid_list = (tuple_t *) malloc(sizeof(tuple_t));
     this->seek_tid_list->tid = 0;
     this->seek_tid_list->seekPosition = 0;
+    this->seek_tid_list->next = NULL;
 }
 
 ///
@@ -86,14 +87,14 @@ bool OpenFile::isOpenByOthers(){
 /// \param tid the thread tid
 //
 void OpenFile::add_seek(unsigned int tid){
-    tuple_t * list = this->seek_tid_list;
+    tuple_t * list = this->seek_tid_list; //get head
 
-    while(list->next != NULL)list = list->next;
+    while(list->next != NULL) list = list->next;
 
     list->next = (tuple_t*) malloc(sizeof(tuple_t));
     list->next->tid = tid;
     list->next->seekPosition = 0;
-
+    list->next = NULL;
 }
 
 /// OpenFile::remove_seek remove a seek to a openfile
@@ -101,7 +102,7 @@ void OpenFile::add_seek(unsigned int tid){
 /// \param tid the thread tid
 //
 bool OpenFile::remove_seek(unsigned int tid){
-    tuple_t* list = this->seek_tid_list;
+    tuple_t* list = this->seek_tid_list; //get head
 
     while(list->next != NULL && list->next->tid != tid)list = list->next;
     if(list->next == NULL) return false;
@@ -254,5 +255,5 @@ int OpenFile::Length() {
 }
 
 int OpenFile::get_sector() {
-    return this->hdr->get_sector(0);
+    return ((FileHeader* )this->hdr)->get_sector(0);
 }

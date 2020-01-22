@@ -216,6 +216,25 @@ main(int argc, char **argv) {
           {			// performance test
           PerformanceTest ();
           }
+        else if (!strcmp (*argv, "-test")){
+            fileSystem->MkDir("cc");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("cc");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->MkDir("cc2");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("cc2");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("..");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("..");
+            fileSystem->List();
+          }
 #endif // FILESYS
 #ifdef NETWORK
         if (!strcmp (*argv, "-o"))

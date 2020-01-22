@@ -18,11 +18,11 @@
 #include "disk.h"
 #include "bitmap.h"
 
-#define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
-#define MaxFileSize 	(NumDirect * SectorSize)
+#define NumDirect    ((SectorSize - 2 * sizeof(int)) / sizeof(int))
+#define MaxFileSize    (NumDirect * SectorSize)
 
 ///enum that define if the FileHeader define a file or a directory
-enum File_type{
+enum File_type {
     f, // file type
     d // directory type
 };
@@ -43,37 +43,39 @@ enum File_type{
 /// reading it from disk.
 
 class FileHeader {
-  public:
+public:
     bool Allocate(BitMap *bitMap, int fileSize);// Initialize a file header, 
-						//  including allocating space 
-						//  on disk for the file data
-    void Deallocate(BitMap *bitMap);  		// De-allocate this file's 
-						//  data blocks
+    //  including allocating space
+    //  on disk for the file data
+    void Deallocate(BitMap *bitMap);        // De-allocate this file's
+    //  data blocks
 
-    void FetchFrom(int sectorNumber); 	// Initialize file header from disk
-    void WriteBack(int sectorNumber); 	// Write modifications to file header
-					//  back to disk
+    void FetchFrom(int sectorNumber);    // Initialize file header from disk
+    void WriteBack(int sectorNumber);    // Write modifications to file header
+    //  back to disk
 
-    int ByteToSector(int offset);	// Convert a byte offset into the file
-					// to the disk sector containing
-					// the byte
+    int ByteToSector(int offset);    // Convert a byte offset into the file
+    // to the disk sector containing
+    // the byte
 
-    int FileLength();			// Return the length of the file in bytes
+    int FileLength();            // Return the length of the file in bytes
 
-    void Print();			// Print the contents of the file.
+    void Print();            // Print the contents of the file.
 
     File_type type;
 
     void test();
+
     int get_sector(int id_sector);
+
     void set_sector(int id_sector, int sector);
 
 
-        private:
-            int numBytes;			// Number of bytes in the file
-            int numSectors;			// Number of data sectors in the file
-            int dataSectors[NumDirect];		// Disk sector numbers for each data block in the file
+private:
+    int numBytes;            // Number of bytes in the file
+    int numSectors;            // Number of data sectors in the file
+    int dataSectors[NumDirect];        // Disk sector numbers for each data block in the file
 
-        };
+};
 
 #endif // FILEHDR_H
