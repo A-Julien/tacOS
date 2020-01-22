@@ -1,4 +1,4 @@
-## **/!\ Don't PUSH on RELEASE branch ONLY CI are allowed to do this action !!!!**
+## **/!\ Do not PUSH on RELEASE-branch. ONLY the CI is allowed to push on RELEASE-branch. !!!!**
 
 # tacOS [![Build Status](https://travis-ci.com/A-Julien/tacOS.svg?branch=master)](https://travis-ci.com/A-Julien/tacOS) [![codecov](https://codecov.io/gh/A-Julien/tacOS/branch/release/graph/badge.svg)](https://codecov.io/gh/A-Julien/tacOS)
 
