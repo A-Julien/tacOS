@@ -172,41 +172,74 @@ void ProcedureGetInt(int *n) {
     *n = res;
 
 }
-
+///
+/// SYScreateUserThread
+/// Syscall function that create a UserThread (and the thread)
+/// \param f  The function where the thread will begin
+/// \param arg the adress of the argument needed by this function
+/// \return The unsigned int TID
 unsigned int  SYScreateUserThread(void * f,void * arg){
+    // Get the parent's adress
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
+    // Create the child UserThread
     UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+    // If there is a parent, it adopt the child
     if(parrent != NULL){
+
         parrent->addChildren(child);
     }
-
-
+    // Assign the parent to the child
     child->setParrent(parrent);
+    // Stock the pointer to the userThread on the thread
     ((Thread *) child->getThread())->setUserThread(child);
     child->Run();
-    //child->getThread()->status;
     return child->getId();
 }
 
-
+///
+/// SYSWaitForChildExited
+/// \param CID
+/// \return the adress of the object returned
 void * SYSWaitForChildExited(unsigned int CID) {
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
     return res;
 }
 
-
+///
+/// SYSExitThread Syscall function to exit a thread (Kill it)
+/// \param object
 void SYSExitThread(void * object){
     UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
-    userThread->exit(object);
-    bool haveChild = userThread->getChildList()->IsEmpty();
-    if(haveChild){
-        // Proccss with the child;
-        // Kill it ? wait it ?
+    List * l = userThread->getChildList();
+    while(!l->IsEmpty()){
+        UserThreadData * enfantMeta = (UserThreadData *) l->get(0);
+        UserThread * enfant = (UserThread *) enfantMeta->getUserThread();
+        if(enfant->isSurvivor()){
+            UserThread * Grandpa = userThread->getParrent();
+            if(Grandpa != NULL){
+                enfant->setParrent(Grandpa);
+                Grandpa->getChildList()->Append(enfantMeta);
+                Grandpa->DoneWithTheChildList();
+            } else {
+                // https://www.youtube.com/watch?v=qiMaOmDtaYI
+            }
+            userThread->DoneWithTheChildList();
+            enfant->setSurvivor(false);
+
+        } else {
+            userThread->DoneWithTheChildList();
+            SYSWaitForChildExited(enfant->getId());
+        }
+        l = userThread->getChildList();
     }
     userThread->DoneWithTheChildList();
+    userThread->exit(object);
 }
 
+///
+/// StartUserThread Init the NachOS thread
+/// \param data
 
 void StartUserThread(int data) {
     thread_init * dataFork = (thread_init *) data;
@@ -324,6 +357,27 @@ ExceptionHandler(ExceptionType which) {
                 ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
             break;
 
+            case SC_makeAllChildSurvive:
+                ((UserThread *) currentThread->getUserThreadAdress())->makeAllChildSurvive();
+            break;
+
+            case SC_makeChildSurvive:
+                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->makeChildSurvive((unsigned int) machine->ReadRegister(4));
+                machine->WriteRegister(2,resultat);
+            break;
+
+            case SC_WakeUpChild:
+                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->WakeUpChild((unsigned int) machine->ReadRegister(4));
+                machine->WriteRegister(2,resultat);
+            break;
+
+            case SC_StopChild:
+                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->StopChild((unsigned int) machine->ReadRegister(4));
+                machine->WriteRegister(2,resultat);
+
+            case SC_ThreadEndedWithoutExit:
+                puts("Exited without exit");
+            break;
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);

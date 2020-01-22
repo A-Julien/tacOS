@@ -49,6 +49,11 @@
 #define SC_WaitForChildExited 21
 #define SC_ExitThread 22
 #define SC_WaitForAllChildExited 23
+#define SC_makeAllChildSurvive 24
+#define SC_makeChildSurvive 25
+#define SC_WakeUpChild 26
+#define SC_StopChild 27
+#define SC_ThreadEndedWithoutExit 28
 
 #ifdef IN_USER_MODE
 
@@ -224,7 +229,12 @@ int Feof();
 unsigned int  createUserThread(void * f,void * arg);
 void * WaitForChildExited(unsigned int CID);
 void ExitThread(void * object);
+// Expert mode
 void WaitForAllChildExited();
+int StopChild(int CID);
+int WakeUpChild(int CID);
+int makeChildSurvive(int CID);
+void makeAllChildSurvive();
 
 
 
