@@ -84,7 +84,7 @@ ci_main_loop() {
       echo "-----------------------"
 
       for file in "$d"*.c; do # for all unit test in step
-        if [ "$file" == "$d*.c" ]; then
+        if [ "$file" == "$d*.c" ]; then # if test folder empty, continue
           continue
         fi
 
