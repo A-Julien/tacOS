@@ -30,8 +30,7 @@
 /// 	Copy the contents of the UNIX file "from" to the Nachos file "to"
 ///
 
-void
-Copy(const char *from, const char *to)
+void Copy(const char *from, const char *to)
 {
     FILE *fp;
     OpenFile* openFile;

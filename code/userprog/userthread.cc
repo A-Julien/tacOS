@@ -7,7 +7,7 @@
 /// of liability and disclaimer of warranty provisions.
 
 #include "userthread.h"
-
+#include "../filesys/openfile.h"
 
 
 
@@ -20,12 +20,17 @@
 UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     char * buffer = (char *) malloc(50*sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
-	thread = new Thread(buffer);
-	dataFork.arg = arg;
-	dataFork.f = f;
-	dataFork.exit = exitPC;
-	ID  = tid; // MODIFY WHEN ID ALLOCATOR;
-	child = new SynchList();
+    this->thread = new Thread(buffer);
+    dataFork.arg = arg;
+    dataFork.f = f;
+    dataFork.exit = exitPC;
+    this->ID = tid; // MODIFY WHEN ID ALLOCATOR;
+    this->child = new SynchList();
+    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
+}
+
+OpenFile** UserThread::getTableOfOpenfile(){
+    return this->TableOfOpenfile;
 }
 
 ///
@@ -215,7 +220,7 @@ void UserThread::makeAllChildSurvive(){
 /// \return
 bool UserThread::removeChild(void * childToRemove){
     bool res;
-    List * childList = getChildList();
+    List* childList = getChildList();
     res = childList->removeElement(childToRemove);
     DoneWithTheChildList();
     return res;

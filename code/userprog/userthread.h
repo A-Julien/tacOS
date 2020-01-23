@@ -14,6 +14,7 @@
 #include "ManagerUserThreadID.h"
 #include "UserThreadMetadata.h"
 
+#include "openfile.h"
 
 
 extern void StartUserThread(int data);
@@ -27,10 +28,8 @@ typedef struct
 } thread_init;
 
 
-
-
 class UserThread {
-	public:
+public:
 
 		UserThread(void * ,void * arg, unsigned int tid, int exitPC);
 		~UserThread();
@@ -57,6 +56,7 @@ class UserThread {
         void setMeta(void *);
         bool isSurvivor();
         void setSurvivor(bool boolean);
+		OpenFile** getTableOfOpenfile();
 
 	private:
 		void * returnObject;
@@ -68,13 +68,8 @@ class UserThread {
         thread_init dataFork;
         void * metaData;
         bool survivor;
+		OpenFile **TableOfOpenfile;
 
 };
-
-
-
-
-
-
 
 #endif // USERTHREAD_H
