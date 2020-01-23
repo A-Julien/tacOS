@@ -141,7 +141,7 @@ Initialize (int argc, char **argv)
       }
 
      managerUserThreadID = new ManagerUserThreadID();
-     mainUserThread = new UserThread(NULL, NULL, 0);
+     mainUserThread = new UserThread(NULL, NULL, 0, 0);
 
     DebugInit (debugArgs);	// initialize DEBUG messages
     stats = new Statistics ();	// collect statistics

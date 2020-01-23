@@ -126,6 +126,7 @@ main (int argc, char **argv)
 		//synchConsole = new SynchConsole(NULL,NULL);
 		StartProcess (*(argv + 1));
 		argCount = 2;
+		printf("This is the end");
 			
 	    }
 	  else if (!strcmp (*argv, "-c"))

@@ -13,6 +13,7 @@ ManagerUserThreadID::ManagerUserThreadID(){
     freeID = new SynchList;
     compteur = 1;
     lock = new Lock ("ManagerUserThreadID lock");
+    stillAlive = 1;
 
 }
 
@@ -49,6 +50,7 @@ unsigned int ManagerUserThreadID::GetNewId(){
         res = compteur;
         compteur++;
     }
+    stillAlive++;
     lock->Release();
     return res;
 }
@@ -60,8 +62,13 @@ void ManagerUserThreadID::addIdFreed(unsigned int ID){
 
     void * adressInt = malloc(sizeof(unsigned int));
     *((unsigned int *) adressInt) = ID;
+    freeID->GetTheLock();
     freeID->Append(adressInt);
+    stillAlive--;
+    freeID->FreeTheLock();
+}
 
-
+bool ManagerUserThreadID::lastAlive(){
+    return (stillAlive == 0);
 
 }
