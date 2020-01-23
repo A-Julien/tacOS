@@ -20,16 +20,18 @@
 extern void StartUserThread(int data);
 
 
-typedef struct {
-    void *f;
-    void *arg;
+typedef struct
+{
+    void * f;
+    void * arg;
+    int exit;
 } thread_init;
 
 
 class UserThread {
 public:
 
-		UserThread(void * ,void * arg, unsigned int tid);
+		UserThread(void * ,void * arg, unsigned int tid, int exitPC);
 		~UserThread();
 		void Run();
 		unsigned int getId();

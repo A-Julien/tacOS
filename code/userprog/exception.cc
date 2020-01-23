@@ -33,6 +33,7 @@
 #include "../threads/system.h"
 #include "userthread.h"
 
+extern void ExitThread(void * object);
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
  * the user program immediately after the "syscall" instruction.
@@ -182,7 +183,7 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     // Get the parent's adress
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
     // Create the child UserThread
-    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId(), machine->ReadRegister(6));
     // If there is a parent, it adopt the child
     if(parrent != NULL){
         parrent->addChildren(child);
@@ -202,8 +203,12 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
 /// \param CID
 /// \return the adress of the object returned
 void * SYSWaitForChildExited(unsigned int CID) {
+
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
+    if(res != 0){
+        managerUserThreadID->addIdFreed(CID);
+    }
     return res;
 }
 
@@ -235,8 +240,12 @@ void SYSExitThread(void * object){
         l = userThread->getChildList();
     }
     userThread->DoneWithTheChildList();
+
     fileSystem->unregisterOpenFileTable(userThread->getId());
     userThread->exit(object);
+    if(managerUserThreadID->lastAlive()){
+        interrupt->Halt();
+    }
 }
 
 ///
@@ -251,7 +260,8 @@ void StartUserThread(int data) {
     machine->WriteRegister(NextPCReg, ((int) dataFork->f) + 4);
     machine->WriteRegister(4, (int) dataFork->arg);
     //Adresse de retour ?
-    machine->Run();
+
+    machine->Run((void *) dataFork->exit);
 
     return;
 }
@@ -285,7 +295,7 @@ ExceptionHandler(ExceptionType which) {
     int size;
     int resultat;
     void *getString;
-
+    DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
         switch (type) {
             case SC_PutChar:
@@ -336,14 +346,20 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_Exit:
                 char str[50];
-                sprintf(str, "Return value : %d ", machine->ReadRegister(4)); 
-                DEBUG('s', str);        
-                interrupt->Halt();
-                break;
+                sprintf(str, "Return value : %d ", machine->ReadRegister(4));
+                DEBUG('s', str);
+                currentThread->Finish();
+                currentThread->Yield();
+                SYSExitThread( (void *)  0);
+
+
+               break;
 
             case SC_createUserThread:
                 resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
+
                 machine->WriteRegister(2,(int) resultat);
+
             break;
 
             case SC_WaitForChildExited:
@@ -381,6 +397,7 @@ ExceptionHandler(ExceptionType which) {
                 puts("Exited without exit");
             break;
             default:
+
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
 
