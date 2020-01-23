@@ -8,5 +8,7 @@
 int main(void){
 	char c = GetChar();
 	PutChar(c);
+	Halt();
+
 	return 0;
 }

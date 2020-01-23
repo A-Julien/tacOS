@@ -32,6 +32,8 @@ int main()
     PutChar('\n');
 	PutInt(-1000000000); // Raise IntOutOfBounds Exception
 	PutChar('\n');
+
+    Halt();
 	return 0;
 	
 } 

@@ -125,7 +125,6 @@ void * UserThread::WaitForChildExited(int CID){
 	if(state == NULL ){
 		return (void *) -1;
 	}
-	puts("Now waiting for child");
 	state->P();
 
 	res = state->getReturnValue();

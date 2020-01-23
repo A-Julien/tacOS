@@ -9,12 +9,9 @@
 void handler(void * arg){
     PutString("Je suis l'enfant ;)\n");
     PutString("Et je ne me suis pas encore fais avorté\n");
-  //  ExitThread((void * ) 0x7777777);
+    ExitThread((void * ) 0x7777777);
 
 }
-
-
-
 
 
 int main(void){

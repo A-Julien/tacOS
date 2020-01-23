@@ -72,9 +72,10 @@ void SynchConsole::SynchPutChar(const char ch){
 	// PutChar will automaticly wait for a character to be written.
 	// ie - the console had to call WriteDone Handler to continue the execution.
 
-	 console->PutChar(ch);
-     writeDone->P();
-
+    writeAvail->P();
+    console->PutChar(ch);
+    writeDone->P();
+    writeAvail->V();
 }
 
 ///
