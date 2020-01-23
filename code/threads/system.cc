@@ -123,6 +123,7 @@ Initialize (int argc, char **argv)
 #ifdef FILESYS_NEEDED
 	  if (!strcmp (*argv, "-f"))
 	      format = TRUE;
+
 #endif
 #ifdef NETWORK
 	  if (!strcmp (*argv, "-l"))
@@ -175,6 +176,7 @@ Initialize (int argc, char **argv)
 
 #ifdef FILESYS_NEEDED
     fileSystem = new FileSystem (format);
+     if(format) exit(0);
 #endif
 
 #ifdef NETWORK

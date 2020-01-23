@@ -157,7 +157,7 @@ ci_kernel_loop(){
     fi
   done
 }
-
+../build/nachos-step5 -f 2> /dev/null
 ci_kernel_loop
 ci_main_loop
 
