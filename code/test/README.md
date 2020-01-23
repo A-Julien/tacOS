@@ -16,11 +16,11 @@ architecture according the following architecture schematic
 test
 │   README.md
 |   test_unit.sh
-└───test_step2
-│   │   test1.c
-│   │   test2.c
+└───kernel_test_step2
+│   │   test1.cmd
+│   │   test2.cmd
 │   │   ...
-│   │   
+│   │
 │   └───input_test
 |   │    │   test1_input
 |   │    │   test2_input
@@ -29,7 +29,20 @@ test
 |   │    │   test1_result
 |   │    │   test2_input
 |   │    │   ...
-│   
+└───test_step2
+│   │   test1.c
+│   │   test2.c
+│   │   ...
+│   │
+│   └───input_test
+|   │    │   test1_input
+|   │    │   test2_input
+|   │    │   ...
+|   └──results_test
+|   │    │   test1_result
+|   │    │   test2_input
+|   │    │   ...
+│
 └───test_step3
 |   │   ...
 |
