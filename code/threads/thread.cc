@@ -375,6 +375,7 @@ Thread::StackAllocate (VoidFunctionPtr func, int arg)
     // LB: It is not sufficient to enable interrupts!
     // A more complex function has to be called here...
     // machineState[StartupPCState] = (int) InterruptEnable;
+    // machineState[StartupPCState] = (int) InterruptEnable;
     machineState[StartupPCState] = (int) SetupThreadState;
     // End of modification
 

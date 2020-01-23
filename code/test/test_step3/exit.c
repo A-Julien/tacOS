@@ -7,7 +7,7 @@
 #include "../../userprog/syscall.h"
 
 void handler(void * arg){
-    PutString("alive");
+    PutString("\nalive\n");
    // ExitThread(0);
 }
 
@@ -15,7 +15,7 @@ int main(void){
     PutString("Création");
     unsigned int TID = createUserThread((void *) handler, (void *) 0x99);
     WaitForChildExited(TID);
-    Halt();
+
     PutString("Killed");
 
     return 0;

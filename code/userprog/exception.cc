@@ -183,7 +183,7 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     // Get the parent's adress
     UserThread * parrent = (UserThread *) currentThread->getUserThreadAdress();
     // Create the child UserThread
-    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId());
+    UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId(), machine->ReadRegister(6));
     // If there is a parent, it adopt the child
     if(parrent != NULL){
 
@@ -202,8 +202,12 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
 /// \param CID
 /// \return the adress of the object returned
 void * SYSWaitForChildExited(unsigned int CID) {
+
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
+    if(res != 0){
+        managerUserThreadID->addIdFreed(CID);
+    }
     return res;
 }
 
@@ -235,7 +239,14 @@ void SYSExitThread(void * object){
         l = userThread->getChildList();
     }
     userThread->DoneWithTheChildList();
+
+
+
+
     userThread->exit(object);
+    if(managerUserThreadID->lastAlive()){
+        interrupt->Halt();
+    }
 }
 
 ///
@@ -251,7 +262,7 @@ void StartUserThread(int data) {
     machine->WriteRegister(4, (int) dataFork->arg);
     //Adresse de retour ?
 
-    machine->Run((void *) 0x666);
+    machine->Run((void *) dataFork->exit);
 
     return;
 }
@@ -347,6 +358,7 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_createUserThread:
                 resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
+
                 machine->WriteRegister(2,(int) resultat);
 
             break;
@@ -357,7 +369,6 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_ExitThread:
-                printf("\nReg 31 = %d\n", machine->ReadRegister(31));
                 SYSExitThread( (void *)  machine->ReadRegister(4));
             break;
 

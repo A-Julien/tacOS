@@ -90,6 +90,7 @@ __start:
  	.ent	createUserThread
  createUserThread:
  	addiu $2,$0,SC_createUserThread
+ 	la  $6, ExitThread
  	syscall
  	j	$31
  	.end createUserThread
