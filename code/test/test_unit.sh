@@ -3,7 +3,7 @@
 # CI UNIT TEST ALGORITHM #
 ##########################
 #
-# THIS SCRIPT RUN ALL UNIT TEST FOR ALL STEP
+# THIS SCRIPT RUN ALL UNIT TEST FOR ALL STEP for FOR MIPS SIDE
 # Please follow the file architecture
 #
 #test
@@ -29,10 +29,11 @@
 #└─── ...
 
 lauch_test() {
+  ../build/nachos-step5 -cp ../build/"$1$2" $2
   if test -f "$1"input_test/"$2"_input; then #check if test need input
-    RESULT=$(../build/nachos-step2 -x ../build/"$1$2" <"$1""input_test/$2"_input)
+   RESULT=$(../build/nachos-step5 -x "$2" <"$1""input_test/$2"_input)
   else
-    RESULT=$(../build/nachos-step2 -x ../build/"$1$2")
+    RESULT=$(../build/nachos-step5 -x "$2")
   fi
   echo "$RESULT"
 }
@@ -40,7 +41,7 @@ lauch_test() {
 filename_extractor() {
   dlenght=$(echo $1 | wc -c) #get directory lenght
   file="$2"
-  file="${file::-2}"        #remove .c extention
+  file="${file::-$3}"        #remove .c extention
   file="${file:$dlenght-1}" # remove directory lenght to get filename
   echo "$file"
 }
@@ -79,23 +80,29 @@ ci_main_loop() {
   for d in */; do #for all step test folder
     if [ "${d::9}" == "test_step" ]; then
       echo "-----------------------"
-      echo "| TESTING STEP ${d:5}"
+      echo "| TESTING STEP ${d:5}  "
       echo "-----------------------"
 
       for file in "$d"*.c; do # for all unit test in step
+        if [ "$file" == "$d*.c" ]; then
+          continue
+        fi
 
-        file=$(filename_extractor "$d" "$file")
+        file=$(filename_extractor "$d" "$file" 2)
 
-        echo "Testing $file ->"
+        echo "Testing $file  :"
 
         RESULT=$(lauch_test "$d" "$file")                  # launchh test
 
         TEST_RESULT=$(cat "$d"results_test/"$file"_result) #get test result
         RESULT="${RESULT%Machine halting!*}"               #cut nachos statistic
 
-        #remove all new line
+        #remove all new line and space
         TEST_RESULT=$(echo "$TEST_RESULT" | tr -d '\n')
+        TEST_RESULT=$(echo "$TEST_RESULT" | sed 's/ //g')
+
         RESULT=$(echo "$RESULT" | tr -d '\n')
+        RESULT=$(echo "$RESULT" | sed 's/ //g')
 
         #print resulr and expected result
         echo "expected -> $TEST_RESULT"
@@ -108,4 +115,49 @@ ci_main_loop() {
   ci_tests_restult
 }
 
+lauch_kernel_test() {
+  if test -f "$1"input_test/"$2"_input; then #check if test need input
+    RESULT=$(../build/nachos-step5 "$(cat $1"$2".cmd | tr '\n' ' ')" <"$1""input_test/$2"_input)
+  else
+    RESULT=$(../build/nachos-step5 "$(cat "$1$2".cmd | tr '\n' ' ')")
+  fi
+  echo $RESULT
+}
+
+ci_kernel_loop(){
+    for d in */; do #for all step test folder
+    if [ "${d::16}" == "kernel_test_step" ]; then
+      echo "-----------------------"
+      echo "| KERNEL TESTING STEP ${d:16}  "
+      echo "-----------------------"
+      for file in "$d"*.cmd; do # for all unit test in step
+        file=$(filename_extractor "$d" "$file" 4)
+
+        echo "Testing $file :"
+
+        RESULT=$(lauch_kernel_test "$d" "$file")
+
+        TEST_RESULT=$(cat "$d"results_test/"$file"_result) #get test result
+        RESULT="${RESULT%Machine halting!*}"               #cut nachos statistic
+
+        #remove all new line and space
+        TEST_RESULT=$(echo "$TEST_RESULT" | tr -d '\n')
+        TEST_RESULT=$(echo "$TEST_RESULT" | sed 's/ //g')
+
+        RESULT=$(echo "$RESULT" | tr -d '\n')
+        RESULT=$(echo "$RESULT" | sed 's/ //g')
+
+        #print resulr and expected result
+        echo "expected -> $TEST_RESULT"
+        echo "results  -> $RESULT"
+
+        ci_test_comparator "$TEST_RESULT" "$RESULT" 'tests_restult'
+
+      done
+    fi
+  done
+}
+
+ci_kernel_loop
 ci_main_loop
+

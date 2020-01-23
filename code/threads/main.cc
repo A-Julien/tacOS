@@ -170,6 +170,7 @@ main(int argc, char **argv) {
           ASSERT (argc > 2);
           Copy (*(argv + 1), *(argv + 2));
           argCount = 3;
+          return 0;
           }
         else if (!strcmp (*argv, "-p"))
           {			// print a Nachos file
@@ -227,10 +228,22 @@ main(int argc, char **argv) {
             fileSystem->List();
             printf("-------\n");
             fileSystem->CdDir("cc2");
+            fileSystem->MkDir("cc3");
             fileSystem->List();
             printf("-------\n");
             fileSystem->CdFromPathName("/");
             fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("/ccroot/cc2");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("..");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("/ccroot/cc2");
+            fileSystem->CdFromPathName("../..");
+            fileSystem->List();
+            return 0;
           }
 #endif // FILESYS
 #ifdef NETWORK
