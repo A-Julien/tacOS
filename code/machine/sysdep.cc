@@ -142,9 +142,9 @@ PollFile(int fd)
 ///
 /// OpenForWrite
 /// 	Open a file for writing.  Create it if it doesn't exist; truncate it
-///	if it does already exist.  @return Return the file descriptor.
-///
-///	@param "name" -- file name
+///	if it does already exist.
+/// @return Return the file descriptor.
+/// @param "name" -- file name
 ///
 
 int

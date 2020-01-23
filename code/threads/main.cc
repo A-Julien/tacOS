@@ -48,12 +48,14 @@
 /// of liability and disclaimer of warranty provisions.
 
 #define MAIN
+
 #include "copyright.h"
+
 #undef MAIN
 
 #include "utility.h"
 #include "system.h"
-// comentaire pour git
+
 
 // External functions used by this file
 
@@ -82,13 +84,11 @@ extern int testUTMmono();
 ///
 
 int
-main (int argc, char **argv)
-{
-    int argCount;		// the number of arguments 
-    // for a particular command
+main(int argc, char **argv) {
+    int argCount; // the number of arguments for a particular command
 
-    DEBUG ('t', "Entering main");
-    (void) Initialize (argc, argv);
+    DEBUG('t', "Entering main");
+    (void) Initialize(argc, argv);
 
 #if defined(THREADS) && !defined(NETWORK)
         ThreadTest ();
@@ -126,8 +126,7 @@ main (int argc, char **argv)
 		//synchConsole = new SynchConsole(NULL,NULL);
 		StartProcess (*(argv + 1));
 		argCount = 2;
-		printf("This is the end");
-			
+
 	    }
 	  else if (!strcmp (*argv, "-c"))
 	    {			// test the console
@@ -166,51 +165,101 @@ main (int argc, char **argv)
 
 #endif // USER_PROGRAM
 #ifdef FILESYS
-	  if (!strcmp (*argv, "-cp"))
-	    {			// copy from UNIX to Nachos
-		ASSERT (argc > 2);
-		Copy (*(argv + 1), *(argv + 2));
-		argCount = 3;
-	    }
-	  else if (!strcmp (*argv, "-p"))
-	    {			// print a Nachos file
-		ASSERT (argc > 1);
-		Print (*(argv + 1));
-		argCount = 2;
-	    }
-	  else if (!strcmp (*argv, "-r"))
-	    {			// remove Nachos file
-		ASSERT (argc > 1);
-		fileSystem->Remove (*(argv + 1));
-		argCount = 2;
-	    }
-	  else if (!strcmp (*argv, "-l"))
-	    {			// list Nachos directory
-		fileSystem->List ();
-	    }
-	  else if (!strcmp (*argv, "-D"))
-	    {			// print entire filesystem
-		fileSystem->Print ();
-	    }
-	  else if (!strcmp (*argv, "-t"))
-	    {			// performance test
-		PerformanceTest ();
-	    }
+        if (!strcmp (*argv, "-cp"))
+          {			// copy from UNIX to Nachos
+          ASSERT (argc > 2);
+          Copy (*(argv + 1), *(argv + 2));
+          argCount = 3;
+          return 0;
+          }
+        else if (!strcmp (*argv, "-p"))
+          {			// print a Nachos file
+          ASSERT (argc > 1);
+          Print (*(argv + 1));
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-cd"))
+          {
+          ASSERT (argc > 1);
+          fileSystem->CdDir(*(argv + 1));
+          fileSystem->List();
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-mkdir"))
+          {
+          ASSERT (argc > 1);
+          fileSystem->MkDir(*(argv + 1));
+          fileSystem->List();
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-rm"))
+          {
+          ASSERT (argc > 1);
+          fileSystem->RmDir(*(argv + 1));
+          fileSystem->List();
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-r"))
+          {			// remove Nachos file
+          ASSERT (argc > 1);
+          fileSystem->Remove (*(argv + 1));
+          argCount = 2;
+          }
+        else if (!strcmp (*argv, "-l"))
+          {			// list Nachos directory
+          fileSystem->List ();
+          }
+        else if (!strcmp (*argv, "-D"))
+          {			// print entire filesystem
+          fileSystem->Print ();
+          }
+        else if (!strcmp (*argv, "-t"))
+          {			// performance test
+          PerformanceTest ();
+          }
+        else if (!strcmp (*argv, "-test")){
+            fileSystem->MkDir("ccroot");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("ccroot");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->MkDir("cc2");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdDir("cc2");
+            fileSystem->MkDir("cc3");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("/");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("/ccroot/cc2");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("..");
+            fileSystem->List();
+            printf("-------\n");
+            fileSystem->CdFromPathName("/ccroot/cc2");
+            fileSystem->CdFromPathName("../..");
+            fileSystem->List();
+            return 0;
+          }
 #endif // FILESYS
 #ifdef NETWORK
-	  if (!strcmp (*argv, "-o"))
-	    {
-		ASSERT (argc > 1);
-		Delay (2);	// delay for 2 seconds
-		// to give the user time to 
-		// start up another nachos
-		MailTest (atoi (*(argv + 1)));
-		argCount = 2;
-	    }
+        if (!strcmp (*argv, "-o"))
+          {
+          ASSERT (argc > 1);
+          Delay (2);	// delay for 2 seconds
+          // to give the user time to
+          // start up another nachos
+          MailTest (atoi (*(argv + 1)));
+          argCount = 2;
+          }
 #endif // NETWORK
-      }
+    }
 
-    currentThread->Finish ();	// NOTE: if the procedure "main" 
+    currentThread->Finish();    // NOTE: if the procedure "main"
     // returns, then the program "nachos"
     // will exit (as any other normal program
     // would).  But there may be other
@@ -218,5 +267,5 @@ main (int argc, char **argv)
     // to those threads by saying that the
     // "main" thread is finished, preventing
     // it from returning.
-    return (0);			// Not reached...
+    return (0);            // Not reached...
 }

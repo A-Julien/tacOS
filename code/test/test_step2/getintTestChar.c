@@ -20,6 +20,7 @@ int main()
 	PutInt(n);
 	PutChar('\n');
 
+    Halt();
 	return 0;
 	
 } 

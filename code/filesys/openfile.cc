@@ -33,7 +33,10 @@ OpenFile::OpenFile(int sector)
 { 
     hdr = new FileHeader;
     hdr->FetchFrom(sector);
-    seekPosition = 0;
+    this->seek_tid_list = (tuple_t *) malloc(sizeof(tuple_t));
+    this->seek_tid_list->tid = 0;
+    this->seek_tid_list->seekPosition = 0;
+    this->seek_tid_list->next = NULL;
 }
 
 ///
@@ -53,12 +56,9 @@ OpenFile::~OpenFile()
 ///
 ///	@param "position" -- the location within the file for the next Read/Write
 ///
-
-void
-OpenFile::Seek(int position)
-{
-    seekPosition = position;
-}	
+void OpenFile::Seek(int position, unsigned int tid) {
+    this->set_seek_position(tid, position);
+}
 
 ///
 /// OpenFile::Read/Write
@@ -72,21 +72,82 @@ OpenFile::Seek(int position)
 ///	@param "from" -- the buffer containing the data to be written to disk
 ///	@param "numBytes" -- the number of bytes to transfer
 ///
-
-int
-OpenFile::Read(char *into, int numBytes)
-{
-   int result = ReadAt(into, numBytes, seekPosition);
-   seekPosition += result;
+int OpenFile::Read(char *into, int numBytes, unsigned int tid){
+   int result = ReadAt(into, numBytes, this->get_seek_position(tid));
+   this->set_seek_position(tid, this->get_seek_position(tid)+result);
    return result;
 }
 
-int
-OpenFile::Write(const char *into, int numBytes)
-{
-   int result = WriteAt(into, numBytes, seekPosition);
-   seekPosition += result;
-   return result;
+bool OpenFile::isOpenByOthers(){
+    return this->seek_tid_list->next != NULL;
+}
+
+/// OpenFile::add_seek add a seek to a openfile
+/// Allow multi threads to access to the same openfile with separated pointer
+/// \param tid the thread tid
+//
+void OpenFile::add_seek(unsigned int tid){
+    tuple_t * list = this->seek_tid_list; //get head
+
+    while(list->next != NULL) list = list->next;
+
+    list->next = (tuple_t*) malloc(sizeof(tuple_t));
+    list->next->tid = tid;
+    list->next->seekPosition = 0;
+    list->next = NULL;
+}
+
+/// OpenFile::remove_seek remove a seek to a openfile
+/// Allow multi threads to access to the same openfile with separated pointer
+/// \param tid the thread tid
+//
+bool OpenFile::remove_seek(unsigned int tid){
+    tuple_t* list = this->seek_tid_list; //get head
+
+    while(list->next != NULL && list->next->tid != tid)list = list->next;
+    if(list->next == NULL) return false;
+
+    tuple_t* nnext = list->next->next;
+    delete list->next;
+    list->next = nnext; //remove element
+
+    return true;
+}
+/// OpenFile::set_seek_position
+/// set the seek positon.
+/// \param tid the thread tid
+/// \param seekPosition the new seek position
+void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
+    tuple_t *list = this->seek_tid_list;
+
+    while (list != NULL){
+        if(list->tid == tid) list->seekPosition = seekPosition;
+        list = list->next;
+    }
+}
+
+/// OpenFile::get_seek_position
+/// \param tid the thread tid
+/// \return the seek positon
+int OpenFile::get_seek_position(unsigned int tid){
+    tuple_t *list = this->seek_tid_list;
+
+    while (list != NULL){
+        if(list->tid == tid) return list->seekPosition;
+        list = list->next;
+    }
+    return -1;
+}
+
+/// OpenFile::Write into a file
+/// \param into
+/// \param numBytes
+/// \param tid
+/// \return
+int OpenFile::Write(const char *into, int numBytes, unsigned int tid){
+    int result = WriteAt(into, numBytes, this->get_seek_position(tid));
+    this->set_seek_position(tid, this->get_seek_position(tid)+result);
+    return result;
 }
 
 //
@@ -115,9 +176,8 @@ OpenFile::Write(const char *into, int numBytes)
 ///			read/written
 ///
 
-int
-OpenFile::ReadAt(char *into, int numBytes, int position)
-{
+int OpenFile::ReadAt(char *into, int numBytes, int position){
+
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     char *buf;
@@ -135,9 +195,9 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
 
     // read in all the full and partial sectors that we need
     buf = new char[numSectors * SectorSize];
-    for (i = firstSector; i <= lastSector; i++)	
-        synchDisk->ReadSector(hdr->ByteToSector(i * SectorSize), 
-					&buf[(i - firstSector) * SectorSize]);
+
+    for (i = firstSector; i <= lastSector; i++)
+        synchDisk->ReadSector(hdr->ByteToSector(i * SectorSize), &buf[(i - firstSector) * SectorSize]);
 
     // copy the part we want
     bcopy(&buf[position - (firstSector * SectorSize)], into, numBytes);
@@ -145,9 +205,7 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
     return numBytes;
 }
 
-int
-OpenFile::WriteAt(const char *from, int numBytes, int position)
-{
+int OpenFile::WriteAt(const char *from, int numBytes, int position){
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
@@ -192,8 +250,10 @@ OpenFile::WriteAt(const char *from, int numBytes, int position)
 /// 	@return Return the number of bytes in the file.
 ///
 
-int
-OpenFile::Length() 
-{ 
+int OpenFile::Length() {
     return hdr->FileLength(); 
+}
+
+int OpenFile::get_sector() {
+    return ((FileHeader* )this->hdr)->get_sector(0);
 }

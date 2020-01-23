@@ -39,16 +39,14 @@
 ///	@param "fileSize" is the bit map of free disk sectors
 ///
 
-bool
-FileHeader::Allocate(BitMap *freeMap, int fileSize)
+bool FileHeader::Allocate(BitMap *freeMap, int fileSize)
 { 
     numBytes = fileSize;
     numSectors  = divRoundUp(fileSize, SectorSize);
     if (freeMap->NumClear() < numSectors)
-	return FALSE;		// not enough space
+    return FALSE;		// not enough space
 
-    for (int i = 0; i < numSectors; i++)
-	dataSectors[i] = freeMap->Find();
+    for (int i = 0; i < numSectors; i++) dataSectors[i] = freeMap->Find();
     return TRUE;
 }
 
@@ -59,8 +57,7 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize)
 ///	@param "freeMap" is the bit map of free disk sectors
 ///
 
-void 
-FileHeader::Deallocate(BitMap *freeMap)
+void FileHeader::Deallocate(BitMap *freeMap)
 {
     for (int i = 0; i < numSectors; i++) {
 	ASSERT(freeMap->Test((int) dataSectors[i]));  // ought to be marked!
@@ -74,9 +71,7 @@ FileHeader::Deallocate(BitMap *freeMap)
 ///
 ///	@param "sector" is the disk sector containing the file header
 ///
-
-void
-FileHeader::FetchFrom(int sector)
+void FileHeader::FetchFrom(int sector)
 {
     synchDisk->ReadSector(sector, (char *)this);
 }
@@ -87,9 +82,7 @@ FileHeader::FetchFrom(int sector)
 ///
 ///	@param "sector" is the disk sector to contain the file header
 ///
-
-void
-FileHeader::WriteBack(int sector)
+void FileHeader::WriteBack(int sector)
 {
     synchDisk->WriteSector(sector, (char *)this); 
 }
@@ -104,8 +97,7 @@ FileHeader::WriteBack(int sector)
 ///	@param "offset" is the location within the file of the byte in question
 ///
 
-int
-FileHeader::ByteToSector(int offset)
+int FileHeader::ByteToSector(int offset)
 {
     return(dataSectors[offset / SectorSize]);
 }
@@ -115,9 +107,7 @@ FileHeader::ByteToSector(int offset)
 ///  @return Return the number of bytes in the file.
 ///
 
-int
-FileHeader::FileLength()
-{
+int FileHeader::FileLength(){
     return numBytes;
 }
 
@@ -126,9 +116,7 @@ FileHeader::FileLength()
 /// 	Print the contents of the file header, and the contents of all
 ///	the data blocks pointed to by the file header.
 ///
-
-void
-FileHeader::Print()
+void FileHeader::Print()
 {
     int i, j, k;
     char *data = new char[SectorSize];
@@ -145,7 +133,18 @@ FileHeader::Print()
             else
 		printf("\\%x", (unsigned char)data[j]);
 	}
-        printf("\n"); 
+        printf("\n");
     }
     delete [] data;
+}
+
+int FileHeader::get_sector(int id_sector){
+    return this->dataSectors[id_sector];
+}
+
+void FileHeader::set_sector(int id_sector, int sector){
+   this->dataSectors[id_sector]=sector;
+}
+void FileHeader::test(){
+    printf("numSectors : %i ", this->numSectors);
 }

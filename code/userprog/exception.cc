@@ -186,9 +186,10 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     UserThread * child = new UserThread( f, arg, managerUserThreadID->GetNewId(), machine->ReadRegister(6));
     // If there is a parent, it adopt the child
     if(parrent != NULL){
-
         parrent->addChildren(child);
+        fileSystem->registerOpenFileTable(child->getTableOfOpenfile(), child->getId());
     }
+
     // Assign the parent to the child
     child->setParrent(parrent);
     // Stock the pointer to the userThread on the thread
@@ -240,9 +241,7 @@ void SYSExitThread(void * object){
     }
     userThread->DoneWithTheChildList();
 
-
-
-
+    fileSystem->unregisterOpenFileTable(userThread->getId());
     userThread->exit(object);
     if(managerUserThreadID->lastAlive()){
         interrupt->Halt();

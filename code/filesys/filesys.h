@@ -38,60 +38,96 @@
 
 #include "copyright.h"
 #include "openfile.h"
+#include "filehdr.h"
+#define MAX_OPEN_FILE 20
+#define ROOT_DIRECTORY_FILE 0
+#define CURRENT_DIRECTORY_FILE 1
 
-#ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
-				// calls to UNIX, until the real file system
-				// implementation is available
+#ifdef FILESYS_STUB        // Temporarily implement file system calls as
+// calls to UNIX, until the real file system
+// implementation is available
+
+
 class FileSystem {
-  public:
+public:
     FileSystem(bool format) {}
 
-    bool Create(const char *name, int initialSize) { 
-	int fileDescriptor = OpenForWrite(name);
+    bool Create(const char *name, int initialSize) {
+    int fileDescriptor = OpenForWrite(name);
 
-	if (fileDescriptor == -1) return FALSE;
-	Close(fileDescriptor); 
-	return TRUE; 
-	}
+    if (fileDescriptor == -1) return FALSE;
+    Close(fileDescriptor);
+    return TRUE;
+    }
 
     OpenFile* Open(char *name) {
-	  int fileDescriptor = OpenForReadWrite(name, FALSE);
+    int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-	  if (fileDescriptor == -1) return NULL;
-	  return new OpenFile(fileDescriptor);
-      }
+    if (fileDescriptor == -1) return NULL;
+    return new OpenFile(fileDescriptor);
+    }
 
     bool Remove(char *name) { return Unlink(name) == 0; }
-
 };
 
 #else // FILESYS
+
+typedef struct file_table{
+    unsigned int tid;
+    OpenFile** thread_table;
+    struct file_table* next;
+}file_table_t;
+
+typedef struct global_file_table{
+    OpenFile* openFile;
+    struct global_file_table* next;
+}global_file_table_t;
+
 class FileSystem {
-  public:
-    FileSystem(bool format);		// Initialize the file system.
-					// Must be called *after* "synchDisk" 
-					// has been initialized.
-    					// If "format", there is nothing on
-					// the disk, so initialize the directory
-    					// and the bitmap of free blocks.
+public:
+    FileSystem(bool format);        // Initialize the file system.
+    // Must be called *after* "synchDisk"
+    // has been initialized.
+    // If "format", there is nothing on
+    // the disk, so initialize the directory
+    // and the bitmap of free blocks.
 
-    bool Create(const char *name, int initialSize);  	
-					// Create a file (UNIX creat)
+    bool Create(const char *name, int initialSize, File_type type = f);
+    bool MkDir(const char *directory_name); // Create a folder
+    bool CdDir(const char *directory_name); // Change the current folder
+    bool RmDir(const char *directory_name);// Remove a folder
+    bool CdFromPathName(const char *path_name);
 
-    OpenFile* Open(const char *name); 	// Open a file (UNIX open)
 
-    bool Remove(const char *name); 	// Delete a file (UNIX unlink)
+        OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
-    void List();			// List all the files in the file system
+    bool Remove(const char *name);    // Delete a file (UNIX unlink)
 
-    void Print();			// List all the files and their contents
+    void List();            // List all the files in the file system
 
-  private:
-   OpenFile* freeMapFile;		// Bit map of free disk blocks,
-					// represented as a file
-   OpenFile* directoryFile;		// "Root" directory -- list of 
-					// file names, represented as a file
-};
+    void Print();            // List all the files and their contents
+
+    void registerOpenFileTable(OpenFile** table,  unsigned int tid);
+    bool unregisterOpenFileTable(unsigned int tid);
+
+
+        private:
+    bool add_to_openFile_table(OpenFile* openFile, OpenFile** table = NULL);
+    OpenFile* get_open_file_by_sector(int sector);
+    bool remove_open_file(OpenFile* openFile);
+    OpenFile** get_thread_file_table(unsigned int tid);
+    void addFiletoGlobalTable(OpenFile* openFile);
+    void init_ThreadsFilesTable();
+
+
+        global_file_table_t* GlobalOpenFileTable;
+    OpenFile* freeMapFile;          // Bit map of free disk blocks, represented as a file
+    file_table_t* ThreadsFilesTable;
+    void init_table(OpenFile** table);
+    char ** parse(char *path_name);
+
+
+    };
 
 #endif // FILESYS
 

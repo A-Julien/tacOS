@@ -44,8 +44,6 @@ static void WriteDone(int arg) { writeDone->V(); }
 /// 
 ///	
 ///
-
-
 SynchConsole::SynchConsole(char *readFile, char *writeFile){
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
@@ -58,7 +56,6 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile){
 /// SynchConsole::~SynchConsole
 /// 	Clean up the SynchConsole
 ///
-
 SynchConsole::~SynchConsole(){
 	delete console;
 	delete writeDone;
@@ -70,16 +67,15 @@ SynchConsole::~SynchConsole(){
 /// SynchConsole::SynchPutChar
 /// Write a char in the output stream
 /// @param ch : the caracter that will be written
-
-
 void SynchConsole::SynchPutChar(const char ch){
 	// Do the work there for the synch for user.
 	// PutChar will automaticly wait for a character to be written.
 	// ie - the console had to call WriteDone Handler to continue the execution.
 
-	 console->PutChar(ch);
-     writeDone->P();
-
+    writeAvail->P();
+    console->PutChar(ch);
+    writeDone->P();
+    writeAvail->V();
 }
 
 ///
@@ -87,7 +83,6 @@ void SynchConsole::SynchPutChar(const char ch){
 /// Wait for a char to be available and return is int value
 /// @return int : The int value of the char readed
 //
-
 int SynchConsole::SynchGetChar(){
 	// Do the work there for the synch for user.
 	// GetChar will automaticly wait for a charactere to be available.
@@ -106,7 +101,6 @@ int SynchConsole::SynchGetChar(){
 // Only one syscall is made.
 /// @param s : the char * that will by written (Care of the '\o' end)
 //
-
 void SynchConsole::SynchPutString(const char s[]){
 	// While there is no end of String ('\0'), put the current char
 	int i = 0;
@@ -129,8 +123,6 @@ void SynchConsole::SynchPutString(const char s[]){
 /// @param  *s : is the adress where the string will be writed
 /// @param n : The max size of the string. The string is ended if one char is wether '\n' or EOF
 //
-
-
 void SynchConsole::SynchGetString(char *s, int n){
 	// For n time, get a character
 	// If c is '\n' or EOF or '\0' we assume it the end of the string.
@@ -152,7 +144,6 @@ void SynchConsole::SynchGetString(char *s, int n){
 /// Test wether the output stream have available charactere to read.
 /// @return Bool, true if the file doesn't have any charactere to be readed
 ///
-
 bool SynchConsole::Feof(){
 	// Call the Feof fonction of Console
 	return console->Feof();
