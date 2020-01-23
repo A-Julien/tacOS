@@ -18,6 +18,8 @@ int main(void){
 
     PutString("Killed");
 
+    Halt();
+
     return 0;
 }
 

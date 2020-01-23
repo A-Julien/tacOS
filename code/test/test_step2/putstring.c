@@ -17,6 +17,7 @@ int main()
 //String.size > 12	
 	PutString("Suplement SauceFromagereChef");
 	PutChar('\n');
+	Halt();
 	return 0;
 	//Halt();
 } 

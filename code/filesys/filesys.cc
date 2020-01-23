@@ -62,7 +62,7 @@
 /// supports extensible files, the directory size sets the maximum number 
 /// of files that can be loaded onto the disk.
 #define FreeMapFileSize    (NumSectors / BitsInByte)
-#define NumDirEntries       10
+#define NumDirEntries       20
 #define DirectoryFileSize   (sizeof(DirectoryEntry) * NumDirEntries)
 
 
@@ -651,7 +651,7 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
     if(fileTable->next == NULL) return false;
 
     for (int i = 0; i < MAX_OPEN_FILE; i++){
-        if(fileTable->next->thread_table[i]->isOpenByOthers()) {
+        if(fileTable->next->thread_table[i] && fileTable->next->thread_table[i]->isOpenByOthers()) {
             fileTable->next->thread_table[i]->remove_seek(tid);
             continue;
         }

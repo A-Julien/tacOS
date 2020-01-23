@@ -12,6 +12,8 @@ int main(void){
 	GetString(string, 20);
 
 	PutString(string);
+
+	Halt();
 	return 0;
 	
 }
