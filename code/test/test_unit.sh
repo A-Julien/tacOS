@@ -160,4 +160,3 @@ ci_kernel_loop(){
 ../build/nachos-step5 -f 2> /dev/null
 ci_kernel_loop
 ci_main_loop
-
