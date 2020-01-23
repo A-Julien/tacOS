@@ -17,12 +17,13 @@
 /// \param f The function where the thread will begin
 /// \param arg The adress of the object passed in parameter
 /// \param tid The Thread Identifiant
-UserThread::UserThread(void * f, void * arg, unsigned int tid){
+UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     char * buffer = (char *) malloc(50*sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
 	thread = new Thread(buffer);
 	dataFork.arg = arg;
 	dataFork.f = f;
+	dataFork.exit = exitPC;
 	ID  = tid; // MODIFY WHEN ID ALLOCATOR;
 	child = new SynchList();
 }
@@ -104,6 +105,7 @@ void UserThread::exit(void * returnAdress){
     state->setReturn(returnAdress);
     state->setEnd();
     state->V();
+
 	thread->Finish();
 }
 
@@ -111,23 +113,24 @@ void UserThread::exit(void * returnAdress){
 /// UserThread::WaitForChildExited Current thraid will wait that his child end
 /// \param CID The child TID
 /// \return void * the adress of the object the child wanted to return.
-/// Return 0 if it's not a child's TiD
+/// Return -1 if it's not a child's TiD
 void * UserThread::WaitForChildExited(int CID){
 	void * res;
 	UserThreadData * state =  (UserThreadData *) getUserThreadDataChild(CID);
 	if(state == NULL ){
-		return (void *) 0;
-	} 
+		return (void *) -1;
+	}
+	puts("Now waiting for child");
 	state->P();
+
 	res = state->getReturnValue();
     // return bool
 	removeChild((void *) state);
 
-
-	// Remove le userThread
+    	// Remove le userThread
 	delete ( (UserThread *) state->getUserThread());
 	delete state;
-	
+
 	return res; 
 }
 

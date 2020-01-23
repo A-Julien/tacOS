@@ -18,10 +18,12 @@ public:
     ~ManagerUserThreadID();
     unsigned int GetNewId();
     void addIdFreed(unsigned int ID);
+    bool lastAlive();
 private:
     SynchList * freeID;
     unsigned int compteur;
     Lock *lock;
+    unsigned int stillAlive;
 };
 
 #endif

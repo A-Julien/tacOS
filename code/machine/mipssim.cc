@@ -27,7 +27,7 @@ static void Mult(int a, int b, bool signedArith, int* hiPtr, int* loPtr);
 ///	This routine is re-entrant, in that it can be called multiple
 ///	times concurrently -- one for each thread executing user code
 void
-Machine::Run()
+Machine::Run(void * fExit)
 {
   // LB: Using a dynamic instr is right here as one never exits this
   // function.
@@ -45,13 +45,13 @@ Machine::Run()
       printf("Starting thread \"%s\" at time %lld\n",
 	     currentThread->getName(), stats->totalTicks);
     // End of correction
-
+    WriteRegister(31,(int) fExit);
     interrupt->setStatus(UserMode);
     for (;;) {
         OneInstruction(instr);
-	interrupt->OneTick();
-	if (singleStep && (runUntilTime <= stats->totalTicks))
-	  Debugger();
+        interrupt->OneTick();
+        if (singleStep && (runUntilTime <= stats->totalTicks))
+          Debugger();
     }
 }
 

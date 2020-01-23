@@ -23,6 +23,7 @@ typedef struct
 {
     void * f;
     void * arg;
+    int exit;
 } thread_init;
 
 
@@ -31,7 +32,7 @@ typedef struct
 class UserThread {
 	public:
 
-		UserThread(void * ,void * arg, unsigned int tid);
+		UserThread(void * ,void * arg, unsigned int tid, int exitPC);
 		~UserThread();
 		void Run();
 		unsigned int getId();

@@ -112,7 +112,7 @@ class Machine {
     ~Machine();			// De-allocate the data structures
 
 // Routines callable by the Nachos kernel
-    void Run();	 		// Run a user program
+    void Run(void * fExit);	 		// Run a user program
 
     int ReadRegister(int num);	// read the contents of a CPU register
 
