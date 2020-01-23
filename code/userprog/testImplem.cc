@@ -1,4 +1,4 @@
-/// @file synchlisttest.                                            
+/// @file testImplem.cc
 /// @brief  Test the list and synchlist after modification by our team
 /// @author Olivier Hureau,  Hugo Feydel , Julien ALaimo         
 ///

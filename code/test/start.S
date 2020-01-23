@@ -41,6 +41,41 @@ __start:
  * -------------------------------------------------------------
  */
 
+  .globl makeAllChildSurvive
+  	.ent	makeAllChildSurvive
+  makeAllChildSurvive:
+  	addiu $2,$0,SC_makeAllChildSurvive
+  	syscall
+  	j	$31
+  	.end makeAllChildSurvive
+
+
+  .globl makeChildSurvive
+  	.ent	makeChildSurvive
+  makeChildSurvive:
+  	addiu $2,$0,SC_makeChildSurvive
+  	syscall
+  	j	$31
+  	.end makeChildSurvive
+
+  .globl WakeUpChild
+  	.ent	WakeUpChild
+  WakeUpChild:
+  	addiu $2,$0,SC_WakeUpChild
+  	syscall
+  	j	$31
+  	.end WakeUpChild
+
+  .globl StopChild
+  	.ent	StopChild
+  StopChild:
+  	addiu $2,$0,SC_StopChild
+  	syscall
+  	j	$31
+  	.end StopChild
+
+
+
   .globl WaitForAllChildExited
   	.ent	WaitForAllChildExited
   WaitForAllChildExited:
