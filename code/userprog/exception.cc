@@ -33,6 +33,8 @@
 #include "../threads/system.h"
 #include "userthread.h"
 
+#define MAX_FILENAME_BUFFER 200
+
 extern void ExitThread(void * object);
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
@@ -295,6 +297,8 @@ ExceptionHandler(ExceptionType which) {
     int size;
     int resultat;
     void *getString;
+    char* filename;
+
     DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
         switch (type) {
@@ -396,10 +400,20 @@ ExceptionHandler(ExceptionType which) {
             case SC_ThreadEndedWithoutExit:
                 puts("Exited without exit");
             break;
-            default:
 
+            case SC_Open:
+                filename = (char* ) malloc(sizeof(char) * MAX_FILENAME_BUFFER);
+                copyStringFromMachine(machine->ReadRegister(4),filename,MAX_FILENAME_BUFFER);
+                machine->WriteRegister(2, synchConsole->fopen(
+                        filename,
+                        ((UserThread *) currentThread->getUserThreadAdress())->getId())
+                        );
+            break;
+
+            default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
+                break;
 
         }
         UpdatePC();

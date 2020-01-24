@@ -22,6 +22,7 @@ class SynchConsole {
 		void SynchPutString(const char *s); // Unix puts(3S)
 		void SynchGetString(char *s, int n); // Unix fgets(3S)
 		bool Feof(); // Unix Feof
+        int fopen(const char* filename, int tid);
 
 
 	private:

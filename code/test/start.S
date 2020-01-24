@@ -41,6 +41,22 @@ __start:
  * -------------------------------------------------------------
  */
 
+   .globl fopen
+   	.ent	fopen
+   fopen:
+   	addiu $2,$0,SC_Open
+   	syscall
+   	j	$31
+   	.end fopen
+
+   .globl fopen
+   	.ent	fopen
+   fopen:
+   	addiu $2,$0,SC_Open
+   	syscall
+   	j	$31
+   	.end fopen
+
   .globl makeAllChildSurvive
   	.ent	makeAllChildSurvive
   makeAllChildSurvive:

@@ -225,9 +225,8 @@ void PutInt(int n);
 //
 
 int Feof();
-
 unsigned int  createUserThread(void * f,void * arg);
-void * WaitForChildExited(unsigned int CID);
+void* WaitForChildExited(unsigned int CID);
 void ExitThread(void * object);
 // Expert mode
 void WaitForAllChildExited();
@@ -236,6 +235,8 @@ int WakeUpChild(int CID);
 int makeChildSurvive(int CID);
 void makeAllChildSurvive();
 
+void* Fopen(const char* filename);
+char* fgets(char *str, int n, FILE *stream);
 
 
 #endif // IN_USER_MODE

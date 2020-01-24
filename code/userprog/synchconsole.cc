@@ -11,7 +11,9 @@
 #include "copyright.h"
 #include "system.h"
 #include "synchconsole.h"
+#include "openfile.h"
 #include "synch.h"
+#include "filesys.h"
 #include "../threads/synch.h"
 
 static Semaphore *readAvail;
@@ -148,3 +150,9 @@ bool SynchConsole::Feof(){
 	// Call the Feof fonction of Console
 	return console->Feof();
 }
+
+int SynchConsole::fopen(const char* filename, int tid) {
+    OpenFile * openFile = fileSystem->Open(filename, tid);
+    return (int)((void *)openFile);
+}
+

@@ -108,12 +108,12 @@ public:
 
     bool isOpenByOthers();
 
+    bool isdir();
+
 
 private:
     void set_seek_position(unsigned int tid, int seekPosition);
-
     int get_seek_position(unsigned int tid);
-
 
     FileHeader *hdr;            // Header for this file
     tuple_t *seek_tid_list;

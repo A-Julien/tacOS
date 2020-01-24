@@ -70,7 +70,6 @@ public:
 
     void set_sector(int id_sector, int sector);
 
-
 private:
     int numBytes;            // Number of bytes in the file
     int numSectors;            // Number of data sectors in the file
