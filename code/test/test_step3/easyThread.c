@@ -37,7 +37,7 @@ int main(void){
     }
     WaitForAllChildExited();
     PutString("Plus aucun thread à attendre\n");
-    Halt();
+    // Halt();
 
     return 0;
 }

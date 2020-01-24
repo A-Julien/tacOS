@@ -19,11 +19,12 @@ public:
     unsigned int GetNewId();
     void addIdFreed(unsigned int ID);
     bool lastAlive();
+    unsigned int stillAlive;
 private:
     SynchList * freeID;
     unsigned int compteur;
     Lock *lock;
-    unsigned int stillAlive;
+    //unsigned int stillAlive;
 };
 
 #endif
