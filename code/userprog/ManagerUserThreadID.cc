@@ -11,7 +11,7 @@
 /// The main thread id is 0, else it begin at 1
 ManagerUserThreadID::ManagerUserThreadID(){
     freeID = new SynchList;
-    compteur = 1;
+    compteur = 2;
     lock = new Lock ("ManagerUserThreadID lock");
     stillAlive = 1;
 

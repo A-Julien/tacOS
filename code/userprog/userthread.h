@@ -56,7 +56,7 @@ public:
         void setMeta(void *);
         bool isSurvivor();
         void setSurvivor(bool boolean);
-		OpenFile** getTableOfOpenfile();
+		int* getTableOfOpenfile();
 
 	private:
 		void * returnObject;
@@ -68,7 +68,7 @@ public:
         thread_init dataFork;
         void * metaData;
         bool survivor;
-		OpenFile **TableOfOpenfile;
+		int* TableOfOpenfile;
 
 };
 

@@ -176,7 +176,8 @@ Initialize (int argc, char **argv)
 
 #ifdef FILESYS_NEEDED
     fileSystem = new FileSystem (format);
-     if(format) exit(0);
+    fileSystem->registerOpenFileTable(mainUserThread->getTableOfOpenfile(),1);//mainUserThread->getId());//((UserThread *) mainUserThread->getUserThreadAdress())->getId());
+    if(format) exit(0);
 #endif
 
 #ifdef NETWORK

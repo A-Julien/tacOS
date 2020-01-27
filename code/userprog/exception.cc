@@ -230,7 +230,7 @@ void SYSExitThread(void * object){
                 Grandpa->getChildList()->Append(enfantMeta);
                 Grandpa->DoneWithTheChildList();
             } else {
-                // https://www.youtube.com/watch?v=qiMaOmDtaYI
+                // https://youtu.be/qiMaOmDtaYI?t=69
             }
             userThread->DoneWithTheChildList();
             enfant->setSurvivor(false);
@@ -404,10 +404,30 @@ ExceptionHandler(ExceptionType which) {
             case SC_Open:
                 filename = (char* ) malloc(sizeof(char) * MAX_FILENAME_BUFFER);
                 copyStringFromMachine(machine->ReadRegister(4),filename,MAX_FILENAME_BUFFER);
-                machine->WriteRegister(2, synchConsole->fopen(
-                        filename,
-                        ((UserThread *) currentThread->getUserThreadAdress())->getId())
-                        );
+                machine->WriteRegister(2,
+                        synchConsole->fopen(
+                            filename,
+                            1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                        )
+                 );
+                break;
+
+            case SC_Read:
+                // int fgets(char* into, int FileDescriptor, int numBytes, int tid);
+                //syscall -> int fgets(int fileDescriptor, char* into, int numBytes);
+                filename = (char* ) malloc(sizeof(char) * MAX_FILENAME_BUFFER);
+                //copyStringFromMachine(machine->ReadRegister(4),filename,MAX_FILENAME_BUFFER);
+
+                machine->WriteRegister(2,
+                        synchConsole->fgets(
+                                filename,
+                                machine->ReadRegister(4),
+                                machine->ReadRegister(6),
+                                1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                        )
+                );
+                copyMachineFromString(filename,machine->ReadRegister(5), machine->ReadRegister(6));
+
             break;
 
             default:
@@ -429,3 +449,4 @@ ExceptionHandler(ExceptionType which) {
     }
 
 }
+

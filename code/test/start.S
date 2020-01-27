@@ -41,13 +41,13 @@ __start:
  * -------------------------------------------------------------
  */
 
-   .globl fopen
-   	.ent	fopen
-   fopen:
-   	addiu $2,$0,SC_Open
+   .globl fgets
+   	.ent	fgets
+   fgets:
+   	addiu $2,$0,SC_Read
    	syscall
    	j	$31
-   	.end fopen
+   	.end fgets
 
    .globl fopen
    	.ent	fopen

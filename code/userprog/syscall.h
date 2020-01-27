@@ -235,8 +235,8 @@ int WakeUpChild(int CID);
 int makeChildSurvive(int CID);
 void makeAllChildSurvive();
 
-void* Fopen(const char* filename);
-char* fgets(char *str, int n, FILE *stream);
+int fopen(const char* filename);
+int fgets(int fileDescriptor, char* into, int numBytes);
 
 
 #endif // IN_USER_MODE

@@ -15,6 +15,7 @@
 #include "synch.h"
 #include "filesys.h"
 #include "../threads/synch.h"
+#include "../filesys/openfile.h"
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
@@ -152,7 +153,10 @@ bool SynchConsole::Feof(){
 }
 
 int SynchConsole::fopen(const char* filename, int tid) {
-    OpenFile * openFile = fileSystem->Open(filename, tid);
-    return (int)((void *)openFile);
+    return fileSystem->UserOpen(filename, tid);
+}
+
+int SynchConsole::fgets(char* into, int fileDescriptor, int numBytes, int tid){
+    return fileSystem->UserRead(fileDescriptor, into, numBytes, tid);
 }
 

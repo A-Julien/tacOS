@@ -26,10 +26,10 @@ UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     dataFork.exit = exitPC;
     this->ID = tid; // MODIFY WHEN ID ALLOCATOR;
     this->child = new SynchList();
-    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
+    this->TableOfOpenfile = (int*) malloc(sizeof(int) * MAX_OPEN_FILE);
 }
 
-OpenFile** UserThread::getTableOfOpenfile(){
+int* UserThread::getTableOfOpenfile(){
     return this->TableOfOpenfile;
 }
 
