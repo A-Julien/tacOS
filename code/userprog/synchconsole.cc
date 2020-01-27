@@ -152,19 +152,23 @@ bool SynchConsole::Feof(){
 	return console->Feof();
 }
 
-int SynchConsole::fopen(const char* filename, int tid) {
+int SynchConsole::fopen(const char* filename, unsigned int tid) {
     return fileSystem->UserOpen(filename, tid);
 }
 
-int SynchConsole::fgets(char* into, int fileDescriptor, int numBytes, int tid){
+int SynchConsole::fgets(char* into, int fileDescriptor, int numBytes, unsigned int tid){
     return fileSystem->UserRead(fileDescriptor, into, numBytes, tid);
 }
 
-int SynchConsole::fputs(char* from, int fileDescriptor, int numBytes, int tid){
+int SynchConsole::fputs(char* from, int fileDescriptor, int numBytes, unsigned int tid){
     return fileSystem->UserWrite(fileDescriptor, from, numBytes, tid);
 }
 
-void SynchConsole::fseek(int fileDescriptor, int position, int tid){
+void SynchConsole::fseek(int fileDescriptor, int position, unsigned int tid){
     fileSystem->UserSetSeek(fileDescriptor, position, tid);
+}
+
+int SynchConsole::fclose(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid){
+    return fileSystem->UserCloseFile(fileDescriptor, threadTableFileDescriptor, tid);
 }
 

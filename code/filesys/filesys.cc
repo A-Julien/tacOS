@@ -439,20 +439,59 @@ OpenFile* FileSystem::get_open_file_by_sector(int sector) {
     return NULL;
 }
 
+int FileSystem::UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid) {
+    OpenFile** threadFileTable = this->get_thread_file_table(tid);
+
+    if(this->close_file(threadFileTable[fileDescriptor], threadFileTable, tid) == -1) return -1;
+
+    for (int i = 0; i < MAX_OPEN_FILE; i++)
+        if(threadTableFileDescriptor[i] == fileDescriptor)  threadTableFileDescriptor[i] = -1;
+
+
+    return 0;
+}
+
 /// Remove an OpenFileTable from the table
 /// Be carefull, this function does not close the openfile
 /// \param openFile the openfile
 /// \return true fi succeed, false of openfile is not found in the table
-bool FileSystem::remove_open_file(OpenFile* openFile) {
-    for (int i = 2; i < MAX_OPEN_FILE; i++) {
-        if (this->ThreadsFilesTable->OpenFileTable[i] == openFile) {
-            this->ThreadsFilesTable->OpenFileTable[i] = NULL;
+int FileSystem::close_file(OpenFile* openFile, OpenFile** threadFileTable, unsigned int tid) {
+    if(openFile->isOpenByOthers()){
+        for (int i = 0; i < MAX_OPEN_FILE; i++) if (threadFileTable[i] == openFile) threadFileTable[i] = NULL;
+        openFile->remove_seek(tid);
+        return true;
+    }
+
+    for (int i = 0; i < MAX_OPEN_FILE; i++) {
+        if (threadFileTable[i] == openFile) {
+            delete threadFileTable[i];
             return true;
         }
     }
     return false;
 }
 
+int FileSystem::removeFiletoGlobalTable(OpenFile* openFile){
+    if(this->GlobalOpenFileTable == NULL) return -1;
+
+    global_file_table_t* gfileTable = this->GlobalOpenFileTable; //get head
+
+    if(gfileTable->openFile == openFile){
+        global_file_table_t* next = gfileTable->next;
+        delete gfileTable;
+        this->GlobalOpenFileTable = next; //remove element
+        return 0;
+    }
+
+    while(gfileTable->next != NULL && gfileTable->next->openFile != openFile) gfileTable = gfileTable->next;
+    if(gfileTable->next == NULL) return -1;
+
+    global_file_table_t* nnext = gfileTable->next->next;
+    delete gfileTable->next;
+    gfileTable->next = nnext; //remove element
+
+    return 0;
+}
 
 void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 
@@ -684,19 +723,13 @@ void FileSystem::registerOpenFileTable(int* table, unsigned int tid){
 
 bool FileSystem::unregisterOpenFileTable(unsigned int tid){
     file_table_t * fileTable =  this->ThreadsFilesTable; // get head
-    OpenFile** threadFileTable = this->get_thread_file_table(tid);
 
     // search the table of the thread
     while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
     if(fileTable->next == NULL) return false;
 
-    for (int i = 0; i < MAX_OPEN_FILE; i++){
-        if(fileTable->next->OpenFileTable[i] && threadFileTable[i]->isOpenByOthers()) {
-            fileTable->next->OpenFileTable[i]->remove_seek(tid);
-            continue;
-        }
-        delete fileTable->next->OpenFileTable[i];
-    }
+    for (int i = 0; i < MAX_OPEN_FILE; i++)
+        this->close_file(fileTable->next->OpenFileTable[i],fileTable->next->OpenFileTable,tid);
 
     file_table_t* nnext = fileTable->next->next;
     delete fileTable->next;

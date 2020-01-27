@@ -22,11 +22,11 @@ class SynchConsole {
 		void SynchPutString(const char *s); // Unix puts(3S)
 		void SynchGetString(char *s, int n); // Unix fgets(3S)
 		bool Feof(); // Unix Feof
-        int fopen(const char* filename, int tid);
-        int fgets(char* into, int FileDescriptor, int numBytes, int tid);
-        int fputs(char* from, int fileDescriptor, int numBytes, int tid);
-        void fseek(int fileDescriptor, int position, int tid);
-
+        int fopen(const char* filename, unsigned int tid);
+        int fgets(char* into, int FileDescriptor, int numBytes, unsigned int tid);
+        int fputs(char* from, int fileDescriptor, int numBytes, unsigned int tid);
+        void fseek(int fileDescriptor, int position, unsigned int tid);
+        int fclose(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
         private:
 
     Console *console;

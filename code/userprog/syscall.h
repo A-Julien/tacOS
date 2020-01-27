@@ -240,7 +240,7 @@ int fopen(const char* filename);
 int fgets(int fileDescriptor, char* into, int numBytes);
 int fputs(int fileDescriptor, char* from, int numBytes);
 void fseek(int fileDescriptor, int position);
-
+int fclose(int fileDescriptor);
 
 #endif // IN_USER_MODE
 

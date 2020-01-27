@@ -458,7 +458,23 @@ ExceptionHandler(ExceptionType which) {
                        1//((UserThread *) currentThread->getUserThreadAdress())->getId()
                );
 
-            break;
+                break;
+
+            case SC_Close:
+                //bool fclose(int fileDescriptor);
+                //void SynchConsole::fclose(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid){
+                //bool FileSystem::UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid) {
+
+                machine->WriteRegister(2,
+                   synchConsole->fclose(
+                           machine->ReadRegister(4),
+                           ((UserThread *) currentThread->getUserThreadAdress())->getTableOfOpenfile(),
+                           1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                   )
+                );
+
+                break;
+
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);

@@ -17,6 +17,7 @@ int main()
     char content[24];
     fgets(file, content, 24);
     PutString(content);
+    fclose(file);
     //void fseek(int fileDescriptor, int position);
     //int fputs(int fileDescriptor, char* from, int numBytes);
     return 0;

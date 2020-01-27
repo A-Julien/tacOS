@@ -121,12 +121,17 @@ public:
 
     void UserSetSeek(int fileDescriptor, int position, unsigned int tid);
 
+    int UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
+
+
         private:
     bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);
 
     OpenFile *get_open_file_by_sector(int sector);
 
-    bool remove_open_file(OpenFile *openFile);
+    int close_file(OpenFile* openFile, OpenFile** threadFileTable, unsigned int tid);
+
+    int removeFiletoGlobalTable(OpenFile* openFile);
 
     OpenFile** get_thread_file_table(unsigned int tid);
 

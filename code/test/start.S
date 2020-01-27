@@ -41,6 +41,14 @@ __start:
  * -------------------------------------------------------------
  */
 
+ .globl fclose
+     .ent	fclose
+ fclose:
+     addiu $2,$0,SC_Close
+     syscall
+     j	$31
+     .end fclose
+
 .globl fseek
     .ent	fseek
 fseek:

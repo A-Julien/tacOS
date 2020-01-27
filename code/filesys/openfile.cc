@@ -99,9 +99,17 @@ void OpenFile::add_seek(unsigned int tid){
 /// OpenFileTable::remove_seek remove a seek to a openfile
 /// Allow multi threads to access to the same openfile with separated pointer
 /// \param tid the thread tid
-//
+// [(23,0),[42,1)]
 bool OpenFile::remove_seek(unsigned int tid){
     tuple_t* list = this->seek_tid_list; //get head
+
+    //TODO CODE DUPLICATE
+    if(list->tid == tid){
+        tuple_t* next = list->next;
+        delete list;
+        this->seek_tid_list = next; //remove element
+        return true;
+    }
 
     while(list->next != NULL && list->next->tid != tid)list = list->next;
     if(list->next == NULL) return false;
