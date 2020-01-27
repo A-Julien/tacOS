@@ -24,6 +24,8 @@ class SynchConsole {
 		bool Feof(); // Unix Feof
         int fopen(const char* filename, int tid);
         int fgets(char* into, int FileDescriptor, int numBytes, int tid);
+        int fputs(char* from, int fileDescriptor, int numBytes, int tid);
+        void fseek(int fileDescriptor, int position, int tid);
 
         private:
 

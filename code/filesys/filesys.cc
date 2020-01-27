@@ -481,6 +481,13 @@ int FileSystem::UserRead(int fileDescriptor, char *into, int numBytes, unsigned 
     return (this->get_thread_file_table(tid))[fileDescriptor]->Read(into,numBytes,tid);
 }
 
+int FileSystem::UserWrite(int fileDescriptor, char *from, int numBytes, unsigned int tid){
+    return (this->get_thread_file_table(tid))[fileDescriptor]->Write(from,numBytes,tid);
+}
+
+void FileSystem::UserSetSeek(int fileDescriptor, int position, unsigned int tid){
+    (this->get_thread_file_table(tid))[fileDescriptor]->Seek(position,tid);
+}
 
 int FileSystem::getFileDescriptor(OpenFile* openFile,unsigned int tid){
     OpenFile** thread_table = this->get_thread_file_table(tid); // get the  thread openfile table

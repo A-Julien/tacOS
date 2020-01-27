@@ -42,6 +42,7 @@
 #define SC_GetInt 15
 #define SC_PutInt 16
 #define SC_Feof 17
+#define SC_Seek 18
 
 // ID Reservé pour Olivier et les threads de 20 à 40
 
@@ -237,6 +238,8 @@ void makeAllChildSurvive();
 
 int fopen(const char* filename);
 int fgets(int fileDescriptor, char* into, int numBytes);
+int fputs(int fileDescriptor, char* from, int numBytes);
+void fseek(int fileDescriptor, int position);
 
 
 #endif // IN_USER_MODE

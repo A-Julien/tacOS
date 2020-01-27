@@ -14,5 +14,4 @@ int main()
     PutString(content);
     return 0;
 }
-//SORTIE = "Samourai"; "aerospatiale"; "Suplement Sa"
 

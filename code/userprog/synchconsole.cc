@@ -160,3 +160,11 @@ int SynchConsole::fgets(char* into, int fileDescriptor, int numBytes, int tid){
     return fileSystem->UserRead(fileDescriptor, into, numBytes, tid);
 }
 
+int SynchConsole::fputs(char* from, int fileDescriptor, int numBytes, int tid){
+    return fileSystem->UserWrite(fileDescriptor, from, numBytes, tid);
+}
+
+void SynchConsole::fseek(int fileDescriptor, int position, int tid){
+    fileSystem->UserSetSeek(fileDescriptor, position, tid);
+}
+

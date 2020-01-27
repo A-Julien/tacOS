@@ -76,7 +76,6 @@ public:
 typedef struct file_table {
     unsigned int tid;
     OpenFile** OpenFileTable;
-    //int* OpenFileTable;
     struct file_table *next;
 } file_table_t;
 
@@ -118,7 +117,9 @@ public:
 
     int UserRead(int fileDescriptor, char *into, int numBytes, unsigned int tid);
 
+    int UserWrite(int fileDescriptor, char *from, int numBytes, unsigned int tid);
 
+    void UserSetSeek(int fileDescriptor, int position, unsigned int tid);
 
         private:
     bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);

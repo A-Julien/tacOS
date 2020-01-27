@@ -298,6 +298,8 @@ ExceptionHandler(ExceptionType which) {
     int resultat;
     void *getString;
     char* filename;
+    char* into;
+    char* from;
 
     DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
@@ -410,26 +412,53 @@ ExceptionHandler(ExceptionType which) {
                             1//((UserThread *) currentThread->getUserThreadAdress())->getId()
                         )
                  );
+                delete filename;
                 break;
 
             case SC_Read:
                 // int fgets(char* into, int FileDescriptor, int numBytes, int tid);
                 //syscall -> int fgets(int fileDescriptor, char* into, int numBytes);
-                filename = (char* ) malloc(sizeof(char) * MAX_FILENAME_BUFFER);
-                //copyStringFromMachine(machine->ReadRegister(4),filename,MAX_FILENAME_BUFFER);
-
+                into = (char* ) malloc(sizeof(char) * machine->ReadRegister(6));
                 machine->WriteRegister(2,
                         synchConsole->fgets(
-                                filename,
+                                into,
                                 machine->ReadRegister(4),
                                 machine->ReadRegister(6),
                                 1//((UserThread *) currentThread->getUserThreadAdress())->getId()
                         )
                 );
-                copyMachineFromString(filename,machine->ReadRegister(5), machine->ReadRegister(6));
-
+                copyMachineFromString(into,machine->ReadRegister(5), machine->ReadRegister(6));
+                delete into;
             break;
 
+            case SC_Write:
+
+                //int fputs(int fileDescriptor, char* from, int numBytes);
+                //int SynchConsole::fputs(char* from, int fileDescriptor, int numBytes, int tid);
+                from = (char* ) malloc(sizeof(char) * machine->ReadRegister(6));
+                copyStringFromMachine(machine->ReadRegister(5),from, machine->ReadRegister(6));
+                machine->WriteRegister(2,
+                                       synchConsole->fputs(
+                                               from,
+                                               machine->ReadRegister(4),
+                                               machine->ReadRegister(6),
+                                               1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                                       )
+                );
+                delete from;
+                break;
+
+            case SC_Seek:
+                //void int SynchConsole::fseek(int fileDescriptor, int position, int tid){
+                //void fseek(int fileDescriptor, int position);
+
+               synchConsole->fseek(
+                       machine->ReadRegister(4),
+                       machine->ReadRegister(5),
+                       1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+               );
+
+            break;
             default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);

@@ -41,6 +41,22 @@ __start:
  * -------------------------------------------------------------
  */
 
+.globl fseek
+    .ent	fseek
+fseek:
+    addiu $2,$0,SC_Seek
+    syscall
+    j	$31
+    .end fseek
+
+.globl fputs
+    .ent	fputs
+fputs:
+    addiu $2,$0,SC_Write
+    syscall
+    j	$31
+    .end fputs
+
    .globl fgets
    	.ent	fgets
    fgets:
