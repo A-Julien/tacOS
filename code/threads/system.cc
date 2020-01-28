@@ -183,7 +183,7 @@ Initialize (int argc, char **argv)
 
 #ifdef FILESYS_NEEDED
     fileSystem = new FileSystem (format);
-    fileSystem->registerOpenFileTable(mainUserThread->getTableOfOpenfile(),1);//mainUserThread->getId());//((UserThread *) mainUserThread->getUserThreadAdress())->getId());
+    fileSystem->registerOpenFileTable(mainUserThread->getTableOfOpenfile(), mainUserThread->getId());//((UserThread *) mainUserThread->getUserThreadAdress())->getId());
     if(format) exit(0);
 #endif
 

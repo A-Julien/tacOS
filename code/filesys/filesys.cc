@@ -855,7 +855,8 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
     if(fileTable->next == NULL) return false;
 
     for (int i = 0; i < MAX_OPEN_FILE; i++)
-        this->close_file(fileTable->next->OpenFileTable[i],fileTable->next->OpenFileTable,tid);
+        if(fileTable->next->OpenFileTable[i] != NULL)
+            this->close_file(fileTable->next->OpenFileTable[i],fileTable->next->OpenFileTable,tid);
 
     file_table_t* nnext = fileTable->next->next;
     delete fileTable->next;
