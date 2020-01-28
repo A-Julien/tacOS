@@ -60,7 +60,7 @@
 
 /// Thread state
 enum ThreadStatus
-{ JUST_CREATED, RUNNING, READY, BLOCKED };
+{ JUST_CREATED, RUNNING, READY, BLOCKED, SYNCH_BLOCK, STOP_BLOCK, SYNCH_STOP_BLOCK };
 
 /// external function, dummy routine whose sole job is to call Thread::Print
 extern void ThreadPrint (int arg);
@@ -104,10 +104,7 @@ class Thread
 
     void CheckOverflow ();	// Check if thread has 
     // overflowed its stack
-    void setStatus (ThreadStatus st)
-    {
-	status = st;
-    }
+    void setStatus (ThreadStatus st);
     const char *getName ()
     {
 	return (name);
@@ -121,9 +118,13 @@ class Thread
     void * getUserThreadAdress();
     ThreadStatus getStatus();
 
+    void enterCritique();
+    void enterCritiqueExt();
+    void exitCritique();
+
   private:
     // some of the private data for this class is listed above
-
+    void * critique;
     int *stack;			// Bottom of the stack 
     // NULL if this is the main thread
     // (If NULL, don't deallocate stack)
@@ -165,3 +166,5 @@ extern "C"
 }
 
 #endif				// THREAD_H
+
+#include "synch.h"

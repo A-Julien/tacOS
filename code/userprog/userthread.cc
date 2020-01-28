@@ -149,44 +149,9 @@ void UserThread::WaitForAllChildExited(){
     }
 }
 
-///
-/// UserThread::StopChild Put the thread in BLOCKED status
-/// \param CID
-/// \return 0 if the child have been stoped, 1 if the child is currently stop, 2 if it's not a child's TID
 
-int UserThread::StopChild(unsigned int CID){
-    UserThreadData * state = (UserThreadData *) getUserThreadDataChild(CID);
-    if(state == NULL){
-        return 2;
-    }
-    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
 
-  //  IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    if(childThread->getStatus() == BLOCKED){
-        return 1;
-    }
-    childThread->setStatus(BLOCKED);
 
-  //  (void) interrupt->SetLevel (oldLevel);
-    return 0;
-}
-
-///
-/// UserThread::WakeUpChild Put a thread in Ready status
-/// \param CID
-/// \return 0 if the child have been WakeUp, 1 if the child is currently Ready, 2 if it's not a child's TID
-int UserThread::WakeUpChild(unsigned int CID){
-    UserThreadData * state = (UserThreadData *) getUserThreadDataChild(CID);
-    if(state == NULL){
-        return 2;
-    }
-    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
-    if(childThread->getStatus() == BLOCKED){
-        return 1;
-    }
-    childThread->setStatus(BLOCKED);
-	return 0;
-}
 
 ///  UserThread::makeChildSurvive Pass a child in suvivor mode
 /// \param CID Child id
@@ -232,6 +197,7 @@ void UserThread::addChildren(UserThread * UTC){
     UserThreadData * childData = new UserThreadData(UTC->getId(), UTC);
     UTC->setMeta(childData);
     child->Append((void *) childData);
+    ASSERT(childData->getID() == UTC->getId());
 }
 
 ///

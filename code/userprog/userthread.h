@@ -40,7 +40,7 @@ public:
 		// EXPERT MODE
 
 		void WaitForAllChildExited();
-		int StopChild(unsigned int CID);
+		//int StopChild(unsigned int CID);
 		int WakeUpChild(unsigned int CID);
 		int makeChildSurvive(unsigned int CID);
 		void makeAllChildSurvive();
