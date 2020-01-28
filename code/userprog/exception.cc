@@ -197,9 +197,7 @@ unsigned int  SYScreateUserThread(void * f,void * arg){
     // Stock the pointer to the userThread on the thread
     ((Thread *) child->getThread())->setUserThread(child);
     child->Run();
-    char dbg[20];
-    sprintf(dbg,"### CID = %u\n", child->getId());
-    puts(dbg);
+
     return child->getId();
 }
 
@@ -279,9 +277,7 @@ void StartUserThread(int data) {
 /// \return 0 if the child have been stoped, 1 if the child is currently stop, 2 if it's not a child's TID
 
 int SYSStopChild(unsigned int CID){
-    char dbg[20];
-    sprintf(dbg,"@@@\n CID = %u", CID);
-    puts(dbg);
+
     UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
     UserThreadData * state = (UserThreadData *) currentUserThread->getUserThreadDataChild(CID);
     if(state == NULL){

@@ -8,13 +8,21 @@
 #include "../../userprog/syscall.h"
 
 void handler1(){
-	int i;
-	for(i = 0; i < 10; i++){
-		PutString("\nJe suis debout !_\n");
-	}
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	PutString("\nJe suis debout !_\n");
+	
 } 
 
-void handler2(){
+void handler2(){	
 	PutString("C2-Naissance_");
 	//PutString("")
 }
@@ -49,7 +57,7 @@ int main (void){
 	PutString("Sleep 5\n");
 	PutString("Waiking up C1_");
 	
-	//WakeUpChild(c1);
+	WakeUpChild(c1);
 	PutString("Sleeping C1_");
 
 	/*PutString("CréationC2_");
@@ -58,5 +66,7 @@ int main (void){
 	WaitForChildExited(c2);
 	*/
 	PutString("C2 finis_");
+		WaitForChildExited(c1);
+
 	Halt();
 }
