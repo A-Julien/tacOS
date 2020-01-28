@@ -112,7 +112,6 @@ FileSystem::FileSystem(bool format) {
         DEBUG('f', "Writing headers back to disk.\n");
         mapHdr->WriteBack(FreeMapSector);
         dirHdr->type = d; // because root is a directory
-        dirHdr->test();
         dirHdr->WriteBack(DirectorySector);
 
         // Adding the special directories "." and ".."
@@ -736,7 +735,6 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
     sector = directory->Find(name);
     if (sector >= 0) { // name was found in directory
         openFile = this->get_open_file_by_sector(sector); //check if the file is already open by kernel or another thread
-
         bool needDelete = false;
         if (openFile == NULL) { //open it otherwise
             openFile = new OpenFile(sector);
@@ -903,8 +901,6 @@ void FileSystem::registerOpenFileTable(int* table, unsigned int tid){
     this->initOpenFileTable(fileTable->next->OpenFileTable);
     this->initFileDesciptortable(table);
     fileTable->next->path = (char *) malloc(sizeof(char)); // at beginning, path = "/"
-    // TODO : get path from parent thread
-    // TODO : get current and root from parent thread
     strcpy(fileTable->next->path, "/");
     fileTable->next->tid = tid;
     fileTable->next->next = NULL;
