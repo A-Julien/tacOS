@@ -273,7 +273,8 @@ path_parse_t* FileSystem::parse(char *path_name) {
     return result;
 }
 
-/// CdFromPathName can jump into the directory with a path
+/// FileSystem::CdFromPathName
+/// can jump into the directory with a path
 /// \param path_name the path name
 /// \return
 path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid, int truncate) {
@@ -288,7 +289,8 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
     if(!strcmp(path_name, "/")) {
         file_table_t *fileTable = this->ThreadsFilesTable;
         while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-        if(fileTable->next == NULL) return NULL;
+        if(fileTable->next ==
+ NULL) return NULL;
 
         if(strcmp(fileTable->next->path, "/") != 0){
             delete fileTable->next->path;
@@ -321,6 +323,10 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
     return path_split;
 }
 
+/// FileSystem::OpenFromPathName
+/// \param path_name
+/// \param tid
+/// \return openFile pointer of te file opened, null if no success
 OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
     OpenFile *openFile;
 
@@ -343,6 +349,23 @@ OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
 
     return openFile;
 
+}
+
+bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
+    // Get thread openFile table
+    file_table_t *fileTable = this->ThreadsFilesTable;
+    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
+    if(fileTable->next == NULL) return NULL;
+
+    // Get path before mkdir
+    char* path_before = fileTable->next->path;
+
+    //
+    path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
+    if(path == NULL) return NULL;
+
+
+    return true;
 }
 
 ///
@@ -384,6 +407,8 @@ bool FileSystem::MkDir(const char *directory_name, unsigned int tid) {
     OpenFile *new_dir_f;
     FileHeader *new_dir_hdr;
     int new_sector;
+
+    if(strcmp(directory_name, "/") == 0) return false; // "/" is reserved for the root directory
 
     //Get current directory
     current_dir = new Directory(NumDirEntries);
