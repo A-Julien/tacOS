@@ -413,12 +413,11 @@ if(fileTable == NULL) return false;
 bool FileSystem::RmdirFromPathName(const char* path_name, unsigned int tid){
 
     // Get thread openFile table
-    file_table_t *fileTable = this->ThreadsFilesTable;
-    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-    if(fileTable->next == NULL) return false;
+    file_table_t * fileTable = get_thread_file_table_t(tid);
+    if(fileTable == NULL) return false;
 
     // Get path before rmdir
-    char* path_before = fileTable->next->path;
+    char* path_before = fileTable->path;
 
     // Cd from path given until the folder to remove
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
