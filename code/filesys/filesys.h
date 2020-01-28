@@ -113,6 +113,8 @@ public:
 
     bool MkdirFromPathName(const char* path_name, unsigned int tid);
 
+    bool RmdirFromPathName(const char* path_name, unsigned int tid);
+
     OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
     bool Remove(const char *name, unsigned int tid = 0);    // Delete a file (UNIX unlink)
@@ -135,7 +137,6 @@ public:
 
     int UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
 
-    bool MkdirFromPathName(const char* path_name, unsigned int tid);
         private:
     bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);
 
