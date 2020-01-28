@@ -102,10 +102,16 @@ public:
     bool Create(const char *name, int initialSize, File_type type = f);
 
     bool MkDir(const char *directory_name, unsigned int tid = 0); // Create a folder
+
     bool CdDir(const char *directory_name, unsigned int tid = 0); // Change the current folder
+
     bool RmDir(const char *directory_name, unsigned int tid = 0);// Remove a folder
+
     path_parse_t* CdFromPathName(const char *path_name, unsigned int tid = 0, int truncate = 0);
+
     OpenFile* OpenFromPathName(const char* path_name, unsigned int tid = 0);
+
+    bool MkdirFromPathName(const char* path_name, unsigned int tid);
 
     OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 

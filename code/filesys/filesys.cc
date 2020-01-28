@@ -289,8 +289,7 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
     if(!strcmp(path_name, "/")) {
         file_table_t *fileTable = this->ThreadsFilesTable;
         while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-        if(fileTable->next ==
- NULL) return NULL;
+        if(fileTable->next == NULL) return NULL;
 
         if(strcmp(fileTable->next->path, "/") != 0){
             delete fileTable->next->path;
@@ -333,37 +332,66 @@ OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
     //check for the root path
     if(!strcmp(path_name, "/")) return NULL;
 
+    // Get thread openFile table
     file_table_t *fileTable = this->ThreadsFilesTable;
     while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
     if(fileTable->next == NULL) return NULL;
     char* path_before = fileTable->next->path;
 
+    // Cd from path given until the folder where to open the file
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
-    if(path == NULL) return NULL;
+    if(path == NULL) {
+        this->CdFromPathName(path_before);
+        return NULL;
+    }
 
+    // Open the file
     openFile = this->Open(path->pathSplit[path->size - 1], tid);
+    if(openFile == NULL) {
+        this->CdFromPathName(path_before);
+        return NULL;
+    }
 
-    if(openFile->isdir()) return NULL; //file to open can't be a folder
+    if(openFile->isdir()) {     //file to open can't be a folder
+        this->CdFromPathName(path_before);
+        return NULL;
+    }
 
+    // Replace in the directory before mkdir
     this->CdFromPathName(path_before);
 
     return openFile;
 
 }
-
+/// FileSystem::MkdirFromPathName
+/// \param path_name
+/// \param tid
+/// \return
 bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
+
     // Get thread openFile table
     file_table_t *fileTable = this->ThreadsFilesTable;
     while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-    if(fileTable->next == NULL) return NULL;
+    if(fileTable->next == NULL) return false;
 
     // Get path before mkdir
     char* path_before = fileTable->next->path;
 
-    //
+    // Cd from path given until the folder to create
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
-    if(path == NULL) return NULL;
+    if(path == NULL) {
+        this->CdFromPathName(path_before, tid);
+        return false;
+    }
 
+    // Create the new folder
+    if(!MkDir(path->pathSplit[path->size - 1], tid)) {
+        this->CdFromPathName(path_before, tid);
+        return false ;
+    }
+
+    // Replace in the directory before mkdir
+    this->CdFromPathName(path_before, tid, 1);
 
     return true;
 }
