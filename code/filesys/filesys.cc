@@ -397,6 +397,39 @@ bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
 }
 
 ///
+/// \param path_name
+/// \param tid
+/// \return
+bool FileSystem::RmdirFromPathName(const char* path_name, unsigned int tid){
+
+    // Get thread openFile table
+    file_table_t *fileTable = this->ThreadsFilesTable;
+    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
+    if(fileTable->next == NULL) return false;
+
+    // Get path before rmdir
+    char* path_before = fileTable->next->path;
+
+    // Cd from path given until the folder to remove
+    path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
+    if(path == NULL) {
+        this->CdFromPathName(path_before, tid);
+        return false;
+    }
+
+    // Remove the folder
+    if(!RmDir(path->pathSplit[path->size - 1], tid)) {
+        this->CdFromPathName(path_before, tid);
+        return false ;
+    }
+
+    // Replace in the directory before mkdir
+    this->CdFromPathName(path_before, tid, 1);
+
+    return true;
+}
+
+///
 /// FileSystem::CdDir
 /// 	Come in folder given.
 ///

@@ -113,6 +113,8 @@ public:
 
     bool MkdirFromPathName(const char* path_name, unsigned int tid);
 
+    bool RmdirFromPathName(const char* path_name, unsigned int tid);
+
     OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
     bool Remove(const char *name, unsigned int tid = 0);    // Delete a file (UNIX unlink)
