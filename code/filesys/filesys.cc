@@ -352,6 +352,7 @@ OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
 }
 
 bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
+   /*
     // Get thread openFile table
     file_table_t *fileTable = this->ThreadsFilesTable;
     while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
@@ -364,7 +365,7 @@ bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
     if(path == NULL) return NULL;
 
-
+*/
     return true;
 }
 

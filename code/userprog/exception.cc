@@ -417,9 +417,10 @@ ExceptionHandler(ExceptionType which) {
                 char str[50];
                 sprintf(str, "Return value : %d ", machine->ReadRegister(4));
                 DEBUG('s', str);
-                currentThread->Finish();
+               // currentThread->Finish();
                 //currentThread->Yield();
                 SYSExitThread( (void *)  0);
+
 
 
                break;
@@ -478,7 +479,7 @@ ExceptionHandler(ExceptionType which) {
                 machine->WriteRegister(2,
                         synchConsole->fopen(
                             filename,
-                            1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                            ((UserThread *) currentThread->getUserThreadAdress())->getId()
                         )
                  );
                 delete filename;
@@ -493,7 +494,7 @@ ExceptionHandler(ExceptionType which) {
                                 into,
                                 machine->ReadRegister(4),
                                 machine->ReadRegister(6),
-                                1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                                ((UserThread *) currentThread->getUserThreadAdress())->getId()
                         )
                 );
                 copyMachineFromString(into,machine->ReadRegister(5), machine->ReadRegister(6));
@@ -511,7 +512,7 @@ ExceptionHandler(ExceptionType which) {
                                                from,
                                                machine->ReadRegister(4),
                                                machine->ReadRegister(6),
-                                               1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                                               ((UserThread *) currentThread->getUserThreadAdress())->getId()
                                        )
                 );
                 delete from;
@@ -524,7 +525,7 @@ ExceptionHandler(ExceptionType which) {
                synchConsole->fseek(
                        machine->ReadRegister(4),
                        machine->ReadRegister(5),
-                       1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                       ((UserThread *) currentThread->getUserThreadAdress())->getId()
                );
 
                 break;
@@ -538,7 +539,7 @@ ExceptionHandler(ExceptionType which) {
                    synchConsole->fclose(
                            machine->ReadRegister(4),
                            ((UserThread *) currentThread->getUserThreadAdress())->getTableOfOpenfile(),
-                           1//((UserThread *) currentThread->getUserThreadAdress())->getId()
+                           ((UserThread *) currentThread->getUserThreadAdress())->getId()
                    )
                 );
 

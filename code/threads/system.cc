@@ -149,7 +149,7 @@ Initialize (int argc, char **argv)
     managerSemaphoreID = new ManagerUserThreadID();
      managerLockID = new ManagerUserThreadID();
 
-     mainUserThread = new UserThread(NULL, NULL, 0, 0);
+     mainUserThread = new UserThread(NULL, NULL, 1, 0);
 
     DebugInit (debugArgs);	// initialize DEBUG messages
     stats = new Statistics ();	// collect statistics
