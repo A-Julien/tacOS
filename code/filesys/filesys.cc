@@ -280,26 +280,32 @@ path_parse_t* FileSystem::parse(char *path_name) {
 path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid, int truncate) {
     bool relatif = true;
     if(path_name[0] == '/') relatif = false;
-
-    char* path = (char *) malloc(sizeof(char) * (strlen(path_name) + 1));
-    strcpy(path, path_name);
-    path_parse_t* path_split = parse(path);
+    path_parse_t* path_split;
 
     //check for the root path
     if(!strcmp(path_name, "/")) {
-        file_table_t *fileTable = this->ThreadsFilesTable;
-        while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-        if(fileTable->next == NULL) return NULL;
+        /*file_table_t *fileTable = this->ThreadsFilesTable;
+        while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;*/
+        file_table_t *fileTable = get_thread_file_table_t(tid);
+        if(fileTable == NULL) return NULL;
 
-        if(strcmp(fileTable->next->path, "/") != 0){
-            delete fileTable->next->path;
-            fileTable->next->path = (char *) malloc(sizeof(char)+1);
-            strcpy(fileTable->next->path, "/");
-            if(this->CdDir(path_name, tid)) return path_split;
-            delete path_split;
-            return NULL;
+        delete fileTable->path;
+        fileTable->path = (char *) malloc(sizeof(char)+1);
+        strcpy(fileTable->path, "/");
+        if(this->CdDir(path_name, tid)){
+            path_split = (path_parse_t *) malloc((sizeof(path_parse_t)));
+            path_split->pathSplit = (char **) malloc(sizeof(char*));
+            path_split->pathSplit[0] = (char *) malloc(sizeof(char)+1);
+            strcpy(path_split->pathSplit[0], "/");
+            path_split->size = 1;
+            return path_split;
         }
+        return NULL;
     }
+
+    char* path = (char *) malloc(sizeof(char) * (strlen(path_name) + 1));
+    strcpy(path, path_name);
+    path_split = parse(path);
 
     if(!relatif) CdDir("/");
 
@@ -308,16 +314,17 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
             delete path_split;
             return NULL;
         }
-
+/*
     file_table_t *fileTable = this->ThreadsFilesTable;
-    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
-    if(fileTable->next == NULL) {
+    while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;*/
+file_table_t *fileTable = get_thread_file_table_t(tid);
+    if(fileTable == NULL) {
         delete path_split;
         return NULL;
     }
-    delete fileTable->next->path;
-    fileTable->next->path = (char *) malloc(sizeof(char)*strlen(path_name));
-    strcpy(fileTable->next->path, path_name);
+    delete fileTable->path;
+    fileTable->path = (char *) malloc(sizeof(char)*strlen(path_name));
+    strcpy(fileTable->path, path_name);
 
     return path_split;
 }
@@ -368,12 +375,15 @@ OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
 /// \param tid
 /// \return
 bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
-
+/*
     // Get thread openFile table
     file_table_t *fileTable = this->ThreadsFilesTable;
+    get_thread_file_table()
     while(fileTable->next != NULL && fileTable->next->tid != tid) fileTable = fileTable->next;
     if(fileTable->next == NULL) return false;
-
+*/
+file_table_t * fileTable = get_thread_file_table_t(tid);
+if(fileTable == NULL) return false;
     // Get path before mkdir
     char* path_before = fileTable->next->path;
 
@@ -391,7 +401,7 @@ bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
     }
 
     // Replace in the directory before mkdir
-    this->CdFromPathName(path_before, tid, 1);
+    this->CdFromPathName(path_before, tid);
 
     return true;
 }
@@ -665,7 +675,6 @@ void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 }
 
 int FileSystem::UserOpen(const char *name, unsigned int tid) {
-    //return this->getFileDescriptor(this->Open(name,tid), tid);
     return this->getFileDescriptor(this->OpenFromPathName(name, tid), tid);
 }
 
@@ -733,14 +742,20 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
     delete directory;
     return openFile;                // return NULL if not found
 }
+file_table_t* FileSystem::get_thread_file_table_t(unsigned int tid) {
+    file_table_t* list = this->ThreadsFilesTable;
 
+    while (list != NULL) {
+        if (list->tid == tid) return list;
+        list = list->next;
+    };
+    return NULL;
+}
 OpenFile** FileSystem::get_thread_file_table(unsigned int tid) {
     file_table_t* list = this->ThreadsFilesTable;
 
     while (list != NULL) {
-        if (list->tid == tid){
-            return list->OpenFileTable;
-        }
+        if (list->tid == tid) return list->OpenFileTable;
         list = list->next;
     };
     exit(-1);

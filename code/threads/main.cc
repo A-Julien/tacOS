@@ -182,21 +182,22 @@ main(int argc, char **argv) {
         else if (!strcmp (*argv, "-cd"))
           {
           ASSERT (argc > 1);
-          fileSystem->CdDir(*(argv + 1));
+          fileSystem->CdFromPathName(*(argv + 1));
           fileSystem->List();
           argCount = 2;
           }
         else if (!strcmp (*argv, "-mkdir"))
           {
           ASSERT (argc > 1);
-          fileSystem->MkDir(*(argv + 1));
+          if(!fileSystem->MkdirFromPathName(*(argv + 1)))
+              printf("mkdir error\n");
           fileSystem->List();
           argCount = 2;
           }
         else if (!strcmp (*argv, "-rm"))
           {
           ASSERT (argc > 1);
-          fileSystem->RmDir(*(argv + 1));
+          fileSystem->RmdirFromPathName(*(argv + 1));
           fileSystem->List();
           argCount = 2;
           }
