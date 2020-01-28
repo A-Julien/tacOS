@@ -153,3 +153,11 @@ Scheduler::Print ()
     printf ("Ready list contents:\n");
     readyList->Mapcar ((VoidFunctionPtr) ThreadPrint);
 }
+
+bool Scheduler::RemoveThreadFromReadyList(Thread * threadToRemove){
+    List * l = readyList;
+    //Print();
+    bool res = l->removeElement(threadToRemove);
+    //Print();
+    return res;
+}

@@ -48,7 +48,7 @@ Thread::Thread (const char *threadName)
     for (int r=NumGPRegs; r<NumTotalRegs; r++)
       userRegisters[r] = 0;
 #endif
-
+    critique = (void*) new Semaphore("_Zone Critique thread_", 1);
 
 }
 
@@ -71,6 +71,7 @@ Thread::~Thread ()
     ASSERT (this != currentThread);
     if (stack != NULL)
 	DeallocBoundedArray ((char *) stack, StackSize * sizeof (int));
+    delete ((Semaphore *) critique);
 }
 
 ///
@@ -208,9 +209,14 @@ Thread::Yield ()
     DEBUG ('t', "Yielding thread \"%s\"\n", getName ());
 
     nextThread = scheduler->FindNextToRun ();
+
+    if(this->getStatus() == RUNNING ){
+
+
+    }
     if (nextThread != NULL)
       {
-	  scheduler->ReadyToRun (this);
+        scheduler->ReadyToRun (this);
 	  scheduler->Run (nextThread);
       }
     (void) interrupt->SetLevel (oldLevel);
@@ -244,8 +250,9 @@ Thread::Sleep ()
     ASSERT (interrupt->getLevel () == IntOff);
 
     DEBUG ('t', "Sleeping thread \"%s\"\n", getName ());
-
-    status = BLOCKED;
+    if(status == RUNNING){
+        status = BLOCKED;
+    }
     while ((nextThread = scheduler->FindNextToRun ()) == NULL)
 	interrupt->Idle ();	// no one to run, wait for an interrupt
 
@@ -442,5 +449,59 @@ ThreadStatus Thread::getStatus(){
 }
 #endif
 
+char * statusToString(ThreadStatus st)
+{
+    char * stName = (char *) malloc(sizeof(char)*20);
+    switch(st){
+        case JUST_CREATED:
+        sprintf(stName,"JUST_CREATED");
+        break;
+        case RUNNING:
+        sprintf(stName,"RUNNING");
+        break;
+        case READY:
+        sprintf(stName,"READY");
+        break;
+        case BLOCKED:
+        sprintf(stName,"BLOCKED");
+        break;
+        case SYNCH_BLOCK:
+        sprintf(stName,"SYNCH_BLOCK");
+        break;
+        case STOP_BLOCK:
+        sprintf(stName,"STOP_BLOCK");
+        break;
+        case SYNCH_STOP_BLOCK:
+        sprintf(stName,"SYNCH_STOP_BLOCK");
+        break;
 
+        default:
+        sprintf(stName, "NULL");
+    }
+    return stName;
+}
+
+void Thread::setStatus (ThreadStatus st){
+    char * oldStatus = statusToString(status);
+    char * newStatus = statusToString(st);
+    DEBUG('t', "Thread no %s change Status from %s to %s\n",name, oldStatus,  newStatus);
+    free(oldStatus);
+    free(newStatus);
+    status = st;
+}
+
+void Thread::enterCritique() {
+    ((Semaphore *) critique)->P();
+
+}
+
+void Thread::enterCritiqueExt() {
+    ((Semaphore *) critique)->P();
+    setStatus(STOP_BLOCK);
+}
+
+void Thread::exitCritique() {
+
+    ((Semaphore *) critique)->V();
+}
 

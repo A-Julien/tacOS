@@ -17,6 +17,7 @@
 #include "../threads/synch.h"
 #include "../filesys/openfile.h"
 
+
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 static Semaphore *writeAvail;
@@ -49,8 +50,8 @@ static void WriteDone(int arg) { writeDone->V(); }
 ///
 SynchConsole::SynchConsole(char *readFile, char *writeFile){
 	readAvail = new Semaphore("read avail", 0);
-	writeDone = new Semaphore("write done", 0);
-    writeAvail = new Semaphore ("can write", 1);
+	writeDone = new Semaphore(" _char writted_ ", 0);
+    writeAvail = new Semaphore ("_can write_", 1);
 	console =  new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
 
 }
@@ -107,15 +108,16 @@ int SynchConsole::SynchGetChar(){
 void SynchConsole::SynchPutString(const char s[]){
 	// While there is no end of String ('\0'), put the current char
 	int i = 0;
-
+    writeAvail->P();
 	while(s[i] != '\0'){
-        writeAvail->P();
+
         console->PutChar(s[i]);
+
         writeDone->P();
-        writeAvail->V();
+
 		i++;
 	}
-
+    writeAvail->V();
 
 }
 

@@ -12,16 +12,18 @@
 \maketitle
 
 \section{Fonctionnalités intéressante/importante}
-\textit{
-Le système a était pensé simple d'utilisation mais avec certaines possibilités pour aller plus loin. En effet, il nous tenais à cœur d'avoir un environnement de développement permissif où certaines erreurs habituels n'arrêterons pas l'exécution du processus. Nous avons alors décidé que le système fonctionnerai permissivement pour un utilisateur non avancé. Cependant pour un utilisateur avancé, il est possible d'utiliser autrement le système d'exploitation, à ses risques et périls.
-}
+
+Le système implémenté est incomplet mais permissif. Certaines erreurs de code ou appel système résulte en une bonne exécution. Cela permet à un programmeur non confirmé de pouvoir tout de même utiliser le système. 
+
+Nous avons aussi implémenté des fonctions systèmes pour les utilisateurs confirmé. Ceux-ci peuvent alors utiliser des structures d'une manière moins intuitive, aux risques et périls de l'utilisateur.
+
 
 
 \subsection{Le Multithreading}
 
 Le multiThreading permet à un utilisateur de faire tourner plusieurs instructions en parallèle. Similaire au processus dans un environement linux, les threads partagent le même espace mémoire.
 
-Notre réalisation permet une utilisation simpliste du multithreading d'une façon permissive : si certaines mécaniques de fermeture sont oublié, le système le fera lui même. A contrario, il est possible pour un utilisateur avancé de manipuler plus en détail ses structures.
+Notre réalisation permet une utilisation simpliste et permissive du multithreading : si certaines mécaniques de fermeture sont oublié, le système le fera par lui même. 
 
 \newpage
 \section{Spécifications}

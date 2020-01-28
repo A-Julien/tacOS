@@ -67,15 +67,18 @@ Semaphore::~Semaphore ()
 void
 Semaphore::P ()
 {
+
     IntStatus oldLevel = interrupt->SetLevel (IntOff);	// disable interrupts
 
     while (value == 0)
       {				// semaphore not available
+
 	  queue->Append ((void *) currentThread);	// so go to sleep
-	  currentThread->Sleep ();
+	  currentThread->Sleep();
       }
     value--;			// semaphore available, 
     // consume its value
+    DEBUG('s', "Thread %d Get the Sem %s\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId(), getName());
 
     (void) interrupt->SetLevel (oldLevel);	// re-enable interrupts
 }
@@ -90,12 +93,20 @@ Semaphore::P ()
 void
 Semaphore::V ()
 {
+    DEBUG('s', "Thread %s release the Sem %s\n",  currentThread->getName(), getName());
     Thread *thread;
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
 
     thread = (Thread *) queue->Remove ();
-    if (thread != NULL)		// make thread ready, consuming the V immediately
-	scheduler->ReadyToRun (thread);
+    // make thread ready, consuming the V immediately
+    if (thread != NULL)	{
+        if(thread->getStatus() != STOP_BLOCK){
+            scheduler->ReadyToRun (thread);
+        } else {
+            puts("\n\n\nJ'y suis");
+        }
+    }
+
     value++;
     (void) interrupt->SetLevel (oldLevel);
 }
@@ -126,15 +137,21 @@ Lock::~Lock ()
 void Lock::Acquire ()
 {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
-        if(currentThreadHolding == NULL){
+        if(currentThreadHolding == NULL ){
             currentThreadHolding = currentThread;
-            DEBUG('t', "Thread %d take the Lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
+            DEBUG('s', "Thread %d get the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
 
+        } else if (currentThreadHolding == currentThread){
+            DEBUG('s', "Thread %d try to retake the Lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
         } else {
-            DEBUG('t', "Thread %d have been blocked by the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
+            DEBUG('s', "Thread %d have been blocked by the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
             WaitingForLock->Append((void *) currentThread);
-            currentThread->setStatus(BLOCKED);
-            currentThread->Yield();
+            if(currentThread->getStatus() == STOP_BLOCK){
+                currentThread->setStatus(SYNCH_STOP_BLOCK);
+            } else {
+                currentThread->setStatus(SYNCH_BLOCK);
+            }
+            currentThread->Sleep();
         }
     (void) interrupt->SetLevel (oldLevel);
 }
@@ -147,10 +164,19 @@ void Lock::Release ()
 {
     Thread * next = NULL;
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    DEBUG('s', "Thread %d release the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
         if(!WaitingForLock->IsEmpty()){
             next = (Thread *) WaitingForLock->Remove();
-            scheduler->ReadyToRun(next);
+            if (next != NULL) {        // make thread ready, consuming the V immediately
+                if(next->getStatus() == SYNCH_STOP_BLOCK){
+                    next->setStatus(STOP_BLOCK);
+                } else {
+                    scheduler->ReadyToRun(next);
+                }
+
+            }
         }
+
     currentThreadHolding = next;
     (void) interrupt->SetLevel (oldLevel);
 }

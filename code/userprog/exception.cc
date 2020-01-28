@@ -208,7 +208,7 @@ void * SYSWaitForChildExited(unsigned int CID) {
 
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
-    if(res != 0){
+    if(res != 0 && res != (void * ) -1){
         managerUserThreadID->addIdFreed(CID);
     }
     return res;
@@ -248,6 +248,8 @@ void SYSExitThread(void * object){
     if(managerUserThreadID->lastAlive()){
         interrupt->Halt();
     }
+    userThread->exit(object);
+
 }
 
 ///
@@ -266,6 +268,62 @@ void StartUserThread(int data) {
     machine->Run((void *) dataFork->exit);
 
     return;
+}
+
+///
+/// UserThread::StopChild Put the thread in BLOCKED status
+/// \param CID
+/// \return 0 if the child have been stoped, 1 if the child is currently stop, 2 if it's not a child's TID
+
+int SYSStopChild(unsigned int CID){
+
+    UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
+    UserThreadData * state = (UserThreadData *) currentUserThread->getUserThreadDataChild(CID);
+    if(state == NULL){
+        currentThread->Yield();
+        state = (UserThreadData *) currentUserThread->getUserThreadDataChild(CID);
+        if(state == NULL){
+            return 2;
+        }
+    }
+    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
+
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+
+    if(childThread->getStatus() == STOP_BLOCK){
+
+       interrupt->SetLevel (oldLevel);
+        return 1;
+    }
+    childThread->enterCritiqueExt();
+
+
+
+
+   interrupt->SetLevel (oldLevel);
+
+    return 0;
+}
+
+///
+/// UserThread::WakeUpChild Put a thread in Ready status
+/// \param CID
+/// \return 0 if the child have been WakeUp, 1 if the child is currently Ready, 2 if it's not a child's TID
+int SYSWakeUpChild(unsigned int CID){
+    UserThreadData * state = (UserThreadData *) ((UserThread *)currentThread->getUserThreadAdress())->getUserThreadDataChild(CID);
+    if(state == NULL){
+        return 2;
+    }
+    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    if(childThread->getStatus() != STOP_BLOCK) {
+        interrupt->SetLevel(oldLevel);
+        return 1;
+    }
+
+    scheduler->ReadyToRun(childThread);
+    interrupt->SetLevel (oldLevel);
+    return 0;
 }
 
 
@@ -297,9 +355,12 @@ ExceptionHandler(ExceptionType which) {
     int size;
     int resultat;
     void *getString;
+    IntStatus oldLevel;
     char* filename;
     char* into;
     char* from;
+    DEBUG('m', "User mode exception %d %d\n", which, type);
+
 
     DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
@@ -310,8 +371,10 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_PutString:
                 char string[MAX_STRING_SIZE + 1];
+                currentThread->enterCritique();
                 copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
                 synchConsole->SynchPutString(string);
+                currentThread->exitCritique();
                 break;
 
             case SC_GetChar:
@@ -355,7 +418,7 @@ ExceptionHandler(ExceptionType which) {
                 sprintf(str, "Return value : %d ", machine->ReadRegister(4));
                 DEBUG('s', str);
                 currentThread->Finish();
-                currentThread->Yield();
+                //currentThread->Yield();
                 SYSExitThread( (void *)  0);
 
 
@@ -391,16 +454,22 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WakeUpChild:
-                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->WakeUpChild((unsigned int) machine->ReadRegister(4));
+                resultat =  SYSWakeUpChild((unsigned int) machine->ReadRegister(4));
                 machine->WriteRegister(2,resultat);
             break;
 
             case SC_StopChild:
-                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->StopChild((unsigned int) machine->ReadRegister(4));
+                oldLevel = interrupt->SetLevel (IntOff);
+
+                DEBUG('t', "Stopping child %d\n", machine->ReadRegister(4));
+                resultat =  SYSStopChild(machine->ReadRegister(4));
                 machine->WriteRegister(2,resultat);
+                (void) interrupt->SetLevel (oldLevel);
+
+                break;
 
             case SC_ThreadEndedWithoutExit:
-                puts("Exited without exit");
+                DEBUG('m', "Thread %s Exited without exit statement", currentThread->getName());
             break;
 
             case SC_Open:

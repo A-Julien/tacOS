@@ -13,7 +13,7 @@ ManagerUserThreadID::ManagerUserThreadID(){
     freeID = new SynchList;
     compteur = 2;
     lock = new Lock ("ManagerUserThreadID lock");
-    stillAlive = 1;
+    stillAlive = 0;
 
 }
 
