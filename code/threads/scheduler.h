@@ -30,6 +30,7 @@ class Scheduler
     // list, if any, and return thread.
     void Run (Thread * nextThread);	// Cause nextThread to start running
     void Print ();		// Print contents of ready list
+    bool RemoveThreadFromReadyList(Thread * threadToRemove); // Remove the thread of current readyList
 
   private:
       List * readyList;		// queue of threads that are ready to run,

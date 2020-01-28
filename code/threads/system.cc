@@ -37,6 +37,10 @@ PostOffice *postOffice;
 #endif
 
 ManagerUserThreadID * managerUserThreadID;
+ManagerUserThreadID * managerSemaphoreID;
+ManagerUserThreadID * managerLockID;
+
+
 UserThread * mainUserThread;
 
 // External definition, to allow us to take a pointer to this function
@@ -142,7 +146,10 @@ Initialize (int argc, char **argv)
       }
 
      managerUserThreadID = new ManagerUserThreadID();
-     mainUserThread = new UserThread(NULL, NULL, 0, 0);
+    managerSemaphoreID = new ManagerUserThreadID();
+     managerLockID = new ManagerUserThreadID();
+
+     mainUserThread = new UserThread(NULL, NULL, 1, 0);
 
     DebugInit (debugArgs);	// initialize DEBUG messages
     stats = new Statistics ();	// collect statistics
@@ -211,7 +218,9 @@ Cleanup()
 #ifdef FILESYS
     delete synchDisk;
 #endif
-
+   // delete managerUserThreadID;
+   // delete managerSemaphoreID;
+  //  delete managerLockID;
     delete timer;
     delete scheduler;
     delete interrupt;
