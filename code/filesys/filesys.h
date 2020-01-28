@@ -99,6 +99,8 @@ public:
     // the disk, so initialize the directory
     // and the bitmap of free blocks.
 
+    ~FileSystem();
+
     bool Create(const char *name, int initialSize, File_type type = f);
 
     bool MkDir(const char *directory_name, unsigned int tid = 0); // Create a folder
