@@ -264,3 +264,7 @@ int OpenFile::Length() {
 int OpenFile::get_sector() {
     return ((FileHeader* )this->hdr)->get_sector(0);
 }
+
+bool OpenFile::isdir() {
+    return (this->hdr->type == d);
+}

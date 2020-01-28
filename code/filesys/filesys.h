@@ -73,8 +73,14 @@ public:
 
 #else // FILESYS
 
+typedef struct path_parse {
+    char** pathSplit;
+    int size;
+} path_parse_t;
+
 typedef struct file_table {
     unsigned int tid;
+    char *path;
     OpenFile** OpenFileTable;
     struct file_table *next;
 } file_table_t;
@@ -95,15 +101,15 @@ public:
 
     bool Create(const char *name, int initialSize, File_type type = f);
 
-    bool MkDir(const char *directory_name); // Create a folder
-    bool CdDir(const char *directory_name); // Change the current folder
-    bool RmDir(const char *directory_name);// Remove a folder
-    bool CdFromPathName(const char *path_name);
-
+    bool MkDir(const char *directory_name, unsigned int tid = 0); // Create a folder
+    bool CdDir(const char *directory_name, unsigned int tid = 0); // Change the current folder
+    bool RmDir(const char *directory_name, unsigned int tid = 0);// Remove a folder
+    path_parse_t* CdFromPathName(const char *path_name, unsigned int tid = 0, int truncate = 0);
+    OpenFile* OpenFromPathName(const char* path_name, unsigned int tid = 0);
 
     OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
 
-    bool Remove(const char *name);    // Delete a file (UNIX unlink)
+    bool Remove(const char *name, unsigned int tid = 0);    // Delete a file (UNIX unlink)
 
     void List();            // List all the files in the file system
 
@@ -145,7 +151,7 @@ public:
 
     void initOpenFileTable(OpenFile** table);
 
-    char **parse(char *path_name);
+    path_parse_t* parse(char *path_name);
 
     global_file_table_t *GlobalOpenFileTable;
     OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
