@@ -39,6 +39,7 @@ PostOffice *postOffice;
 ManagerUserThreadID * managerUserThreadID;
 ManagerUserThreadID * managerSemaphoreID;
 ManagerUserThreadID * managerLockID;
+char* pwd;
 
 
 UserThread * mainUserThread;

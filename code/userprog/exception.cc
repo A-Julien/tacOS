@@ -244,7 +244,7 @@ void SYSExitThread(void * object){
     userThread->DoneWithTheChildList();
 
     fileSystem->unregisterOpenFileTable(userThread->getId());
-    userThread->exit(object);
+    //userThread->exit(object);
     if(managerUserThreadID->lastAlive()){
         interrupt->Halt();
     }

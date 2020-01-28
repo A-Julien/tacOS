@@ -64,6 +64,6 @@ extern PostOffice *postOffice;
 extern ManagerUserThreadID * managerUserThreadID;
 extern ManagerUserThreadID * managerSemaphoreID;
 extern ManagerUserThreadID * managerLockID;
-
+extern char* path;
 
 #endif // SYSTEM_H

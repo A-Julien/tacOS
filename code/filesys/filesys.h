@@ -135,7 +135,6 @@ public:
 
     int UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
 
-    bool MkdirFromPathName(const char* path_name, unsigned int tid);
         private:
     bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);
 
