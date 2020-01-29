@@ -27,6 +27,7 @@ UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     this->ID = tid; // MODIFY WHEN ID ALLOCATOR;
     this->child = new SynchList();
     this->TableOfOpenfile = (int*) malloc(sizeof(int) * MAX_OPEN_FILE);
+    survivor = false;
 }
 
 int* UserThread::getTableOfOpenfile(){
@@ -164,8 +165,8 @@ int UserThread::makeChildSurvive(unsigned int CID){
     if(state == NULL){
         return 1;
     }
-    setSurvivor(true);
-
+    ((UserThread *) state->getUserThread())->setSurvivor(true);
+    DEBUG('t', "Thread %d is now in survivor mode\n ", state->getID());
 	return 0;
 }
 ///

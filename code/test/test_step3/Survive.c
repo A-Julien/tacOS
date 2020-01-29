@@ -24,16 +24,17 @@ void handler2(void * arg){
 
 void handler1(void * arg){
 	PutString("ThreadFils");
-	makeChildSurvive( createUserThread((void *) handler2, 0));
-	//WaitForAllChildExited();
+	unsigned int TID = createUserThread((void *) handler2, 0);
+	makeChildSurvive(TID);
+	ExitThread((void * ) 0);
 }
 
 
 int main(void){
 
    
-    unsigned int TID = createUserThread((void *) handler1, 0);
-   	WaitForChildExited(TID);
+    
+   	WaitForChildExited(createUserThread((void *) handler1, 0));
    	PutString("Fils terminé");
     WaitForAllChildExited();
   	PutString("Tout est terminé");
