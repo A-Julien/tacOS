@@ -7,7 +7,7 @@
 #include "../../userprog/syscall.h"
 
 void handlerSon(){
-	PutString("Orde 5-\n");
+	PutString("Orde 4-\n");
 	PutString("Orde 7-\n");
 	ExitThread((void* ) 0);
 }
@@ -16,7 +16,7 @@ void handlerSon(){
 void handler(void * arg){
     PutString("Orde 2-\n");
     unsigned int TID = createUserThread((void *) handlerSon, 0);
-    PutString("Orde 4-\n");
+    PutString("Orde 5-\n");
    	int i = (int) WaitForChildExited(TID);
    	PutInt(i);
     PutString("Orde 5-\n");
@@ -26,8 +26,6 @@ void handler(void * arg){
 
 
 int main(void){
-    PutString("Debug");
-    Halt();
     void * retour;
      PutString("Orde 1-\n");
     unsigned int TID = createUserThread((void *) handler, 0);

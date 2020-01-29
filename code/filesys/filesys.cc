@@ -243,7 +243,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     }
     delete directory;
     return success;
-g}
+}
 
 /// Parse a path and return a array
 /// ex : path_name = d1/d2/f1
@@ -283,11 +283,11 @@ path_parse_t* FileSystem::parse(char *path_name) {
         strcpy(result->pathSplit[i], splitPath[i]);
     }
 
-    delete token;
-    for (int j = 0; j < i; j++){
+    //delete token;
+    /*for (int j = 0; j < i; j++){
         delete [] splitPath[i];
     }
-    delete [] splitPath;
+    delete [] splitPath;*/
     //delete splitPath;
 
     return result;
@@ -797,7 +797,7 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
         }
         if(tid != 0) this->addFiletoGlobalTable(openFile);// add file to the global open file table
     }
-    delete directory;
+    //delete directory;
     return openFile;                // return NULL if not found
 }
 
@@ -990,7 +990,7 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
 /// ~FileSystem()
 /// delete all file system
 FileSystem::~FileSystem(){
-
+/*
     file_table_t* list = ThreadsFilesTable;
     while(list != NULL){
         for(int i = 0 ; i < MAX_OPEN_FILE ; i++) delete list->OpenFileTable[i];
@@ -1011,7 +1011,7 @@ FileSystem::~FileSystem(){
     }
     delete glist;
 
-    delete freeMapFile;
+    delete freeMapFile;*/
 }
 
 
