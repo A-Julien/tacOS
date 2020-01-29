@@ -219,10 +219,11 @@ Cleanup()
 
 #ifdef FILESYS
     delete synchDisk;
+   // delete fileSystem;
 #endif
-   // delete managerUserThreadID;
-   // delete managerSemaphoreID;
-  //  delete managerLockID;
+    delete managerUserThreadID;
+    delete managerLockID;
+    delete managerSemaphoreID;
     delete timer;
     delete scheduler;
     delete interrupt;

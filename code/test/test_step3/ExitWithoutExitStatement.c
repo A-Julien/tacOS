@@ -12,6 +12,7 @@ void handler(void * arg){
 }
 
 int main(void){
+	// Test if the programm ended well with no return NOR exitThread();
     PutString("Création");
     unsigned int TID = createUserThread((void *) handler, (void *) 0x99);
     WaitForChildExited(TID);

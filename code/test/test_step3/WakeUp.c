@@ -21,7 +21,7 @@ void handler1(){
 int main (void){
 	int res;
 
-
+	// Test to wake a non initialized thread
 	res = WakeUpChild(7);
 	if( res != 2){
 		PutString("should not be a child\n");
@@ -30,7 +30,7 @@ int main (void){
 	unsigned int c1 = createUserThread((void *) handler1, 0);
 	
 	res = WakeUpChild(c1);
-	
+	// Try to wake a thread allready waked
 	 if(res == 0) {
 		PutString("should be waked up\n");
 	} else if(res == 2){
@@ -43,6 +43,7 @@ int main (void){
 	PutString("l'enfantDO-");
 	PutString("Reveil sonne-");
 	WakeUpChild(c1);
+	// Try to re-wake a thread allready waked
 	res = WakeUpChild(c1);
 	if( res == 2){
 		PutString("should be a child");

@@ -32,7 +32,8 @@ void handler1(void * arg){
 
 int main(void){
 
-   
+   // Create a son that will die before the grandson
+	// So see if the son is printing before the grandson
     
    	WaitForChildExited(createUserThread((void *) handler1, 0));
    	PutString("Fils terminé");

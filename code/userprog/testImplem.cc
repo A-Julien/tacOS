@@ -82,6 +82,7 @@ int testList (void){
 	if( !(l->get(4) == NULL || 	l->get(5) == NULL || l->get(-1) == NULL)){
 		return 6;
 	}
+	delete l;
 	return 0;
 
 
