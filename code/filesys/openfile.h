@@ -28,10 +28,10 @@
 #ifdef FILESYS_STUB            // Temporarily implement calls to
 // Nachos file system as calls to UNIX!
 // See definitions listed under #else
-class OpenFile {
+class OpenFileTable {
 public:
-OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
-~OpenFile() { Close(file); }			// close the file
+OpenFileTable(int f) { file = f; currentOffset = 0; }	// open the file
+~OpenFileTable() { Close(file); }			// close the file
 
 int ReadAt(char *into, int numBytes, int position) {
 Lseek(file, position, 0);
@@ -108,12 +108,12 @@ public:
 
     bool isOpenByOthers();
 
+    bool isdir();
+
 
 private:
     void set_seek_position(unsigned int tid, int seekPosition);
-
     int get_seek_position(unsigned int tid);
-
 
     FileHeader *hdr;            // Header for this file
     tuple_t *seek_tid_list;

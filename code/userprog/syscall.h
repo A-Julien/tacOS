@@ -42,6 +42,7 @@
 #define SC_GetInt 15
 #define SC_PutInt 16
 #define SC_Feof 17
+#define SC_Seek 18
 
 // ID Reservé pour Olivier et les threads de 20 à 40
 
@@ -54,6 +55,16 @@
 #define SC_WakeUpChild 26
 #define SC_StopChild 27
 #define SC_ThreadEndedWithoutExit 28
+
+#define SC_LockCreate 30
+#define SC_LockAcquire 31
+#define SC_LockRelease 32
+#define SC_LockDelete 33
+#define SC_SemaphoreCreate 34
+#define SC_SemaphoreP 35
+#define SC_SemaphoreV 36
+#define SC_SemaphoreDelete 37
+
 
 #ifdef IN_USER_MODE
 
@@ -225,9 +236,8 @@ void PutInt(int n);
 //
 
 int Feof();
-
 unsigned int  createUserThread(void * f,void * arg);
-void * WaitForChildExited(unsigned int CID);
+void* WaitForChildExited(unsigned int CID);
 void ExitThread(void * object);
 // Expert mode
 void WaitForAllChildExited();
@@ -235,6 +245,20 @@ int StopChild(int CID);
 int WakeUpChild(int CID);
 int makeChildSurvive(int CID);
 void makeAllChildSurvive();
+
+int fopen(const char* filename);
+int fgets(int fileDescriptor, char* into, int numBytes);
+int fputs(int fileDescriptor, char* from, int numBytes);
+void fseek(int fileDescriptor, int position);
+int fclose(int fileDescriptor);
+int LockCreate();
+void LockAcquire(unsigned int ID);
+void LockRelease(unsigned int ID);
+int LockDelete(unsigned int ID);
+int SemaphoreCreate(int nbTokens);
+void SemaphoreP(unsigned int ID);
+void SemaphoreV(unsigned int ID);
+int SemaphoreDelete(unsigned int ID);
 
 
 

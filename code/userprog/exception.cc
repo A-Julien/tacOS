@@ -33,6 +33,8 @@
 #include "../threads/system.h"
 #include "userthread.h"
 
+#define MAX_FILENAME_BUFFER 200
+
 extern void ExitThread(void * object);
 /**
  * UpdatePC : Increments the Program Counter register in order to resume
@@ -206,10 +208,25 @@ void * SYSWaitForChildExited(unsigned int CID) {
 
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
-    if(res != 0){
+    if(res != (void * ) -1){
         managerUserThreadID->addIdFreed(CID);
     }
     return res;
+}
+
+void  SYSWaitForAllChildExited() {
+    List * child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+    while(!child->IsEmpty()){
+
+        UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
+        ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
+
+        SYSWaitForChildExited(WaitedChild->getID());
+
+        child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+
+    }
+    ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
 }
 
 ///
@@ -228,8 +245,9 @@ void SYSExitThread(void * object){
                 Grandpa->getChildList()->Append(enfantMeta);
                 Grandpa->DoneWithTheChildList();
             } else {
-                // https://www.youtube.com/watch?v=qiMaOmDtaYI
+                // https://youtu.be/qiMaOmDtaYI?t=69
             }
+            l->removeElement((void *) enfantMeta);
             userThread->DoneWithTheChildList();
             enfant->setSurvivor(false);
 
@@ -242,10 +260,12 @@ void SYSExitThread(void * object){
     userThread->DoneWithTheChildList();
 
     fileSystem->unregisterOpenFileTable(userThread->getId());
-    userThread->exit(object);
+    //userThread->exit(object);
     if(managerUserThreadID->lastAlive()){
         interrupt->Halt();
     }
+    userThread->exit(object);
+
 }
 
 ///
@@ -264,6 +284,64 @@ void StartUserThread(int data) {
     machine->Run((void *) dataFork->exit);
 
     return;
+}
+
+///
+/// UserThread::StopChild Put the thread in BLOCKED status
+/// \param CID
+/// \return 0 if the child have been stoped, 1 if the child is currently stop, 2 if it's not a child's TID
+
+int SYSStopChild(unsigned int CID){
+
+    UserThread * currentUserThread = (UserThread *) currentThread->getUserThreadAdress();
+    UserThreadData * state = (UserThreadData *) currentUserThread->getUserThreadDataChild(CID);
+    if(state == NULL){
+        currentThread->Yield();
+        state = (UserThreadData *) currentUserThread->getUserThreadDataChild(CID);
+        if(state == NULL){
+            return 2;
+        }
+    }
+    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
+
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+
+    if(childThread->stopped ){
+
+       interrupt->SetLevel (oldLevel);
+        return 1;
+    }
+    childThread->enterCritiqueExt();
+
+
+
+
+   interrupt->SetLevel (oldLevel);
+
+    return 0;
+}
+
+///
+/// UserThread::WakeUpChild Put a thread in Ready status
+/// \param CID
+/// \return 0 if the child have been WakeUp, 1 if the child is currently Ready, 2 if it's not a child's TID
+int SYSWakeUpChild(unsigned int CID){
+    UserThreadData * state = (UserThreadData *) ((UserThread *)currentThread->getUserThreadAdress())->getUserThreadDataChild(CID);
+    if(state == NULL){
+        return 2;
+    }
+    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    if(!childThread->stopped) {
+        interrupt->SetLevel(oldLevel);
+        return 1;
+    }
+    childThread->exitCritique();
+    scheduler->ReadyToRun(childThread);
+    childThread->stopped = false;
+    interrupt->SetLevel (oldLevel);
+   //  currentThread->Yield();
+    return 0;
 }
 
 
@@ -295,6 +373,13 @@ ExceptionHandler(ExceptionType which) {
     int size;
     int resultat;
     void *getString;
+    IntStatus oldLevel;
+    char* filename;
+    char* into;
+    char* from;
+    DEBUG('m', "User mode exception %d %d\n", which, type);
+
+
     DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
     if (which == SyscallException) {
         switch (type) {
@@ -304,8 +389,10 @@ ExceptionHandler(ExceptionType which) {
 
             case SC_PutString:
                 char string[MAX_STRING_SIZE + 1];
+                currentThread->enterCritique();
                 copyStringFromMachine(machine->ReadRegister(4), string, MAX_STRING_SIZE);
                 synchConsole->SynchPutString(string);
+                currentThread->exitCritique();
                 break;
 
             case SC_GetChar:
@@ -348,9 +435,10 @@ ExceptionHandler(ExceptionType which) {
                 char str[50];
                 sprintf(str, "Return value : %d ", machine->ReadRegister(4));
                 DEBUG('s', str);
-                currentThread->Finish();
-                currentThread->Yield();
+               // currentThread->Finish();
+                //currentThread->Yield();
                 SYSExitThread( (void *)  0);
+
 
 
                break;
@@ -372,7 +460,8 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WaitForAllChildExited:
-                ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
+                SYSWaitForAllChildExited();
+
             break;
 
             case SC_makeAllChildSurvive:
@@ -385,21 +474,100 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WakeUpChild:
-                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->WakeUpChild((unsigned int) machine->ReadRegister(4));
+                resultat =  SYSWakeUpChild((unsigned int) machine->ReadRegister(4));
                 machine->WriteRegister(2,resultat);
             break;
 
             case SC_StopChild:
-                resultat =  ((UserThread *) currentThread->getUserThreadAdress())->StopChild((unsigned int) machine->ReadRegister(4));
+                oldLevel = interrupt->SetLevel (IntOff);
+
+                DEBUG('t', "Stopping child %d\n", machine->ReadRegister(4));
+                resultat =  SYSStopChild(machine->ReadRegister(4));
                 machine->WriteRegister(2,resultat);
+                (void) interrupt->SetLevel (oldLevel);
+
+                break;
 
             case SC_ThreadEndedWithoutExit:
-                puts("Exited without exit");
+                DEBUG('m', "Thread %s Exited without exit statement", currentThread->getName());
             break;
-            default:
 
+            case SC_Open:
+                filename = (char* ) malloc(sizeof(char) * MAX_FILENAME_BUFFER);
+                copyStringFromMachine(machine->ReadRegister(4),filename,MAX_FILENAME_BUFFER);
+                machine->WriteRegister(2,
+                        synchConsole->fopen(
+                            filename,
+                            ((UserThread *) currentThread->getUserThreadAdress())->getId()
+                        )
+                 );
+                delete filename;
+                break;
+
+            case SC_Read:
+                // int fgets(char* into, int FileDescriptor, int numBytes, int tid);
+                //syscall -> int fgets(int fileDescriptor, char* into, int numBytes);
+                into = (char* ) malloc(sizeof(char) * machine->ReadRegister(6));
+                machine->WriteRegister(2,
+                        synchConsole->fgets(
+                                into,
+                                machine->ReadRegister(4),
+                                machine->ReadRegister(6),
+                                ((UserThread *) currentThread->getUserThreadAdress())->getId()
+                        )
+                );
+                copyMachineFromString(into,machine->ReadRegister(5), machine->ReadRegister(6));
+                delete into;
+            break;
+
+            case SC_Write:
+
+                //int fputs(int fileDescriptor, char* from, int numBytes);
+                //int SynchConsole::fputs(char* from, int fileDescriptor, int numBytes, int tid);
+                from = (char* ) malloc(sizeof(char) * machine->ReadRegister(6));
+                copyStringFromMachine(machine->ReadRegister(5),from, machine->ReadRegister(6));
+                machine->WriteRegister(2,
+                                       synchConsole->fputs(
+                                               from,
+                                               machine->ReadRegister(4),
+                                               machine->ReadRegister(6),
+                                               ((UserThread *) currentThread->getUserThreadAdress())->getId()
+                                       )
+                );
+                delete from;
+                break;
+
+            case SC_Seek:
+                //void int SynchConsole::fseek(int fileDescriptor, int position, int tid){
+                //void fseek(int fileDescriptor, int position);
+
+               synchConsole->fseek(
+                       machine->ReadRegister(4),
+                       machine->ReadRegister(5),
+                       ((UserThread *) currentThread->getUserThreadAdress())->getId()
+               );
+
+                break;
+
+            case SC_Close:
+                //bool fclose(int fileDescriptor);
+                //void SynchConsole::fclose(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid){
+                //bool FileSystem::UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid) {
+
+                machine->WriteRegister(2,
+                   synchConsole->fclose(
+                           machine->ReadRegister(4),
+                           ((UserThread *) currentThread->getUserThreadAdress())->getTableOfOpenfile(),
+                           ((UserThread *) currentThread->getUserThreadAdress())->getId()
+                   )
+                );
+
+                break;
+
+            default:
                 printf("Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
+                break;
 
         }
         UpdatePC();
@@ -415,3 +583,4 @@ ExceptionHandler(ExceptionType which) {
     }
 
 }
+

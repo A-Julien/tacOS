@@ -55,6 +55,7 @@
 
 #include "utility.h"
 #include "system.h"
+#include "../machine/machine.h"
 
 
 // External functions used by this file
@@ -181,21 +182,22 @@ main(int argc, char **argv) {
         else if (!strcmp (*argv, "-cd"))
           {
           ASSERT (argc > 1);
-          fileSystem->CdDir(*(argv + 1));
+          fileSystem->CdFromPathName(*(argv + 1));
           fileSystem->List();
           argCount = 2;
           }
         else if (!strcmp (*argv, "-mkdir"))
           {
           ASSERT (argc > 1);
-          fileSystem->MkDir(*(argv + 1));
+          if(!fileSystem->MkdirFromPathName(*(argv + 1)))
+              printf("mkdir error\n");
           fileSystem->List();
           argCount = 2;
           }
         else if (!strcmp (*argv, "-rm"))
           {
           ASSERT (argc > 1);
-          fileSystem->RmDir(*(argv + 1));
+          fileSystem->RmdirFromPathName(*(argv + 1));
           fileSystem->List();
           argCount = 2;
           }
@@ -259,13 +261,6 @@ main(int argc, char **argv) {
 #endif // NETWORK
     }
 
-    currentThread->Finish();    // NOTE: if the procedure "main"
-    // returns, then the program "nachos"
-    // will exit (as any other normal program
-    // would).  But there may be other
-    // threads on the ready list.  We switch
-    // to those threads by saying that the
-    // "main" thread is finished, preventing
-    // it from returning.
+    machine->RaiseException(SyscallException, 1);
     return (0);            // Not reached...
 }

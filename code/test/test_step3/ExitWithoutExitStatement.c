@@ -18,9 +18,9 @@ int main(void){
 
     PutString("Killed");
 
-    Halt();
 
-    return 0;
+
+   // return 0;
 }
 
 
