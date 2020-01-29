@@ -1,7 +1,9 @@
 ###########################
 ##		tacOS
 ###########################
-
+.aux
+code/test/DISK
+code/test/core
 code/build/*
 code/bin/coff2noff
 code/bin/*.o
