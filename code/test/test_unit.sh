@@ -92,9 +92,10 @@ ci_tests_restult() {
 ci_main_loop() {
   for d in */; do #for all step test folder
     if [ "${d::9}" == "test_step" ]; then
-      echo "-----------------------"
+      echo $'\n'
+      echo '----------------------------------------------'
       echo "| TESTING STEP ${d:5}  "
-      echo "-----------------------"
+      echo "----------------------------------------------"
 
       for file in "$d"*.c; do # for all unit test in step
         if [ "$file" == "$d*.c" ]; then # if test folder empty, continue
@@ -140,9 +141,10 @@ lauch_kernel_test() {
 ci_kernel_loop(){
     for d in */; do #for all step test folder
     if [ "${d::16}" == "kernel_test_step" ]; then
-      echo "-----------------------"
+      echo $'\n'
+      echo "----------------------------------------------"
       echo "| KERNEL TESTING STEP ${d:16}  "
-      echo "-----------------------"
+      echo "----------------------------------------------"
       for file in "$d"*.cmd; do # for all unit test in step
         file=$(filename_extractor "$d" "$file" 4)
 

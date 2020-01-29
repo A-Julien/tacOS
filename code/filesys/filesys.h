@@ -6,7 +6,7 @@
 ///	into directories.  Operations on the file system have to
 ///	do with "naming" -- creating, opening, and deleting files,
 ///	given a textual file name.  Operations on an individual
-///	"open" file (read, write, close) are to be found in the OpenFile
+///	"open" file (read, write, close) are to be found in the OpenFileTable
 ///	class (openfile.h).
 ///
 ///	We define two separate implementations of the file system.
@@ -39,6 +39,7 @@
 #include "copyright.h"
 #include "openfile.h"
 #include "filehdr.h"
+
 #define MAX_OPEN_FILE 20
 #define ROOT_DIRECTORY_FILE 0
 #define CURRENT_DIRECTORY_FILE 1
@@ -60,11 +61,11 @@ public:
     return TRUE;
     }
 
-    OpenFile* Open(char *name) {
+    OpenFileTable* Open(char *name) {
     int fileDescriptor = OpenForReadWrite(name, FALSE);
 
     if (fileDescriptor == -1) return NULL;
-    return new OpenFile(fileDescriptor);
+    return new OpenFileTable(fileDescriptor);
     }
 
     bool Remove(char *name) { return Unlink(name) == 0; }
@@ -72,16 +73,22 @@ public:
 
 #else // FILESYS
 
-typedef struct file_table{
-    unsigned int tid;
-    OpenFile** thread_table;
-    struct file_table* next;
-}file_table_t;
+typedef struct path_parse {
+    char** pathSplit;
+    int size;
+} path_parse_t;
 
-typedef struct global_file_table{
-    OpenFile* openFile;
-    struct global_file_table* next;
-}global_file_table_t;
+typedef struct file_table {
+    unsigned int tid;
+    char *path;
+    OpenFile** OpenFileTable;
+    struct file_table *next;
+} file_table_t;
+
+typedef struct global_file_table {
+    OpenFile *openFile;
+    struct global_file_table *next;
+} global_file_table_t;
 
 class FileSystem {
 public:
@@ -92,42 +99,78 @@ public:
     // the disk, so initialize the directory
     // and the bitmap of free blocks.
 
+    ~FileSystem();
+
     bool Create(const char *name, int initialSize, File_type type = f);
-    bool MkDir(const char *directory_name); // Create a folder
-    bool CdDir(const char *directory_name); // Change the current folder
-    bool RmDir(const char *directory_name);// Remove a folder
-    bool CdFromPathName(const char *path_name);
 
+    bool MkDir(const char *directory_name, unsigned int tid = 0); // Create a folder
 
-        OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
+    bool CdDir(const char *directory_name, unsigned int tid = 0); // Change the current folder
 
-    bool Remove(const char *name);    // Delete a file (UNIX unlink)
+    bool RmDir(const char *directory_name, unsigned int tid = 0);// Remove a folder
+
+    path_parse_t* CdFromPathName(const char *path_name, unsigned int tid = 0, int truncate = 0);
+
+    OpenFile* OpenFromPathName(const char* path_name, unsigned int tid = 0);
+
+    bool MkdirFromPathName(const char* path_name, unsigned int tid = 0);
+
+    bool RmdirFromPathName(const char* path_name, unsigned int tid = 0);
+
+    OpenFile *Open(const char *name, unsigned int tid = 0);    // Open a file (UNIX open)
+
+    bool Remove(const char *name, unsigned int tid = 0);    // Delete a file (UNIX unlink)
 
     void List();            // List all the files in the file system
 
     void Print();            // List all the files and their contents
 
-    void registerOpenFileTable(OpenFile** table,  unsigned int tid);
+    void registerOpenFileTable(int* table, unsigned int tid);
+
     bool unregisterOpenFileTable(unsigned int tid);
 
+    /** Methode for User Syscall **/
+    int UserOpen(const char *name, unsigned int tid);
 
-        private:
-    bool add_to_openFile_table(OpenFile* openFile, OpenFile** table = NULL);
-    OpenFile* get_open_file_by_sector(int sector);
-    bool remove_open_file(OpenFile* openFile);
+    int UserRead(int fileDescriptor, char *into, int numBytes, unsigned int tid);
+
+    int UserWrite(int fileDescriptor, char *from, int numBytes, unsigned int tid);
+
+    void UserSetSeek(int fileDescriptor, int position, unsigned int tid);
+
+    int UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
+
+    private:
+
+    bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);
+
+    OpenFile *get_open_file_by_sector(int sector);
+
+    int close_file(OpenFile* openFile, OpenFile** threadFileTable, unsigned int tid);
+
+    int removeFiletoGlobalTable(OpenFile* openFile);
+
     OpenFile** get_thread_file_table(unsigned int tid);
-    void addFiletoGlobalTable(OpenFile* openFile);
+    
+    file_table_t* get_thread_file_table_t(unsigned int tid);
+
+    void addFiletoGlobalTable(OpenFile *openFile);
+
     void init_ThreadsFilesTable();
 
+    int getFileDescriptor(OpenFile* openFile,unsigned int tid);
 
-        global_file_table_t* GlobalOpenFileTable;
-    OpenFile* freeMapFile;          // Bit map of free disk blocks, represented as a file
-    file_table_t* ThreadsFilesTable;
-    void init_table(OpenFile** table);
-    char ** parse(char *path_name);
+    void initFileDesciptortable(int* table);
 
+    void initOpenFileTable(OpenFile** table);
 
-    };
+    path_parse_t* parse(char *path_name);
+
+    global_file_table_t *GlobalOpenFileTable;
+    OpenFile *freeMapFile;          // Bit map of free disk blocks, represented as a file
+    file_table_t *ThreadsFilesTable;
+
+};
 
 #endif // FILESYS
 

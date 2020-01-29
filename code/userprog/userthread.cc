@@ -26,10 +26,10 @@ UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     dataFork.exit = exitPC;
     this->ID = tid; // MODIFY WHEN ID ALLOCATOR;
     this->child = new SynchList();
-    this->TableOfOpenfile = (OpenFile**) malloc(sizeof(OpenFile) * MAX_OPEN_FILE);
+    this->TableOfOpenfile = (int*) malloc(sizeof(int) * MAX_OPEN_FILE);
 }
 
-OpenFile** UserThread::getTableOfOpenfile(){
+int* UserThread::getTableOfOpenfile(){
     return this->TableOfOpenfile;
 }
 
@@ -143,50 +143,18 @@ void * UserThread::WaitForChildExited(int CID){
 ///
 /// UserThread::WaitForAllChildExited Wait for all the child exited
 void UserThread::WaitForAllChildExited(){
+
     while(!child->IsEmpty()){
         UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
         WaitForChildExited(WaitedChild->getID());
+
+
     }
 }
 
-///
-/// UserThread::StopChild Put the thread in BLOCKED status
-/// \param CID
-/// \return 0 if the child have been stoped, 1 if the child is currently stop, 2 if it's not a child's TID
 
-int UserThread::StopChild(unsigned int CID){
-    UserThreadData * state = (UserThreadData *) getUserThreadDataChild(CID);
-    if(state == NULL){
-        return 2;
-    }
-    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
 
-  //  IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    if(childThread->getStatus() == BLOCKED){
-        return 1;
-    }
-    childThread->setStatus(BLOCKED);
 
-  //  (void) interrupt->SetLevel (oldLevel);
-    return 0;
-}
-
-///
-/// UserThread::WakeUpChild Put a thread in Ready status
-/// \param CID
-/// \return 0 if the child have been WakeUp, 1 if the child is currently Ready, 2 if it's not a child's TID
-int UserThread::WakeUpChild(unsigned int CID){
-    UserThreadData * state = (UserThreadData *) getUserThreadDataChild(CID);
-    if(state == NULL){
-        return 2;
-    }
-    Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
-    if(childThread->getStatus() == BLOCKED){
-        return 1;
-    }
-    childThread->setStatus(BLOCKED);
-	return 0;
-}
 
 ///  UserThread::makeChildSurvive Pass a child in suvivor mode
 /// \param CID Child id
@@ -232,6 +200,7 @@ void UserThread::addChildren(UserThread * UTC){
     UserThreadData * childData = new UserThreadData(UTC->getId(), UTC);
     UTC->setMeta(childData);
     child->Append((void *) childData);
+    ASSERT(childData->getID() == UTC->getId());
 }
 
 ///

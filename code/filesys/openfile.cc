@@ -5,7 +5,7 @@
 ///	Routines to manage an open Nachos file.  As in UNIX, a
 ///	file must be open before we can read or write to it.
 ///	Once we're all done, we can close it (in Nachos, by deleting
-///	the OpenFile data structure).
+///	the OpenFileTable data structure).
 ///
 ///	Also as in UNIX, for convenience, we keep the file header in
 ///	memory while the file is open.
@@ -22,7 +22,7 @@
 #include <strings.h> /* for bzero */
 
 ///
-/// OpenFile::OpenFile
+/// OpenFileTable::OpenFileTable
 /// 	Open a Nachos file for reading and writing.  Bring the file header
 ///	into memory while the file is open.
 ///
@@ -40,17 +40,16 @@ OpenFile::OpenFile(int sector)
 }
 
 ///
-/// OpenFile::~OpenFile
+/// OpenFileTable::~OpenFileTable
 /// 	Close a Nachos file, de-allocating any in-memory data structures.
 ///
 
-OpenFile::~OpenFile()
-{
+OpenFile::~OpenFile(){
     delete hdr;
 }
 
 ///
-/// OpenFile::Seek
+/// OpenFileTable::Seek
 /// 	Change the current location within the open file -- the point at
 ///	which the next Read or Write will start from.
 ///
@@ -61,9 +60,9 @@ void OpenFile::Seek(int position, unsigned int tid) {
 }
 
 ///
-/// OpenFile::Read/Write
+/// OpenFileTable::Read/Write
 /// 	Read/write a portion of a file, starting from seekPosition.
-///	Return the number of bytes actually written or read, and as a
+///	@return Return the number of bytes actually written or read, and as a
 ///	side effect, increment the current position within the file.
 ///
 ///	Implemented using the more primitive ReadAt/WriteAt.
@@ -71,7 +70,6 @@ void OpenFile::Seek(int position, unsigned int tid) {
 ///	@param "into" -- the buffer to contain the data to be read from disk
 ///	@param "from" -- the buffer containing the data to be written to disk
 ///	@param "numBytes" -- the number of bytes to transfer
-///
 int OpenFile::Read(char *into, int numBytes, unsigned int tid){
    int result = ReadAt(into, numBytes, this->get_seek_position(tid));
    this->set_seek_position(tid, this->get_seek_position(tid)+result);
@@ -82,7 +80,7 @@ bool OpenFile::isOpenByOthers(){
     return this->seek_tid_list->next != NULL;
 }
 
-/// OpenFile::add_seek add a seek to a openfile
+/// OpenFileTable::add_seek add a seek to a openfile
 /// Allow multi threads to access to the same openfile with separated pointer
 /// \param tid the thread tid
 //
@@ -94,15 +92,23 @@ void OpenFile::add_seek(unsigned int tid){
     list->next = (tuple_t*) malloc(sizeof(tuple_t));
     list->next->tid = tid;
     list->next->seekPosition = 0;
-    list->next = NULL;
+    list->next->next = NULL;
 }
 
-/// OpenFile::remove_seek remove a seek to a openfile
+/// OpenFileTable::remove_seek remove a seek to a openfile
 /// Allow multi threads to access to the same openfile with separated pointer
 /// \param tid the thread tid
-//
+// [(23,0),[42,1)]
 bool OpenFile::remove_seek(unsigned int tid){
     tuple_t* list = this->seek_tid_list; //get head
+
+    //TODO CODE DUPLICATE
+    if(list->tid == tid){
+        tuple_t* next = list->next;
+        delete list;
+        this->seek_tid_list = next; //remove element
+        return true;
+    }
 
     while(list->next != NULL && list->next->tid != tid)list = list->next;
     if(list->next == NULL) return false;
@@ -113,7 +119,7 @@ bool OpenFile::remove_seek(unsigned int tid){
 
     return true;
 }
-/// OpenFile::set_seek_position
+/// OpenFileTable::set_seek_position
 /// set the seek positon.
 /// \param tid the thread tid
 /// \param seekPosition the new seek position
@@ -126,7 +132,7 @@ void OpenFile::set_seek_position(unsigned int tid, int seekPosition){
     }
 }
 
-/// OpenFile::get_seek_position
+/// OpenFileTable::get_seek_position
 /// \param tid the thread tid
 /// \return the seek positon
 int OpenFile::get_seek_position(unsigned int tid){
@@ -139,7 +145,7 @@ int OpenFile::get_seek_position(unsigned int tid){
     return -1;
 }
 
-/// OpenFile::Write into a file
+/// OpenFileTable::Write into a file
 /// \param into
 /// \param numBytes
 /// \param tid
@@ -151,7 +157,7 @@ int OpenFile::Write(const char *into, int numBytes, unsigned int tid){
 }
 
 //
-/// OpenFile::ReadAt/WriteAt
+/// OpenFileTable::ReadAt/WriteAt
 /// 	Read/write a portion of a file, starting at "position".
 ///	Return the number of bytes actually written or read, but has
 ///	no side effects (except that Write modifies the file, of course).
@@ -246,7 +252,7 @@ int OpenFile::WriteAt(const char *from, int numBytes, int position){
 }
 
 ///
-/// OpenFile::Length
+/// OpenFileTable::Length
 /// 	@return Return the number of bytes in the file.
 ///
 
@@ -256,4 +262,8 @@ int OpenFile::Length() {
 
 int OpenFile::get_sector() {
     return ((FileHeader* )this->hdr)->get_sector(0);
+}
+
+bool OpenFile::isdir() {
+    return (this->hdr->type == d);
 }
