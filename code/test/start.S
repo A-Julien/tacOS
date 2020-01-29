@@ -41,6 +41,74 @@ __start:
  * -------------------------------------------------------------
  */
 
+   	 .globl SemaphoreDelete
+  	.ent	SemaphoreDelete
+  SemaphoreDelete:
+  	addiu $2,$0,SC_SemaphoreDelete
+  	syscall
+  	j	$31
+  	.end SemaphoreDelete
+
+  	 .globl SemaphoreV
+  	.ent	SemaphoreV
+  SemaphoreV:
+  	addiu $2,$0,SC_SemaphoreV
+  	syscall
+  	j	$31
+  	.end SemaphoreV
+
+
+  	 .globl SemaphoreP
+  	.ent	SemaphoreP
+  SemaphoreP:
+  	addiu $2,$0,SC_SemaphoreP
+  	syscall
+  	j	$31
+  	.end SemaphoreP
+
+ 	 .globl SemaphoreCreate
+  	.ent	SemaphoreCreate
+  SemaphoreCreate:
+  	addiu $2,$0,SC_SemaphoreCreate
+  	syscall
+  	j	$31
+  	.end SemaphoreCreate
+
+
+ 	 .globl LockDelete
+  	.ent	LockDelete
+  LockDelete:
+  	addiu $2,$0,SC_LockDelete
+  	syscall
+  	j	$31
+  	.end LockDelete
+
+ 	 .globl LockRelease
+  	.ent	LockRelease
+  LockRelease:
+  	addiu $2,$0,SC_LockRelease
+  	syscall
+  	j	$31
+  	.end LockRelease
+
+ 	 .globl LockAcquire
+  	.ent	LockAcquire
+  LockAcquire:
+  	addiu $2,$0,SC_LockAcquire
+  	syscall
+  	j	$31
+  	.end LockAcquire
+
+
+  .globl LockCreate
+  	.ent	LockCreate
+  LockCreate:
+  	addiu $2,$0,SC_LockCreate
+  	syscall
+  	j	$31
+  	.end LockCreate
+
+
   .globl makeAllChildSurvive
   	.ent	makeAllChildSurvive
   makeAllChildSurvive:
