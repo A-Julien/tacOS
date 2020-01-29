@@ -209,10 +209,25 @@ void * SYSWaitForChildExited(unsigned int CID) {
 
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
-    if(res != 0 && res != (void * ) -1){
+    if(res != (void * ) -1){
         managerUserThreadID->addIdFreed(CID);
     }
     return res;
+}
+
+void  SYSWaitForAllChildExited() {
+    List * child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+    while(!child->IsEmpty()){
+
+        UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
+        ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
+
+        SYSWaitForChildExited(WaitedChild->getID());
+
+        child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+
+    }
+    ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
 }
 
 ///
@@ -233,6 +248,7 @@ void SYSExitThread(void * object){
             } else {
                 // https://www.youtube.com/watch?v=qiMaOmDtaYI
             }
+            l->removeElement((void *) enfantMeta);
             userThread->DoneWithTheChildList();
             enfant->setSurvivor(false);
 
@@ -439,7 +455,8 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WaitForAllChildExited:
-                ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
+                SYSWaitForAllChildExited();
+
             break;
 
             case SC_makeAllChildSurvive:
