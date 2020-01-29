@@ -68,6 +68,9 @@ void ManagerUserThreadID::addIdFreed(unsigned int ID){
     freeID->FreeTheLock();
 }
 
+///
+/// ManagerUserThreadID::lastAlive return true if it's the las thread running (for doing an halt)
+/// \return Bool a boolean
 bool ManagerUserThreadID::lastAlive(){
     return (stillAlive == 0);
 

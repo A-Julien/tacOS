@@ -28,7 +28,7 @@ int main (void){
 	unsigned int c1 = createUserThread((void *) handler1, 0);
 	// createUserThread((void *) handler1, 0);
 	PutString("C1_Créé");
-	
+	// Test a stop in a non initialized thread
 	res =  StopChild(7);
 	if(res == 2 ){
 		PutString("\nIt's not a child thread");
@@ -36,8 +36,10 @@ int main (void){
 
 	
 	PutString("LE threadDors\n");
-		StopChild(c1);
+	// Stop the child (will no more cry !)
+	StopChild(c1);
 
+	// Try to re-stop the child
 	res = StopChild(c1);
 	if( res == 1){
 		PutString("Child isAlready sleeping _");
@@ -45,6 +47,6 @@ int main (void){
 	} if(res == 0) {
 		PutString("BonRetourDeSleep\n");
 	}
-
+	// Need to be a halt because handler 1 is still alive.
 	Halt();
 }

@@ -154,10 +154,11 @@ Scheduler::Print ()
     readyList->Mapcar ((VoidFunctionPtr) ThreadPrint);
 }
 
+///
+/// Scheduler::RemoveThreadFromReadyList Remove a specific thread from the ready list
+/// \return True if the operation suceed, else false
 bool Scheduler::RemoveThreadFromReadyList(Thread * threadToRemove){
-    List * l = readyList;
-    //Print();
+    List * l = readyList; 
     bool res = l->removeElement(threadToRemove);
-    //Print();
     return res;
 }

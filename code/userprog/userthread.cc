@@ -20,6 +20,7 @@
 UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
     char * buffer = (char *) malloc(50*sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
+    free(buffer);
     this->thread = new Thread(buffer);
     dataFork.arg = arg;
     dataFork.f = f;
@@ -37,6 +38,9 @@ int* UserThread::getTableOfOpenfile(){
 ///
 /// UserThread::~UserThread Delete the UserThread class
 UserThread::~UserThread(){
+
+    free(TableOfOpenfile);
+
     delete child;
 
 }

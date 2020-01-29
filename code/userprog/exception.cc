@@ -213,6 +213,9 @@ void * SYSWaitForChildExited(unsigned int CID) {
     }
     return res;
 }
+///
+/// SYSWaitForAllChildExited
+/// Call SYSWaitForChildExited on all child
 
 void  SYSWaitForAllChildExited() {
     List * child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
@@ -231,14 +234,17 @@ void  SYSWaitForAllChildExited() {
 
 ///
 /// SYSExitThread Syscall function to exit a thread (Kill it)
+/// Function called at end of all thread if no return and/or ExitThread()
 /// \param object
 void SYSExitThread(void * object){
     UserThread * userThread = (UserThread *) currentThread->getUserThreadAdress();
     List * l = userThread->getChildList();
+    // For all the child
     while(!l->IsEmpty()){
         UserThreadData * enfantMeta = (UserThreadData *) l->get(0);
         UserThread * enfant = (UserThread *) enfantMeta->getUserThread();
         DEBUG('t', "Parrent no : %d is going to die, looking for child %d is isSurvivor\n", userThread->getId(), enfant->getId());
+        // If they are survivor, put in the list of the nearest parent and delete his survivor mode.
         if(enfant->isSurvivor()){
             UserThread * Grandpa = userThread->getParrent();
             if(Grandpa != NULL){
@@ -251,7 +257,7 @@ void SYSExitThread(void * object){
             l->removeElement((void *) enfantMeta);
             userThread->DoneWithTheChildList();
             enfant->setSurvivor(false);
-
+        // Else wait for his ending
         } else {
              DEBUG('t', "Child %d ins't a survivor\n", enfant->getId());
             userThread->DoneWithTheChildList();
@@ -264,9 +270,12 @@ void SYSExitThread(void * object){
     fileSystem->unregisterOpenFileTable(userThread->getId());
     //userThread->exit(object);
     if(managerUserThreadID->lastAlive()){
+        delete(userThread);
         interrupt->Halt();
     }
     userThread->exit(object);
+
+
 
 }
 

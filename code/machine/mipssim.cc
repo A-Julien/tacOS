@@ -45,6 +45,8 @@ Machine::Run(void * fExit)
       printf("Starting thread \"%s\" at time %lld\n",
 	     currentThread->getName(), stats->totalTicks);
     // End of correction
+
+  // There we write into RA (return adress) register the function to call when ended
     WriteRegister(31,(int) fExit);
     interrupt->setStatus(UserMode);
     for (;;) {
