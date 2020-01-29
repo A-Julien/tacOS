@@ -263,23 +263,22 @@ path_parse_t* FileSystem::parse(char *path_name) {
 
     char* token = strtok(path_name, "/");
     char** splitPath = (char **) malloc(sizeof(char *) * count);
-    splitPath[0] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
 
     path_parse_t* result = (path_parse_t*) malloc(sizeof(path_parse_t));
     result->pathSplit = (char**) malloc(sizeof(char *));
 
     int i = 0;
     while(token != NULL){
+        splitPath[i] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
         strcpy(splitPath[i], token);
         i++;
-        splitPath[i] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
         token = strtok(NULL, "/");
     }
 
     result->size = i;
-    for(int j = 0 ; j < i - 1; ++j) {
-        result->pathSplit[i] = (char*) malloc(sizeof(char));
-        strcpy(result->pathSplit[i], splitPath[i]);
+    for(int j = 0 ; j < i ; j++) {
+        result->pathSplit[j] = (char*) malloc( sizeof(char)* (strlen(splitPath[j])+1) );
+        strcpy(result->pathSplit[j], splitPath[j]);
     }
 
     //delete token;
