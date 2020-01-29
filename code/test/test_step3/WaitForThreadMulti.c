@@ -6,20 +6,17 @@
  */
 #include "../../userprog/syscall.h"
 
-void handlerSon(){
+void handlerSon(void * arg){
 	PutString("Orde 4-\n");
-	PutString("Orde 7-\n");
+	PutString("Orde 5-\n");
 	ExitThread((void* ) 0);
 }
 
 
 void handler(void * arg){
     PutString("Orde 2-\n");
-    unsigned int TID = createUserThread((void *) handlerSon, 0);
-    PutString("Orde 5-\n");
-   	int i = (int) WaitForChildExited(TID);
-   	PutInt(i);
-    PutString("Orde 5-\n");
+    WaitForChildExited(createUserThread((void *) handlerSon, 0));  	
+    PutString("Orde 6-\n");
     ExitThread((void * ) 0x7777777);
 
 }
@@ -32,7 +29,7 @@ int main(void){
     PutString("Orde 3-\n");
    	
    retour = WaitForChildExited(TID);
-     PutString("Orde 6-\n");
+     PutString("Orde 7-\n");
     if(retour != (void * ) 0x7777777){
         PutString("Ce n'est pas le bon retour : !-\n");
         if((int) retour != 0){
