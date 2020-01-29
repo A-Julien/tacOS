@@ -56,6 +56,16 @@
 #define SC_StopChild 27
 #define SC_ThreadEndedWithoutExit 28
 
+#define SC_LockCreate 30
+#define SC_LockAcquire 31
+#define SC_LockRelease 32
+#define SC_LockDelete 33
+#define SC_SemaphoreCreate 34
+#define SC_SemaphoreP 35
+#define SC_SemaphoreV 36
+#define SC_SemaphoreDelete 37
+
+
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -241,6 +251,16 @@ int fgets(int fileDescriptor, char* into, int numBytes);
 int fputs(int fileDescriptor, char* from, int numBytes);
 void fseek(int fileDescriptor, int position);
 int fclose(int fileDescriptor);
+int LockCreate();
+void LockAcquire(unsigned int ID);
+void LockRelease(unsigned int ID);
+int LockDelete(unsigned int ID);
+int SemaphoreCreate(int nbTokens);
+void SemaphoreP(unsigned int ID);
+void SemaphoreV(unsigned int ID);
+int SemaphoreDelete(unsigned int ID);
+
+
 
 #endif // IN_USER_MODE
 

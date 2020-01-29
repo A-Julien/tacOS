@@ -143,9 +143,12 @@ void * UserThread::WaitForChildExited(int CID){
 ///
 /// UserThread::WaitForAllChildExited Wait for all the child exited
 void UserThread::WaitForAllChildExited(){
+
     while(!child->IsEmpty()){
         UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
         WaitForChildExited(WaitedChild->getID());
+
+
     }
 }
 

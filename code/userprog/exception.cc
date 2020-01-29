@@ -208,10 +208,25 @@ void * SYSWaitForChildExited(unsigned int CID) {
 
     UserThread * currentUserThread = (UserThread * ) currentThread->getUserThreadAdress();
     void * res = currentUserThread->WaitForChildExited(CID);
-    if(res != 0 && res != (void * ) -1){
+    if(res != (void * ) -1){
         managerUserThreadID->addIdFreed(CID);
     }
     return res;
+}
+
+void  SYSWaitForAllChildExited() {
+    List * child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+    while(!child->IsEmpty()){
+
+        UserThreadData * WaitedChild = (UserThreadData *) child->get(0);
+        ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
+
+        SYSWaitForChildExited(WaitedChild->getID());
+
+        child = ((UserThread *)currentThread->getUserThreadAdress())->getChildList();
+
+    }
+    ((UserThread *)currentThread->getUserThreadAdress())->DoneWithTheChildList();
 }
 
 ///
@@ -232,6 +247,7 @@ void SYSExitThread(void * object){
             } else {
                 // https://youtu.be/qiMaOmDtaYI?t=69
             }
+            l->removeElement((void *) enfantMeta);
             userThread->DoneWithTheChildList();
             enfant->setSurvivor(false);
 
@@ -290,7 +306,7 @@ int SYSStopChild(unsigned int CID){
 
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
 
-    if(childThread->getStatus() == STOP_BLOCK){
+    if(childThread->stopped ){
 
        interrupt->SetLevel (oldLevel);
         return 1;
@@ -316,13 +332,15 @@ int SYSWakeUpChild(unsigned int CID){
     }
     Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    if(childThread->getStatus() != STOP_BLOCK) {
+    if(!childThread->stopped) {
         interrupt->SetLevel(oldLevel);
         return 1;
     }
-
+    childThread->exitCritique();
     scheduler->ReadyToRun(childThread);
+    childThread->stopped = false;
     interrupt->SetLevel (oldLevel);
+   //  currentThread->Yield();
     return 0;
 }
 
@@ -442,7 +460,8 @@ ExceptionHandler(ExceptionType which) {
             break;
 
             case SC_WaitForAllChildExited:
-                ((UserThread *) currentThread->getUserThreadAdress())->WaitForAllChildExited();
+                SYSWaitForAllChildExited();
+
             break;
 
             case SC_makeAllChildSurvive:

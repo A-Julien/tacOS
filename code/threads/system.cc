@@ -42,6 +42,7 @@ ManagerUserThreadID * managerLockID;
 char* pwd;
 
 
+
 UserThread * mainUserThread;
 
 // External definition, to allow us to take a pointer to this function

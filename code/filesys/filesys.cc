@@ -243,7 +243,7 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     }
     delete directory;
     return success;
-}
+g}
 
 /// Parse a path and return a array
 /// ex : path_name = d1/d2/f1

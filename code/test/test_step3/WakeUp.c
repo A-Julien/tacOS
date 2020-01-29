@@ -1,52 +1,55 @@
 /**
  * @file WakeUp.c
- * @brief Test if WakeUp syscall have good comportement
+ * @brief Test if WakeUpChild syscall have good comportement
  * @author Olivier Hureau,  Hugo Feydel , Julien ALaimo
  */
 
 
 #include "../../userprog/syscall.h"
 
+void handler1(){
+	PutString("\nAwake");
+	PutString("\nBaillement");
+	PutString("WAKED");
 
+	
 
-void handler1(void * arg){
-	int * i = (int *) arg;
-	PutString("Debut handler");
-	int j = 0;
-	for(*i = 0; *i < 500; *i = *i +1){
-		j = *i +1;
-	}
-	PutString("Middle");
-	while(*i < 1000){
-		*i = *i +1;
-	}
-	ExitThread((void *) j);
+	
 } 
 
 
 int main (void){
 	int res;
-	int i = 0;
-	PutInt(i);
-	PutString("CréationC1_");
-	unsigned int c1 = createUserThread((void *) handler1, (void *) &i);
-	StopChild(c1);
-	PutInt(i);
+
+
+	res = WakeUpChild(7);
+	if( res != 2){
+		PutString("should not be a child\n");
+	}
+
+	unsigned int c1 = createUserThread((void *) handler1, 0);
 	
-	PutInt(i);
-	PutInt(i);
-	PutInt(i);
-	res =  WakeUpChild(7);
-	if(res != 2 ){
-		PutString("It's not a child thread");
+	res = WakeUpChild(c1);
+	
+	 if(res == 0) {
+		PutString("should be waked up\n");
+	} else if(res == 2){
+		PutString("should be a child\n");
+
 	}
+	PutString("Endore l'enfant");
 	StopChild(c1);
-	res = StopChild(c1);
-	if( res != 1){
-		PutString("Child should be Allready WakedUp now .. _");
+	PutString("DODO-");
+	PutString("l'enfantDO-");
+	PutString("Reveil sonne-");
+	WakeUpChild(c1);
+	res = WakeUpChild(c1);
+	if( res == 2){
+		PutString("should be a child");
+	
+	} if(res == 0) {
+		PutString("should not re wake\n");
 	}
-	PutString("Attente");
-	WaitForAllChildExited();
-	PutString("Finis");
-	Halt();
+   	WaitForChildExited(c1);
+   	
 }
