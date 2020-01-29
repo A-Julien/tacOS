@@ -63,7 +63,7 @@
 /// supports extensible files, the directory size sets the maximum number 
 /// of files that can be loaded onto the disk.
 #define FreeMapFileSize    (NumSectors / BitsInByte)
-#define NumDirEntries       20
+#define NumDirEntries       30
 #define DirectoryFileSize   (sizeof(DirectoryEntry) * NumDirEntries)
 
 

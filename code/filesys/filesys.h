@@ -40,7 +40,7 @@
 #include "openfile.h"
 #include "filehdr.h"
 
-#define MAX_OPEN_FILE 20
+#define MAX_OPEN_FILE 50
 #define ROOT_DIRECTORY_FILE 0
 #define CURRENT_DIRECTORY_FILE 1
 

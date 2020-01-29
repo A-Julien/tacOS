@@ -90,6 +90,7 @@ ci_tests_restult() {
 }
 
 ci_main_loop() {
+      ../build/nachos-step5 -cp cc cc
   for d in */; do #for all step test folder
     if [ "${d::9}" == "test_step" ]; then
       echo $'\n'
