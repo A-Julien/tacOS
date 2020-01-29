@@ -62,9 +62,9 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile){
 ///
 SynchConsole::~SynchConsole(){
 	delete console;
-	delete writeDone;
 	delete readAvail;
     delete writeAvail;
+    delete writeDone;
 }
 
 ///

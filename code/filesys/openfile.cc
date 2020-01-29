@@ -45,7 +45,7 @@ OpenFile::OpenFile(int sector)
 ///
 
 OpenFile::~OpenFile(){
-    delete seek_tid_list;
+   // delete seek_tid_list;
     delete hdr;
 }
 

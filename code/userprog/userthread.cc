@@ -39,7 +39,7 @@ int* UserThread::getTableOfOpenfile(){
 /// UserThread::~UserThread Delete the UserThread class
 UserThread::~UserThread(){
 
-    free(TableOfOpenfile);
+    //free(TableOfOpenfile);
 
     delete child;
 
