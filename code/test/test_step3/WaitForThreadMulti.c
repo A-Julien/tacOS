@@ -26,7 +26,8 @@ void handler(void * arg){
 
 
 int main(void){
-
+    PutString("Debug");
+    Halt();
     void * retour;
      PutString("Orde 1-\n");
     unsigned int TID = createUserThread((void *) handler, 0);

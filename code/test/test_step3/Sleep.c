@@ -22,11 +22,6 @@ void handler1(){
 	
 } 
 
-void handler2(){	
-	PutString("C2-Naissance_");
-	//PutString("")
-}
-
 int main (void){
 	int res;
 	PutString("CréationC1_");

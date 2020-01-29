@@ -321,9 +321,11 @@ int SYSWakeUpChild(unsigned int CID){
         interrupt->SetLevel(oldLevel);
         return 1;
     }
-
+    childThread->exitCritique();
     scheduler->ReadyToRun(childThread);
+    childThread->stopped = false;
     interrupt->SetLevel (oldLevel);
+   //  currentThread->Yield();
     return 0;
 }
 
