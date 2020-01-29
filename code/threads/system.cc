@@ -214,7 +214,7 @@ Cleanup()
 #endif
 
 #ifdef FILESYS_NEEDED
-    delete fileSystem;
+   // delete fileSystem;
 #endif
 
 #ifdef FILESYS
