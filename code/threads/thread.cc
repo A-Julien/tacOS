@@ -465,15 +465,6 @@ char * statusToString(ThreadStatus st)
         case BLOCKED:
         sprintf(stName,"BLOCKED");
         break;
-        case SYNCH_BLOCK:
-        sprintf(stName,"SYNCH_BLOCK");
-        break;
-        case STOP_BLOCK:
-        sprintf(stName,"STOP_BLOCK");
-        break;
-        case SYNCH_STOP_BLOCK:
-        sprintf(stName,"SYNCH_STOP_BLOCK");
-        break;
 
         default:
         sprintf(stName, "NULL");
@@ -497,7 +488,7 @@ void Thread::enterCritique() {
 
 void Thread::enterCritiqueExt() {
     ((Semaphore *) critique)->P();
-    setStatus(STOP_BLOCK);
+    stopped=true;
 }
 
 void Thread::exitCritique() {

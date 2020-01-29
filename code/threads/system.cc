@@ -41,6 +41,7 @@ ManagerUserThreadID * managerSemaphoreID;
 ManagerUserThreadID * managerLockID;
 
 
+
 UserThread * mainUserThread;
 
 // External definition, to allow us to take a pointer to this function

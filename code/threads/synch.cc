@@ -100,10 +100,8 @@ Semaphore::V ()
     thread = (Thread *) queue->Remove ();
     // make thread ready, consuming the V immediately
     if (thread != NULL)	{
-        if(thread->getStatus() != STOP_BLOCK){
+        if(!thread->stopped){
             scheduler->ReadyToRun (thread);
-        } else {
-            puts("\n\n\nJ'y suis");
         }
     }
 
@@ -146,11 +144,7 @@ void Lock::Acquire ()
         } else {
             DEBUG('s', "Thread %d have been blocked by the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
             WaitingForLock->Append((void *) currentThread);
-            if(currentThread->getStatus() == STOP_BLOCK){
-                currentThread->setStatus(SYNCH_STOP_BLOCK);
-            } else {
-                currentThread->setStatus(SYNCH_BLOCK);
-            }
+            currentThread->setStatus(BLOCKED);
             currentThread->Sleep();
         }
     (void) interrupt->SetLevel (oldLevel);
@@ -167,17 +161,15 @@ void Lock::Release ()
     DEBUG('s', "Thread %d release the lock %s.\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId() , ((UserThread *) currentThread->getName()));
         if(!WaitingForLock->IsEmpty()){
             next = (Thread *) WaitingForLock->Remove();
-            if (next != NULL) {        // make thread ready, consuming the V immediately
-                if(next->getStatus() == SYNCH_STOP_BLOCK){
-                    next->setStatus(STOP_BLOCK);
-                } else {
-                    scheduler->ReadyToRun(next);
-                }
-
+           if(!next->stopped) {
+               scheduler->ReadyToRun(next);
             }
         }
 
     currentThreadHolding = next;
+    if(next != NULL && next->stopped){
+        Release();
+    }
     (void) interrupt->SetLevel (oldLevel);
 }
 

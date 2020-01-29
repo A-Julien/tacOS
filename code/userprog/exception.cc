@@ -291,7 +291,7 @@ int SYSStopChild(unsigned int CID){
 
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
 
-    if(childThread->getStatus() == STOP_BLOCK){
+    if(childThread->stopped ){
 
        interrupt->SetLevel (oldLevel);
         return 1;
@@ -317,7 +317,7 @@ int SYSWakeUpChild(unsigned int CID){
     }
     Thread * childThread = ((UserThread *) state->getUserThread())->getThread();
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    if(childThread->getStatus() != STOP_BLOCK) {
+    if(!childThread->stopped) {
         interrupt->SetLevel(oldLevel);
         return 1;
     }

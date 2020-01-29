@@ -60,7 +60,7 @@
 
 /// Thread state
 enum ThreadStatus
-{ JUST_CREATED, RUNNING, READY, BLOCKED, SYNCH_BLOCK, STOP_BLOCK, SYNCH_STOP_BLOCK };
+{ JUST_CREATED, RUNNING, READY, BLOCKED };
 
 /// external function, dummy routine whose sole job is to call Thread::Print
 extern void ThreadPrint (int arg);
@@ -121,6 +121,8 @@ class Thread
     void enterCritique();
     void enterCritiqueExt();
     void exitCritique();
+
+    bool stopped = false;
 
   private:
     // some of the private data for this class is listed above
