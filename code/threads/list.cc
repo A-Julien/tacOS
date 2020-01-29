@@ -280,13 +280,13 @@ List::SortedRemove (long long *keyPtr)
 
 unsigned int 
 List::size(){
-  unsigned size = 0;
+  unsigned currentSize = 0;
   ListElement * element = first;
   for (element = first; element != NULL; element = element->next){
-    size++; 
+    currentSize++; 
   
   }
-  return size;
+  return currentSize;
 
 }
 

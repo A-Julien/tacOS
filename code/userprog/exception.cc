@@ -238,6 +238,7 @@ void SYSExitThread(void * object){
     while(!l->IsEmpty()){
         UserThreadData * enfantMeta = (UserThreadData *) l->get(0);
         UserThread * enfant = (UserThread *) enfantMeta->getUserThread();
+        DEBUG('t', "Parrent no : %d is going to die, looking for child %d is isSurvivor\n", userThread->getId(), enfant->getId());
         if(enfant->isSurvivor()){
             UserThread * Grandpa = userThread->getParrent();
             if(Grandpa != NULL){
@@ -252,6 +253,7 @@ void SYSExitThread(void * object){
             enfant->setSurvivor(false);
 
         } else {
+             DEBUG('t', "Child %d ins't a survivor\n", enfant->getId());
             userThread->DoneWithTheChildList();
             SYSWaitForChildExited(enfant->getId());
         }
