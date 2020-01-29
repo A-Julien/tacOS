@@ -129,6 +129,7 @@ public:
 
     bool unregisterOpenFileTable(unsigned int tid);
 
+    /** Methode for User Syscall **/
     int UserOpen(const char *name, unsigned int tid);
 
     int UserRead(int fileDescriptor, char *into, int numBytes, unsigned int tid);
@@ -140,6 +141,7 @@ public:
     int UserCloseFile(int fileDescriptor, int* threadTableFileDescriptor, unsigned int tid);
 
     private:
+
     bool add_to_openFile_table(OpenFile *openFile, OpenFile **table = NULL);
 
     OpenFile *get_open_file_by_sector(int sector);
@@ -149,6 +151,7 @@ public:
     int removeFiletoGlobalTable(OpenFile* openFile);
 
     OpenFile** get_thread_file_table(unsigned int tid);
+    
     file_table_t* get_thread_file_table_t(unsigned int tid);
 
     void addFiletoGlobalTable(OpenFile *openFile);

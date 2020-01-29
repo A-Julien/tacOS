@@ -158,6 +158,10 @@ FileSystem::FileSystem(bool format) {
 
 }
 
+///
+/// init the first element of the ThreadFilesTable linked List.
+/// the first element of this list or dedicated to the kernel
+///
 void FileSystem::init_ThreadsFilesTable(){
     this->ThreadsFilesTable = (file_table_t* ) malloc(sizeof(file_table_t));
 
@@ -241,6 +245,11 @@ bool FileSystem::Create(const char *name, int initialSize, File_type type) {
     return success;
 }
 
+/// Parse a path and return a array
+/// ex : path_name = d1/d2/f1
+///     -> split[0] = "d1", split[1] = "d2", split[2] = "f1"
+/// \param path_name the path to split
+/// \return
 path_parse_t* FileSystem::parse(char *path_name) {
 
     int count = 0;
@@ -258,6 +267,7 @@ path_parse_t* FileSystem::parse(char *path_name) {
     splitPath[0] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
 
     path_parse_t* result = (path_parse_t*) malloc(sizeof(path_parse_t));
+    result->pathSplit = (char**) malloc(sizeof(char *));
 
     int i = 0;
     while(token != NULL){
@@ -268,10 +278,17 @@ path_parse_t* FileSystem::parse(char *path_name) {
     }
 
     result->size = i;
-    for(int j = 0 ; j < i ; j++) strcpy(result->pathSplit[i], splitPath[i]);
+    for(int j = 0 ; j < i - 1; ++j) {
+        result->pathSplit[i] = (char*) malloc(sizeof(char));
+        strcpy(result->pathSplit[i], splitPath[i]);
+    }
 
     delete token;
-    delete splitPath;
+    for (int j = 0; j < i; j++){
+        delete [] splitPath[i];
+    }
+    delete [] splitPath;
+    //delete splitPath;
 
     return result;
 }
@@ -670,6 +687,8 @@ int FileSystem::removeFiletoGlobalTable(OpenFile* openFile){
     return 0;
 }
 
+/// When thread open file, log it in the global file table
+/// \param openFile
 void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
 
    if(this->GlobalOpenFileTable == NULL){ //if head is NULL
@@ -689,22 +708,46 @@ void FileSystem::addFiletoGlobalTable(OpenFile* openFile){
     gfileTable->next->next = NULL;
 }
 
+/// allow a user to open a file
+/// \param name
+/// \param tid
+/// \return a file descritptor
 int FileSystem::UserOpen(const char *name, unsigned int tid) {
     return this->getFileDescriptor(this->OpenFromPathName(name, tid), tid);
 }
 
+/// allow user to read into file
+/// \param fileDescriptor
+/// \param into
+/// \param numBytes
+/// \param tid
+/// \return
 int FileSystem::UserRead(int fileDescriptor, char *into, int numBytes, unsigned int tid){
     return (this->get_thread_file_table(tid))[fileDescriptor]->Read(into,numBytes,tid);
 }
 
+/// Allow user to write into a file
+/// \param fileDescriptor
+/// \param from
+/// \param numBytes
+/// \param tid
+/// \return
 int FileSystem::UserWrite(int fileDescriptor, char *from, int numBytes, unsigned int tid){
     return (this->get_thread_file_table(tid))[fileDescriptor]->Write(from,numBytes,tid);
 }
 
+/// User method that allow user to move the seek into a file
+/// \param fileDescriptor
+/// \param position
+/// \param tid
 void FileSystem::UserSetSeek(int fileDescriptor, int position, unsigned int tid){
     (this->get_thread_file_table(tid))[fileDescriptor]->Seek(position,tid);
 }
 
+/// Do correlation between openFile object and file descriptor for user
+/// \param openFile
+/// \param tid
+/// \return int FileDescriptor
 int FileSystem::getFileDescriptor(OpenFile* openFile,unsigned int tid){
     if(openFile == NULL) return -1;
 
@@ -757,6 +800,10 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
     delete directory;
     return openFile;                // return NULL if not found
 }
+
+/// Return the object file_table_t associate to thread tid
+/// \param tid
+/// \return the object file_table_t
 file_table_t* FileSystem::get_thread_file_table_t(unsigned int tid) {
     file_table_t* list = this->ThreadsFilesTable;
 
@@ -766,6 +813,10 @@ file_table_t* FileSystem::get_thread_file_table_t(unsigned int tid) {
     };
     return NULL;
 }
+
+/// Return the list of openFile associate to thread tid
+/// \param tid
+/// \return the list of openFile
 OpenFile** FileSystem::get_thread_file_table(unsigned int tid) {
     file_table_t* list = this->ThreadsFilesTable;
 
@@ -893,6 +944,9 @@ void FileSystem::initFileDesciptortable(int* table) {
     for (int i = 0; i < MAX_OPEN_FILE; i++) table[i] = -1;
 }
 
+/// Allow a thread to use filesystem by register his tid
+/// \param table
+/// \param tid
 void FileSystem::registerOpenFileTable(int* table, unsigned int tid){
     file_table_t * fileTable =  this->ThreadsFilesTable; // get head
 
@@ -910,6 +964,10 @@ void FileSystem::registerOpenFileTable(int* table, unsigned int tid){
     fileTable->next->next = NULL;
 }
 
+///
+/// When thread die need to call this method
+/// \param tid the tid of the thread
+/// \return false if an error occur, otherwise true
 bool FileSystem::unregisterOpenFileTable(unsigned int tid){
     file_table_t * fileTable =  this->ThreadsFilesTable; // get head
 
@@ -928,6 +986,9 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
     return true;
 }
 
+///
+/// ~FileSystem()
+/// delete all file system
 FileSystem::~FileSystem(){
 
     file_table_t* list = ThreadsFilesTable;
@@ -944,6 +1005,7 @@ FileSystem::~FileSystem(){
     while(glist != NULL){
         delete glist->openFile;
         glist = glist->next;
+// 1000 lines ! To much... Need to split this file in several classes..
         delete GlobalOpenFileTable;
         GlobalOpenFileTable = glist;
     }
@@ -951,3 +1013,5 @@ FileSystem::~FileSystem(){
 
     delete freeMapFile;
 }
+
+
