@@ -40,7 +40,7 @@ public:
 		// EXPERT MODE
 
 		void WaitForAllChildExited();
-		int StopChild(unsigned int CID);
+		//int StopChild(unsigned int CID);
 		int WakeUpChild(unsigned int CID);
 		int makeChildSurvive(unsigned int CID);
 		void makeAllChildSurvive();
@@ -56,7 +56,7 @@ public:
         void setMeta(void *);
         bool isSurvivor();
         void setSurvivor(bool boolean);
-		OpenFile** getTableOfOpenfile();
+		int* getTableOfOpenfile();
 
 	private:
 		void * returnObject;
@@ -68,7 +68,7 @@ public:
         thread_init dataFork;
         void * metaData;
         bool survivor;
-		OpenFile **TableOfOpenfile;
+		int* TableOfOpenfile;
 
 };
 

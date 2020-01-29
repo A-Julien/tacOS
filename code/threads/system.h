@@ -62,5 +62,8 @@ extern PostOffice *postOffice;
 #include "ManagerUserThreadID.h"
 #include "UserThreadMetadata.h"
 extern ManagerUserThreadID * managerUserThreadID;
+extern ManagerUserThreadID * managerSemaphoreID;
+extern ManagerUserThreadID * managerLockID;
+extern char* path;
 
 #endif // SYSTEM_H

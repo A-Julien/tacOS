@@ -41,6 +41,114 @@ __start:
  * -------------------------------------------------------------
  */
 
+ .globl fclose
+     .ent	fclose
+ fclose:
+     addiu $2,$0,SC_Close
+     syscall
+     j	$31
+     .end fclose
+
+.globl fseek
+    .ent	fseek
+fseek:
+    addiu $2,$0,SC_Seek
+    syscall
+    j	$31
+    .end fseek
+
+.globl fputs
+    .ent	fputs
+fputs:
+    addiu $2,$0,SC_Write
+    syscall
+    j	$31
+    .end fputs
+
+   .globl fgets
+   	.ent	fgets
+   fgets:
+   	addiu $2,$0,SC_Read
+   	syscall
+   	j	$31
+   	.end fgets
+
+   .globl fopen
+   	.ent	fopen
+   fopen:
+   	addiu $2,$0,SC_Open
+   	syscall
+   	j	$31
+   	.end fopen
+
+   	 .globl SemaphoreDelete
+  	.ent	SemaphoreDelete
+  SemaphoreDelete:
+  	addiu $2,$0,SC_SemaphoreDelete
+  	syscall
+  	j	$31
+  	.end SemaphoreDelete
+
+  	 .globl SemaphoreV
+  	.ent	SemaphoreV
+  SemaphoreV:
+  	addiu $2,$0,SC_SemaphoreV
+  	syscall
+  	j	$31
+  	.end SemaphoreV
+
+
+  	 .globl SemaphoreP
+  	.ent	SemaphoreP
+  SemaphoreP:
+  	addiu $2,$0,SC_SemaphoreP
+  	syscall
+  	j	$31
+  	.end SemaphoreP
+
+ 	 .globl SemaphoreCreate
+  	.ent	SemaphoreCreate
+  SemaphoreCreate:
+  	addiu $2,$0,SC_SemaphoreCreate
+  	syscall
+  	j	$31
+  	.end SemaphoreCreate
+
+
+ 	 .globl LockDelete
+  	.ent	LockDelete
+  LockDelete:
+  	addiu $2,$0,SC_LockDelete
+  	syscall
+  	j	$31
+  	.end LockDelete
+
+ 	 .globl LockRelease
+  	.ent	LockRelease
+  LockRelease:
+  	addiu $2,$0,SC_LockRelease
+  	syscall
+  	j	$31
+  	.end LockRelease
+
+ 	 .globl LockAcquire
+  	.ent	LockAcquire
+  LockAcquire:
+  	addiu $2,$0,SC_LockAcquire
+  	syscall
+  	j	$31
+  	.end LockAcquire
+
+
+  .globl LockCreate
+  	.ent	LockCreate
+  LockCreate:
+  	addiu $2,$0,SC_LockCreate
+  	syscall
+  	j	$31
+  	.end LockCreate
+
+
   .globl makeAllChildSurvive
   	.ent	makeAllChildSurvive
   makeAllChildSurvive:

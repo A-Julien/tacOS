@@ -104,10 +104,7 @@ class Thread
 
     void CheckOverflow ();	// Check if thread has 
     // overflowed its stack
-    void setStatus (ThreadStatus st)
-    {
-	status = st;
-    }
+    void setStatus (ThreadStatus st);
     const char *getName ()
     {
 	return (name);
@@ -121,9 +118,15 @@ class Thread
     void * getUserThreadAdress();
     ThreadStatus getStatus();
 
+    void enterCritique();
+    void enterCritiqueExt();
+    void exitCritique();
+
+    bool stopped = false;
+
   private:
     // some of the private data for this class is listed above
-
+    void * critique;
     int *stack;			// Bottom of the stack 
     // NULL if this is the main thread
     // (If NULL, don't deallocate stack)
@@ -165,3 +168,5 @@ extern "C"
 }
 
 #endif				// THREAD_H
+
+#include "synch.h"
