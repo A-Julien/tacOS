@@ -471,7 +471,10 @@ char * statusToString(ThreadStatus st)
     }
     return stName;
 }
-
+///
+/// Thread::setStatus
+/// Set the status as in parameter with debug info
+/// \param ThreadStatus st
 void Thread::setStatus (ThreadStatus st){
     char * oldStatus = statusToString(status);
     char * newStatus = statusToString(st);
@@ -481,18 +484,31 @@ void Thread::setStatus (ThreadStatus st){
     status = st;
 }
 
+///
+///  Thread::enterCritique
+/// Get a semaphore for "critic area" code with still having interrupt
+
 void Thread::enterCritique() {
     ((Semaphore *) critique)->P();
 
 }
+///
+///  Thread::enterCritiqueExt
+/// From exterior of a thread
+/// Get a semaphore for "critic area" code with still having interrupt
+/// Basicly stopped the thread when the thread is'nt in critique mode
+/// No exit statut for this just exit and call ReadyToRun form the scheduler.
 
 void Thread::enterCritiqueExt() {
     ((Semaphore *) critique)->P();
     stopped=true;
 }
 
+///
+/// Thread::exitCritique
+/// Drop the semaphore for the critique zone of code, see Thread::enterCritique
+///
 void Thread::exitCritique() {
-
     ((Semaphore *) critique)->V();
 }
 
