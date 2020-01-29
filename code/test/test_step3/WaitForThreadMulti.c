@@ -27,7 +27,7 @@ int main(void){
      PutString("Orde 1-\n");
     unsigned int TID = createUserThread((void *) handler, 0);
     PutString("Orde 3-\n");
-   	
+   	// Wait for the son who's also waiting
    retour = WaitForChildExited(TID);
      PutString("Orde 7-\n");
     if(retour != (void * ) 0x7777777){
@@ -40,9 +40,8 @@ int main(void){
     } else {
         PutString("C'est le bon retour-\n");
     }
+    // Wait all child (no more running actually)
     WaitForAllChildExited();
     PutString("Plus aucun thread a attendre-\n");
-    // Halt();
-    Halt();
     return 0;
 }
