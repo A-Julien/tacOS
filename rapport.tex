@@ -6,6 +6,8 @@
 \author{Julien ALAIMO, Hugo FEYDEL, Olivier HUREAU }
 \date{2019-2020}
 \usepackage{graphicx}
+\usepackage{listings}
+\lstset{language=C}
 
 \begin{document}
 
@@ -13,11 +15,7 @@
 
 \section{Fonctionnalités intéressante/importante}
 
-Le système implémenté est incomplet mais permissif. Certaines erreurs de code ou appel système résulte en une bonne exécution. Cela permet à un programmeur non confirmé de pouvoir tout de même utiliser le système. 
-
-Nous avons aussi implémenté des fonctions systèmes pour les utilisateurs confirmé. Ceux-ci peuvent alors utiliser des structures d'une manière moins intuitive, aux risques et périls de l'utilisateur.
-
-
+TACOS (The Amazing Control Operating System) est un système d'exploitation incomplet mais robuste : il dispose d'un système de multithreading complet et d'un système de fichier opérationnel. Il est également livré avec les fonctionnalités basiques d'entrées/sorties (cf. 2.1). 
 
 \subsection{Le Multithreading}
 
@@ -25,62 +23,66 @@ Le multiThreading permet à un utilisateur de faire tourner plusieurs instructio
 
 Notre réalisation permet une utilisation simpliste et permissive du multithreading : si certaines mécaniques de fermeture sont oublié, le système le fera par lui même. 
 
+\subsection{Le Système de fichier}
+
+Le système de fichier fourni permet à l'utilisateur de se déplacer à sa guise dans l'arborescence, de créer/supprimer des répertoires et des fichiers, d'ouvrir des fichiers, de lire leur contenu ou le modifier.
+
+Il est possible d'utiliser des noms de chemins (absolus comme relatifs) et les répertoires spéciaux "." (répertoire courant), ".." (répertoire parent) et "/" (répertoire racine).
+
+Attention, ce système de fichier opère sur des fichiers de tailles fixes uniquement. 
+
 \newpage
+
 \section{Spécifications}
-
-\textit{
-une partie "spécifications" listant ce qui est disponible pour les programmes utilisateurs. Il faut mettre ici le genre d'information que vous trouvez dans les pages man. On doit donc trouver tous les appels systèmes implémentés avec leur prototype, la description des arguments, la description du fonctionnement (fonctionnalités utilisateurs, pas implémentation) de l'appel système, de la valeur de retour éventuelle, la signalisation des erreurs, ... Si vous avez également une bibliothèque utilisateur, vous devez décrire ses fonctions de la même manière que les appels systèmes.
-}
-
-
 
 \subsection{Entrées/Sorties}
 \begin{itemize}
     \item 
-    \textbf{void PutChar( char c);}
+    \textbf{void PutChar(char c);}
     
-    Ecris le charactère "char c" sur la sortie standard
+    Ecrit le caractère \textbf{c}  sur la sortie standard
     
     \item 
     \textbf{void PutString(char * string);}
     
-    Ecris le chaine de caractère "char * string" sur la sortie standard.
-    La chaine de caractère doit finir par '\textbackslash0'.
-    La taille maximal de la chaine de caractère est de 
-    \textbf{ MODIFIE ICI STP}.
-    L'apel système \textbf{PutString} est moins coûteux que plusieurs appels système \textbf{PutChar}
+    Ecrit la chaîne de caractères \textbf{string} sur la sortie standard.
+    La chaîne de caractères doit finir par '\textbackslash0'.
+    La taille maximale de la chaîne de caractères est définie par la constante \textbf{MAX\_STRING\_SIZE} (cf. "system.h").
+    
+    L'appel système \textbf{PutString} est moins coûteux que plusieurs appels système \textbf{PutChar}.
     
      \item 
     \textbf{int GetChar();}
     
     Retourne la valeur ascii d'un caractère rentré dans l'entrée standard.
-    La fonction attend qu'un charactère soit disponnible. Attention il peux y avoir blocage.
+    La fonction attend qu'un caractère soit disponible, elle est bloquante.
     
     
      \item 
     \textbf{void GetString(char * string, int taille);}
     
-    Ecris la chaine de caractère rentrée dans l'entrée standart à l'adresse de la chaine de caractère en paramètre \textbf{char * string}. La taille de cette chaîne de caractère sera inférieur ou égal au paramètre \textbf{int taille}.
-    \textbf{JULIEN MODIFIE ICI, c'est peut etre faux}.
+    Ecrit la chaîne de caractères rentrée dans l'entrée standard à l'adresse de la chaîne de caractères passée en paramètre \textbf{string}. La taille de cette chaîne de caractère sera inférieure ou égale au paramètre \textbf{taille}. Si celle de la chaîne rentrée lui est supérieure, la chaîne obtenue en sera une troncature.
     
       \item 
     \textbf{void GetInt(int * n);}
     
-    Ecris l'entier rentrée dans l'entrée standart à l'adresse pointé par le paramètre \textbf{n}.
-    L'entier peux être positif comme négatif.
-    La valeur absolue de lentier ne dois pas êre supérieur a \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
+    Ecrit l'entier rentré dans l'entrée standard à l'adresse pointée par le paramètre \textbf{n}.
+    L'entier peut être positif comme négatif.
+    La valeur absolue de l'entier ne doit pas être supérieure à \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
     
     
     
       \item 
     \textbf{void PutInt(int n);}
     
-     Ecris l'entier en paramètre \textbf{int n} sur la sortie standard
-    L'entier peux être positif comme négatif.
-    La valeur absolue de l'entier ne dois pas êre supérieur a \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
+     Ecrit l'entier en paramètre \textbf{int n} sur la sortie standard
+    L'entier peut être positif comme négatif.
+    La valeur absolue de l'entier ne doit pas être supérieure à \[10^{10}-1\] (valeur absolue). Sinon une erreur est levée.
     
     
 \end{itemize}
+
+\newpage
 
 \subsection{Threads}
 En cours de développement
@@ -90,13 +92,13 @@ En cours de développement
     \textbf{unsigned int CreateThread(void * f (void * arg), void * arg;}
     
     Crée un thread utilisateur et lance la routine \textbf{f}. Le deuxième argument 
-    \textbf{void * arg} est passé en argument a la fonction f.
+    \textbf{void * arg} est passé en argument à la fonction f.
     Retourne l'identifiant du thread.
    
    \item 
    \textbf{void ExitThread(void * obj)} 
    
-   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Doit absolument être utiliser à la fin de l'execution d'un thread (mise à part les utilisateurs avancés, 2.3
+   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Cette fonction doit absolument être utiliser à la fin de l'exécution d'un thread (mise à part les utilisateurs avancés, 2.3
    
    \item 
    \textbf{unsigned int ThreadId();}
@@ -106,7 +108,7 @@ En cours de développement
    \item
    \textbf{void * WaitForChildExited(int CID);} 
    
-   Attente passif que le thread d'identifiant \textbf{CID} termine. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente <trouver une valeur>, alors l'identifiant \textbf{CID} n'as pas était reconnu où le thread n'est pas enfant.
+   Attente passive de la terminaison du thread d'identifiant \textbf{CID}. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente <trouver une valeur>, alors l'identifiant \textbf{CID} n'as pas été reconnu ou le thread n'est pas enfant.
    Cette fonction détruit le thread système. Il faut donc veiller à l'utiliser.
    
     
@@ -119,7 +121,7 @@ En cours de développement
   \item 
   \textbf{void WaitForAllChildExited();}
   
-  Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution
+  Met le thread en attente active. Le thread sort de l'attente quand plus aucun de ses threads enfants ne sont en cours d'execution
   
   \item 
   \textbf{int StopChild(int CID)}
@@ -128,7 +130,7 @@ En cours de développement
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
-      \item \textbf{-1} Si l'arrêt à échoué
+      \item \textbf{-1} Si l'arrêt a échoué
       \item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
     \end{itemize}       
     
@@ -137,7 +139,7 @@ En cours de développement
   \textbf{int WakeUpChild(int CID);}
   
     
-  Reveil le thread enfant d'identifiant \textbf{CID}. 
+  Réveille le thread enfant d'identifiant \textbf{CID}. 
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
@@ -153,28 +155,125 @@ En cours de développement
   \item 
   \textbf{void makeAllChildSurvive();}
   
-  Met tout les threads enfant en \textbf{mode survivor}
+  Met tous les threads enfant en \textbf{mode survivor}
 \end{itemize}
 
 \subsection{Système de fichiers}
-JULIEN AND HUGO
+
+\begin{itemize}
+
+\item 
+Fonctions de navigation/création/suppression sur l'arborescence :
+
+Les fonctions \textbf{Create()} et \textbf{Remove()} opèrent depuis le répertoire courant.
+
+\begin{itemize}
+
+  \item  
+  \textbf{bool Create(const char *name, int initialSize, File\_type type = f);}
+  
+  Crée un fichier ou un répertoire selon le type \textbf{type} (f pour fichier, d pour répertoire, fixé à f par défaut), de nom \textbf{name} et de taille \textbf{initialSize}. 
+  Retourne vrai si succès, faux si le fichier/répertoire existe déjà ou si l'espace disponible est insuffisant.
+  
+    \item 
+    \textbf{ bool Remove(const char *name, unsigned int tid = 0);}
+    
+    Supprime un fichier de nom \textbf{name} du thread d'identifiant \textbf{tid}.
+    
+    Retourne vrai si succès, faux si le fichier n'existe pas.
+
+\end{itemize}
+     
+Les fonctions \textbf{OpenFromPathName()},  \textbf{MkdirFromPathName()} et  \textbf{RmdirFromPathName()} utilisent la fonction  \textbf{CdFromPathName()} afin de se placer dans le bon répertoire, effectuer leurs opérations, et enfin de se replacer dans le répertoire avant les changements.
+
+     \begin{itemize}
+     
+     \item
+      \textbf{path\_parse\_t * CdFromPathName(const char *path\_name, unsigned int tid = 0, int truncate = 0);}
+     
+     Change le répertoire courant avec celui de nom du dernier élément de \textbf{path\_name} du thread d'identifiant \textbf{tid} et retourne un pointeur vers une structure  \textbf{path\_parse\_t}. 
+     
+     Exemple : 
+     
+     CdFromPathName("/folder1/folder2") vous placera dans "folder2" si la racine contient "folder1", NULL sinon.
+
+     \item  
+     \textbf{bool MkdirFromPathName(const char* path\_name, unsigned int tid = 0);}
+  
+  Crée un répertoire de nom du dernier élément de \textbf{path\_name} du thread d'identifiant \textbf{tid} dans le répertoire de nom de l'avant dernier élément de  \textbf{path\_name}.
+  
+  Retourne vrai si succès, faux si chemin incorrect ou si le répertoire existe déjà ou si l'espace disponible est insuffisant.
+  
+  Exemples :
+    
+  MkdirFromPathName("folder1/folder2/file1") renverra false.
+  
+  MkdirFromPathName("folder2/folder3") créera "folder3" dans "folder2" en admettant que le répertoire courant le contienne.
+  
+  MkdirFromPathName("/folder3") créera "folder3" à la racine.
+
+ 	\item 
+ 	\textbf{bool RmdirFromPathName(const char* path\_name, unsigned int tid = 0);}
+  
+  Supprime un répertoire de nom du dernier élément de \textbf{path\_name} du thread d'identifiant \textbf{tid} dans le répertoire de nom de l'avant dernier élément de  \textbf{path\_name}.
+  
+  Retourne vrai si succès, faux si le répertoire n'existe pas ou si le répertoire n'est pas vide.  
+
+
+\end{itemize}
+
+\item
+
+Fonctions utilisateurs :
+
+\begin{itemize}
+  
+	\item
+    \textbf{int UserOpen(const char *name, unsigned int tid);}
+  
+	Ouvre un fichier de nom du dernier élément de \textbf{name} du thread d'identifiant \textbf{tid} et retourne l'entier du descripteur de fichier associé (-1 si échec).
+
+	\item
+    \textbf{int UserRead(int fileDescriptor, char *into, int numBytes, unsigned int tid);}
+
+	Lit \textbf{numBytes} octets depuis le fichier décrit par \textbf{fileDescriptor} et les écrit dans \textbf{into}.
+
+    \item
+    \textbf{int UserWrite(int fileDescriptor, char *from, int numBytes, unsigned int tid);}
+    
+	Ecrit \textbf{numBytes} octets depuis \textbf{from} dans le fichier décrit par \textbf{fileDescriptor}.
+	
+    \item
+    \textbf{void UserSetSeek(int fileDescriptor, int position, unsigned int tid);}
+
+	Change la position du curseur dans l'entête du fichier décrit par \textbf{fileDescriptor} par \textbf{position}.
+
+    \item
+    \textbf{int UserCloseFile(int fileDescriptor, unsigned int tid);}
+
+	Ferme le fichier décrit par \textbf{fileDescriptor}.
+
+\end{itemize}
+
+\end{itemize}
+
+\newpage
 
 \section{Tests Utilisateurs}
-\textit{une partie "tests utilisateurs" décrivant les programmes de test que vous avez réalisés, ce qu'ils montrent, ...}
-\vspace{5mm}
 
+\vspace{5mm}
 
 Ici je veux bien que t'explique vite faire que la CI execute ton script, ce que fait ton script. J'écrirais les tests pour step2 et threads.
 
 \newpage
+
 \section{Implémentation}
-\textit{une partie "implémentation" qui explique les points importants de votre implémentation. C'est donc la seule partie qui parle du détail du code que vous avez écrit. Expliquez vos choix d'implémentation.
-}
+
 \vspace{5mm}
 
 \subsection{Threads}
 
-Pour implémenter les threads, nous avons choisis d'utiliser les 3 classes suivantes
+Pour implémenter les threads, nous avons choisis d'utiliser les 3 classes suivantes :
 \begin{itemize}
 \item
 UserThread
@@ -185,13 +284,58 @@ UserThreadData
 \end{itemize}
 \includegraphics{code/userprog/UserThread.PNG}
 
-Ainsi, chaque thread utilisateur sera associé à un thread kerbel grâce au stockage de l'adresse d'un UserThread dans la classe Thread du Kernel
+Ainsi, chaque thread utilisateur sera associé à un thread kernel grâce au stockage de l'adresse d'un UserThread dans la classe Thread du Kernel.
 
 
-Lorsqu'un appel système se déclenche, via le pointeur machine->currentThread ou se trouve un pointeur vers son UserThread, on pas alors utiliser les UserThread pour y appliquer les différentes opérations nécessaire.
+Lorsqu'un appel système se déclenche, via le pointeur machine->currentThread où se trouve un pointeur vers son UserThread, on pas alors utiliser les UserThread pour y appliquer les différentes opérations nécessaires.
 \vspace{5mm}
 
-L'assignation des identifiants d'UserThread se fait via le UserThreadManager. Le userThreadManager stock un variable compteur qui est incrémenter à chaque demande d'identifiant. C'est UserThread étant stocké sur des "unsigned int" on peux se voir limiter en nombre de thread parallèle par la limite de taille d'un unsigned int. Cependant, les identifiants sont recyclé. A chaque destruction de UserThread on réinjecter alors sont identifiant dans la liste du ThreadManager. Cela permet alors d'être sur qu'on programme à longue utilisation ne se retrouve jamais à cours d'identifiant. Néanmoins cela implique une plus grosse structure de stockage et une éventuelle perte temps par rapport à d'autre structure (exemple : bitmap)
+L'assignation des identifiants d'UserThread se fait via le UserThreadManager. Le userThreadManager stocke une variable compteur qui est incrémentée à chaque demande d'identifiant. UserThread étant stocké sur des "unsigned int", on peut se voir limiter en nombre de thread parallèle par la limite de taille d'un unsigned int. Cependant, les identifiants sont recyclés. À chaque destruction de UserThread, on réinjecte alors son identifiant dans la liste du ThreadManager, il est alors réutilisable. Néanmoins cela implique une plus grosse structure de stockage et une éventuelle perte de temps par rapport à d'autres structures (exemple : bitmap)
+
+\subsection{Système de fichiers}
+\begin{itemize}
+\item
+Le Système de fichiers est organisé de la manière suivante :
+\begin{itemize}
+	\item
+	Une table globale des fichiers ouverts sous forme de liste chaînée (cf.  \textbf{global\_file\_table\_t}).
+	\item
+	Une table des fichiers ouverts par thread sous forme de liste chaînée (cf \textbf{file\_table\_t}). Les 2 premiers élément de l'OpenFileTable de chaque thread sont dédiés aux répertoires racine (indice 0) et courant (indice 1).
+	
+\end{itemize}
+
+ \begin{lstlisting}[frame=single]
+typedef struct global_file_table {
+    OpenFile *openFile;
+    struct global_file_table *next;
+} global_file_table_t;
+  \end{lstlisting}
+  
+  \begin{lstlisting}[frame=single]
+typedef struct file_table {
+    unsigned int tid;
+    char *path;
+    OpenFile** OpenFileTable;
+    struct file_table *next;
+} file_table_t;
+  \end{lstlisting}
+ 
+ \item
+La fonction "CdFromPathName"  découpe le nom de chemin par le séparateur "/" en tableau de chaînes de caractères (stockée dans \textbf{pathSplit}) afin de le parcourir répertoire par répertoire (en changeant le répertoire courant) jusqu'à (\textbf{size} - \textbf{truncate}) et retourne un pointeur vers une  structure \textbf{path\_parse\_t} (cf. ci-après).
+
+
+  \begin{lstlisting}[frame=single]
+  typedef struct path_parse { 
+    char** pathSplit;   
+    int size;   
+} path_parse_t;
+  \end{lstlisting}
+
+  Exemple : 
+  En admettant que "folder1" existe dans le répertoire courant, CdFromPathName("folder1/folder2/file1", 1) vous placera dans "folder2" et renverra un pointeur vers une structure suivante avec les champs suivants : 
+  pathSplit = [ [folder1] [folder2] ] ; size = 2.
+ 
+ \end{itemize} 
 
 \section{Scolaire}
 \textit{une partie plus "scolaire" où vous décrivez l'organisation de votre travail (planning, ...), commentaires constructifs sur le déroulement du projet, ...}

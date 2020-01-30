@@ -37,6 +37,7 @@ OpenFile::OpenFile(int sector)
     this->seek_tid_list->tid = 0;
     this->seek_tid_list->seekPosition = 0;
     this->seek_tid_list->next = NULL;
+    this->hdrTofree = hdr;
 }
 
 ///
@@ -45,7 +46,7 @@ OpenFile::OpenFile(int sector)
 ///
 
 OpenFile::~OpenFile(){
-    delete hdr;
+    delete this->hdrTofree;
 }
 
 ///
