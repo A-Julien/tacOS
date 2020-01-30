@@ -116,6 +116,7 @@ private:
     int get_seek_position(unsigned int tid);
 
     FileHeader *hdr;            // Header for this file
+    FileHeader* hdrTofree;
     tuple_t *seek_tid_list;
 
 };
