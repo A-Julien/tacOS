@@ -1,3 +1,4 @@
+
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
@@ -8,7 +9,7 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \lstset{language=C}
-
+\setlength{\marginparwidth}{20pt}
 \begin{document}
 
 \maketitle
@@ -168,8 +169,6 @@ Voici les différentes procédures liéé aux threads :
 
 \subsection{Système de fichiers}
 
-\subsection{Système de fichiers}
-
 \begin{itemize}
 
 \item
@@ -315,24 +314,27 @@ Fonctions utilisateurs :
 
 
 
-Pour implémenter les threads, nous avons choisis d'utiliser les 3 classes suivantes :
-\begin{itemize}
-\item
-UserThread
-\item
-ManagerUserThreadID
-\item
-UserThreadData
-\end{itemize}
-\includegraphics{code/userprog/UserThread.PNG}
+Pour implémenter les threads, nous avons choisis d'utiliser les 3 classes suivantes : UserThread, ManagerUserThreadID,UserThreadData
 
-Ainsi, chaque thread utilisateur sera associé à un thread kernel grâce au stockage de l'adresse d'un UserThread dans la classe Thread du Kernel.
+\includegraphics[scale=0.7]{code/userprog/UserThread.PNG}
+
+L'adresse d'un UserThread est stocké dans la class Thread, Ainsi, le UserThread du currentThread est acessible via currentThread-$>$getAdressOfUserThread(). En ayant accès au UserThread, on a donc les informations nécessaire sur le thread tel que : Les UserThreadData de tout ses fils, le UserThread du père, l'identifiant est toutes autres informations nécessaire.
+	
+\vspace{5mm} 
+
+Nous avons choisis de créer une nouvelle classe afin de gagner en lisibilité au niveau du code. De plus, cet implémentation est certes gourmandes en mémoire mais permet d'effectuer des tâches plus rapidement. Il aurais était possible d'utiliser un arbre de UserThread mais la recherche du UserThread correspondant à chaque thread aurais était beaucoup trop longue.
 
 
-Lorsqu'un appel système se déclenche, via le pointeur machine->currentThread où se trouve un pointeur vers son UserThread, on pas alors utiliser les UserThread pour y appliquer les différentes opérations nécessaires.
-\vspace{5mm}
 
-L'assignation des identifiants d'UserThread se fait via le UserThreadManager. Le userThreadManager stocke une variable compteur qui est incrémentée à chaque demande d'identifiant. UserThread étant stocké sur des "unsigned int", on peut se voir limiter en nombre de thread parallèle par la limite de taille d'un unsigned int. Cependant, les identifiants sont recyclés. À chaque destruction de UserThread, on réinjecte alors son identifiant dans la liste du ThreadManager, il est alors réutilisable. Néanmoins cela implique une plus grosse structure de stockage et une éventuelle perte de temps par rapport à d'autres structures (exemple : bitmap)
+La création du Thread utilisateur se fait alors par le biai du constructeur de la classe UserThread. Lors de la construction un "new Thread()" est appelé. 
+
+
+
+Le terminaison des threads sans fonction de retour ou ExitThread() se fait par l'appel du syscall ExitThread stocké dans le registre RA (31) de chaque thread dès son initialisation.
+
+La destruction des classes Thread se fait lors de l'appel d'un WaitChildExited(unsigned int CID). Lors de cette appel, le père essaye de prendre un sémaphore du UserThread fils (token rajouté lors du ExitThread() , récupèrer l'adresse de retour du fils et détruire les différentes classes.
+
+L'assignation des identifiants d'UserThread se fait via le UserThreadManager.
 
 \subsection{Système de fichiers}
 \begin{itemize}

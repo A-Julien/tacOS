@@ -290,7 +290,8 @@ void StartUserThread(int data) {
     machine->WriteRegister(PCReg, (int) dataFork->f);
     machine->WriteRegister(NextPCReg, ((int) dataFork->f) + 4);
     machine->WriteRegister(4, (int) dataFork->arg);
-    //Adresse de retour ?
+    //machine->WriteRegister(31, (int) dataFork->exit);
+    //Adresse de retour ne fonctione pas ?
 
     machine->Run((void *) dataFork->exit);
 
