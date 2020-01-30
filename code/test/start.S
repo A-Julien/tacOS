@@ -41,6 +41,14 @@ __start:
  * -------------------------------------------------------------
  */
 
+  .globl ThreadId
+      .ent	ThreadId
+  ThreadId:
+      addiu $2,$0,SC_ThreadId
+      syscall
+      j	$31
+      .end ThreadId
+
  .globl fclose
      .ent	fclose
  fclose:

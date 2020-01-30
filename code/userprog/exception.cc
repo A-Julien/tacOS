@@ -348,7 +348,10 @@ int SYSWakeUpChild(unsigned int CID){
         return 1;
     }
     childThread->exitCritique();
-    scheduler->ReadyToRun(childThread);
+    if(!currentThread->inAMutex){
+        scheduler->ReadyToRun(childThread);
+    }
+
     childThread->stopped = false;
     interrupt->SetLevel (oldLevel);
    //  currentThread->Yield();
@@ -391,11 +394,13 @@ ExceptionHandler(ExceptionType which) {
     DEBUG('m', "User mode exception %d %d\n", which, type);
 
 
-    DEBUG('m', "Unexpected user mode exception %d %d\n", which, type);
+
     if (which == SyscallException) {
         switch (type) {
             case SC_PutChar:
+                currentThread->enterCritique();
                 synchConsole->SynchPutChar(machine->ReadRegister(4));
+                currentThread->exitCritique();
                 break;
 
             case SC_PutString:
@@ -407,34 +412,44 @@ ExceptionHandler(ExceptionType which) {
                 break;
 
             case SC_GetChar:
+                currentThread->enterCritique();
                 machine->WriteRegister(2, synchConsole->SynchGetChar());
+                currentThread->exitCritique();
                 break;
 
             case SC_GetString:
+                currentThread->enterCritique();
                 size = machine->ReadRegister(5); // size passed in GetString() in syscall.h
                 getString = malloc(sizeof(char) * (size + 1)); //allocate the necessary size of the string
                 synchConsole->SynchGetString((char *) getString, size); //
                 copyMachineFromString((char *) getString, machine->ReadRegister(4), size + 1);
                 free(getString);
+                currentThread->exitCritique();
                 break;
 
             case SC_PutInt:
+                currentThread->enterCritique();
                 ProcedurePutInt(machine->ReadRegister(4));
                 DEBUG('t', "TestDebug\n");
+                currentThread->exitCritique();
                 break;
 
             case SC_GetInt:
+                currentThread->enterCritique();
                 resultat = 0;
                 ProcedureGetInt(&resultat);
                 machine->WriteMem(machine->ReadRegister(4), sizeof(int), resultat);
+                currentThread->exitCritique();
                 break;
 
             case SC_Feof:
+                currentThread->enterCritique();
                 if (synchConsole->Feof()) {
                     machine->WriteRegister(2, 1);
                 } else {
                     machine->WriteRegister(2, 0);
                 }
+                currentThread->exitCritique();
                 break;
 
             case SC_Halt:
@@ -450,10 +465,10 @@ ExceptionHandler(ExceptionType which) {
                 //currentThread->Yield();
                 SYSExitThread( (void *)  0);
 
-
-
                break;
-
+            case SC_ThreadId:
+                machine->WriteRegister(2,((UserThread * )currentThread->getUserThreadAdress())->getId());
+             break;
             case SC_createUserThread:
                 resultat = (int)  SYScreateUserThread((void *) machine->ReadRegister(4), (void *) machine->ReadRegister(5));
 
@@ -576,7 +591,7 @@ ExceptionHandler(ExceptionType which) {
                 break;
 
             default:
-                printf("Unexpected user mode exception %d %d\n", which, type);
+                DEBUG('m',"Unexpected user mode exception %d %d\n", which, type);
                 ASSERT(FALSE);
                 break;
 

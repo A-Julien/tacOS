@@ -18,9 +18,10 @@
 /// \param arg The adress of the object passed in parameter
 /// \param tid The Thread Identifiant
 UserThread::UserThread(void * f, void * arg, unsigned int tid, int exitPC){
+    ASSERT(tid != 0);
     char * buffer = (char *) malloc(50*sizeof(char));
     sprintf(buffer, "Thread NO : %d", tid);
-    free(buffer);
+
     this->thread = new Thread(buffer);
     dataFork.arg = arg;
     dataFork.f = f;

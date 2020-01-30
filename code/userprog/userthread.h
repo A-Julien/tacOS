@@ -33,14 +33,14 @@ public:
 
 		UserThread(void * ,void * arg, unsigned int tid, int exitPC);
 		~UserThread();
-		void Run();
+    	void Run();
 		unsigned int getId();
 		void exit(void * returnAdress);
 		void * WaitForChildExited(int CID);
 		// EXPERT MODE
 
 		void WaitForAllChildExited();
-		//int StopChild(unsigned int CID);
+		int StopChild(unsigned int CID);
 		int WakeUpChild(unsigned int CID);
 		int makeChildSurvive(unsigned int CID);
 		void makeAllChildSurvive();
