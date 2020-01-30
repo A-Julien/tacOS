@@ -63,7 +63,7 @@
 /// supports extensible files, the directory size sets the maximum number 
 /// of files that can be loaded onto the disk.
 #define FreeMapFileSize    (NumSectors / BitsInByte)
-#define NumDirEntries       20
+#define NumDirEntries       30
 #define DirectoryFileSize   (sizeof(DirectoryEntry) * NumDirEntries)
 
 
@@ -264,31 +264,27 @@ path_parse_t* FileSystem::parse(char *path_name) {
 
     char* token = strtok(path_name, "/");
     char** splitPath = (char **) malloc(sizeof(char *) * count);
-    splitPath[0] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
 
     path_parse_t* result = (path_parse_t*) malloc(sizeof(path_parse_t));
     result->pathSplit = (char**) malloc(sizeof(char *));
 
     int i = 0;
     while(token != NULL){
+        splitPath[i] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
         strcpy(splitPath[i], token);
         i++;
-        splitPath[i] =  (char *) malloc((sizeof(char) * (strlen(token)+1)));
         token = strtok(NULL, "/");
     }
 
     result->size = i;
-    for(int j = 0 ; j < i - 1; ++j) {
-        result->pathSplit[i] = (char*) malloc(sizeof(char));
-        strcpy(result->pathSplit[i], splitPath[i]);
+    for(int j = 0 ; j < i ; j++) {
+        result->pathSplit[j] = (char*) malloc( sizeof(char)* (strlen(splitPath[j])+1) );
+        strcpy(result->pathSplit[j], splitPath[j]);
     }
 
-    //delete token;
-    /*for (int j = 0; j < i; j++){
-        delete [] splitPath[i];
-    }
-    delete [] splitPath;*/
-    //delete splitPath;
+    delete token;
+    for (int j = 0; j < i -1; j++) delete [] splitPath[j];
+    delete [] splitPath;
 
     return result;
 }
@@ -308,7 +304,7 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
     //check for the root path
     if(!strcmp(path_name, "/")) {
 
-        delete fileTable->path;
+        delete [] fileTable->path;
         fileTable->path = (char *) malloc(sizeof(char)+1);
         strcpy(fileTable->path, "/");
         if(this->CdDir(path_name, tid)){
@@ -330,16 +326,16 @@ path_parse_t* FileSystem::CdFromPathName(const char* path_name, unsigned int tid
 
     for (int i = 0; i < (path_split->size - truncate); i++)
         if(!this->CdDir(path_split->pathSplit[i], tid)) {
-            delete path_split;
-            delete path;
+            delete [] path_split;
+            delete [] path;
             return NULL;
         }
 
-    delete fileTable->path;
+    delete [] fileTable->path;
     fileTable->path = (char *) malloc(sizeof(char)*strlen(path_name));
     strcpy(fileTable->path, path_name);
 
-    delete path;
+    delete [] path;
     return path_split;
 }
 
@@ -364,8 +360,8 @@ OpenFile* FileSystem::OpenFromPathName(const char* path_name, unsigned int tid){
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
     if(path == NULL) {
         this->CdFromPathName(path_before);
-        delete path_before;
-        delete path;
+        delete [] path_before;
+        delete [] path;
         return NULL;
     }
 
@@ -411,7 +407,7 @@ bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
     path_parse_t* path = this->CdFromPathName(path_name, tid, 1);
     if(path == NULL) {
         this->CdFromPathName(path_before, tid);
-        delete  path_before;
+        delete path_before;
         delete path;
         return false;
     }
@@ -427,7 +423,7 @@ bool FileSystem::MkdirFromPathName(const char* path_name, unsigned int tid){
     // Replace in the directory before mkdir
     this->CdFromPathName(path_before, tid);
 
-    delete  path_before;
+    delete path_before;
     delete path;
     return true;
 }
@@ -796,7 +792,7 @@ OpenFile* FileSystem::Open(const char *name, unsigned int tid) {
         }
         if(tid != 0) this->addFiletoGlobalTable(openFile);// add file to the global open file table
     }
-    //delete directory;
+    delete directory;
     return openFile;                // return NULL if not found
 }
 
@@ -861,7 +857,7 @@ bool FileSystem::Remove(const char *name, unsigned int tid) {
     int sector;
 
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(this->ThreadsFilesTable->OpenFileTable[ROOT_DIRECTORY_FILE]);
+    directory->FetchFrom(this->ThreadsFilesTable->OpenFileTable[CURRENT_DIRECTORY_FILE]);
     sector = directory->Find(name);
     if (sector == -1) {
         delete directory;
@@ -977,6 +973,7 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
             this->close_file(fileTable->next->OpenFileTable[i],fileTable->next->OpenFileTable,tid);
 
     file_table_t* nnext = fileTable->next->next;
+    delete fileTable->path;
     delete fileTable->next;
     fileTable->next = nnext; //remove element
 
@@ -987,28 +984,9 @@ bool FileSystem::unregisterOpenFileTable(unsigned int tid){
 /// ~FileSystem()
 /// delete all file system
 FileSystem::~FileSystem(){
-/*
-    file_table_t* list = ThreadsFilesTable;
-    while(list != NULL){
-        for(int i = 0 ; i < MAX_OPEN_FILE ; i++) delete list->OpenFileTable[i];
-        delete list->path;
-        list = list->next;
-        delete ThreadsFilesTable;
-        ThreadsFilesTable = list;
-    }
-    delete list;
-
-    global_file_table_t* glist = GlobalOpenFileTable;
-    while(glist != NULL){
-        delete glist->openFile;
-        glist = glist->next;
-// 1000 lines ! To much... Need to split this file in several classes..
-        delete GlobalOpenFileTable;
-        GlobalOpenFileTable = glist;
-    }
-    delete glist;
-
-    delete freeMapFile;*/
+    delete freeMapFile;
+    delete GlobalOpenFileTable;
+    delete ThreadsFilesTable;
 }
 
 
