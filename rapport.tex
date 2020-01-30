@@ -90,24 +90,24 @@ Le programmation multithreadé permet à l'utilisateur d'éxecuter plusieurs thr
 
 Tout les threads sont identifié par des identifiants unique stocké sur des unsigned int. A la mort de chaque thread, lors de la mort de son parent, l'identifiant du thread enfant est retransmis au système de gestion des identifiants afin qu'il soit recyclé. Le thread principal ayant pour identifiant '1', si la mémoire le permet, il est possible d'utiliser jusqu'à \(2^{32}-1\) thread simultanément mais aussi possible d'avoir une infinité de thread ayant était éxecuté sur la machine d'un point de vue temporel.
 
-Dans le système tacOS il existe un lien de parenté entre tout les threads. Chaque thread créé est enfant du thread créateur. A la fin de l'exécution d'un thread dis \textit{\textbf{parent}} , celui-ci va attendre la fin de l'exécution de tout ses fils.
+Dans le système tacOS il existe un lien de parenté entre tout les threads. Chaque thread créé est enfant du thread créateur. A la fin de l'exécution d'un thread dis \textit{\textbf{parent}} , celui-ci va attendre la fin de l'exécution de tout ses fils. 
 
-Cependant, un mode \textit{\textbf{survivant}} est mis en place tel que lorsqu'un un thread est dis \textit{\textbf{survivant}}, il ne seras pas attendu pas son thread père met par son grand père.
+Cependant, un mode \textit{\textbf{survivant}} est mis en place tel que lorsqu'un un thread est dis \textit{\textbf{survivant}}, il ne seras pas attendu pas son thread père met par son grand père. 
 
 Voici les différentes procédures liéé aux threads :
 \begin{itemize}
-
+ 
     \item 
     \textbf{unsigned int CreateThread(void * f (void * arg), void * arg;}
     
     Crée un thread utilisateur et lance la routine \textbf{f}. Le deuxième argument 
-    \textbf{void * arg} est passé en argument à la fonction f.
+    \textbf{void * arg} est passé en argument a la fonction f.
     Retourne l'identifiant du thread.
    
    \item 
    \textbf{void ExitThread(void * obj)} 
    
-   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Cette fonction doit absolument être utiliser à la fin de l'exécution d'un thread (mise à part les utilisateurs avancés, 2.3
+   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Doit être appelé lorsque l'on désire terminer un thread "fils". \textit{Le système possède néanmoins un mécanisme permettant de rattraper cet oubli }
    
    \item 
    \textbf{unsigned int ThreadId();}
@@ -117,8 +117,7 @@ Voici les différentes procédures liéé aux threads :
    \item
    \textbf{void * WaitForChildExited(int CID);} 
    
-   Attente passive de la terminaison du thread d'identifiant \textbf{CID}. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente <trouver une valeur>, alors l'identifiant \textbf{CID} n'as pas été reconnu ou le thread n'est pas enfant.
-   Cette fonction détruit le thread système. Il faut donc veiller à l'utiliser.
+   Attente passif que le thread d'identifiant \textbf{CID} termine. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente à \textbf{(void *) -1}, alors l'identifiant \textbf{CID} n'as pas était reconnu où le thread n'est pas enfant.
    
     
 \end{itemize}
@@ -128,7 +127,7 @@ Voici les différentes procédures liéé aux threads :
   \item 
   \textbf{void WaitForAllChildExited();}
   
-  Met le thread en attente active. Le thread sort de l'attente quand plus aucun de ses threads enfants ne sont en cours d'execution
+  Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution (y compris les thread en mode survivant)
   
   \item 
   \textbf{int StopChild(int CID)}
@@ -137,24 +136,25 @@ Voici les différentes procédures liéé aux threads :
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
-      \item \textbf{-1} Si l'arrêt à échoué
-      \item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
-    \end{itemize}       
+      \item \textbf{1} Si l'arrêt à échoué
+      \item \textbf{2} Si l'identifiant n'est pas celui d'un de ses enfants
+    \end{itemize} 
+    Si le thread est en zone critique (Ecriture /lecture) dans la conssole, le thread s'arretera après cette lecture/ecriture.      
     
   
   \item 
   \textbf{int WakeUpChild(int CID);}
   
     
-  Réveille le thread enfant d'identifiant \textbf{CID}.
+  Reveil le thread enfant d'identifiant \textbf{CID}. 
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
       \item \textbf{1} Si l'identifiant n'est pas celui d'un de ses enfants
       \item \textbf{2} Si le thread n'est pas en pause
     \end{itemize} 
-
-
+    
+  
   \item 
   \textbf{int makeChildSurvive(int CID);}
   
@@ -163,8 +163,10 @@ Voici les différentes procédures liéé aux threads :
   \item 
   \textbf{void makeAllChildSurvive();}
   
-  Met tous les threads enfant en \textbf{mode survivor} jusqu'à la mort du père courant.
+  Met tout les threads enfant en \textbf{mode survivor} jusqu'à la mort du père courant.
 \end{itemize}
+
+\subsection{Système de fichiers}
 
 \subsection{Système de fichiers}
 
