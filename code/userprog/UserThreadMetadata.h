@@ -34,7 +34,7 @@ private:
     unsigned int ID;
     Semaphore * sem;
     void * userthread;
-    bool Dosurvive = false;
+
 };
 
 #endif

@@ -67,18 +67,22 @@ Semaphore::~Semaphore ()
 void
 Semaphore::P ()
 {
-
+    DEBUG('s', "Thread %d try to get the Sem %s with %d token\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId(), getName(), value);
     IntStatus oldLevel = interrupt->SetLevel (IntOff);	// disable interrupts
 
     while (value == 0)
       {				// semaphore not available
 
 	  queue->Append ((void *) currentThread);	// so go to sleep
+	  currentThread->inAMutex = true;
 	  currentThread->Sleep();
       }
-    value--;			// semaphore available, 
+    value--;
+
+    DEBUG('s', "%d tokens to go on the Sem %s\n",value,   getName());
+    // semaphore available,
     // consume its value
-    DEBUG('s', "Thread %d Get the Sem %s\n",  ((UserThread *) currentThread->getUserThreadAdress())->getId(), getName());
+
 
     (void) interrupt->SetLevel (oldLevel);	// re-enable interrupts
 }
@@ -100,12 +104,15 @@ Semaphore::V ()
     thread = (Thread *) queue->Remove ();
     // make thread ready, consuming the V immediately
     if (thread != NULL)	{
+        currentThread->inAMutex = false;
         if(!thread->stopped){
+
             scheduler->ReadyToRun (thread);
         }
     }
 
     value++;
+    DEBUG('s', "%d tokens to go on the Sem %s\n",value,   getName());
     (void) interrupt->SetLevel (oldLevel);
 }
 
@@ -147,6 +154,7 @@ void Lock::Acquire ()
             currentThread->setStatus(BLOCKED);
             currentThread->Sleep();
         }
+    currentThread->inAMutex = true;
     (void) interrupt->SetLevel (oldLevel);
 }
 
@@ -169,6 +177,9 @@ void Lock::Release ()
     currentThreadHolding = next;
     if(next != NULL && next->stopped){
         Release();
+    }
+    if(next != NULL){
+        currentThread->inAMutex = false;
     }
     (void) interrupt->SetLevel (oldLevel);
 }

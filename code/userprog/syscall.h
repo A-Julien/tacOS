@@ -55,6 +55,7 @@
 #define SC_WakeUpChild 26
 #define SC_StopChild 27
 #define SC_ThreadEndedWithoutExit 28
+#define SC_ThreadId 29
 
 #define SC_LockCreate 30
 #define SC_LockAcquire 31
@@ -245,6 +246,7 @@ int StopChild(int CID);
 int WakeUpChild(int CID);
 int makeChildSurvive(int CID);
 void makeAllChildSurvive();
+unsigned int ThreadId();
 
 int fopen(const char* filename);
 int fgets(int fileDescriptor, char* into, int numBytes);

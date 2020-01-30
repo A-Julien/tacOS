@@ -83,9 +83,18 @@ une partie "spécifications" listant ce qui est disponible pour les programmes u
 \end{itemize}
 
 \subsection{Threads}
-En cours de développement
-\begin{itemize}
+Le programmation multithreadé permet à l'utilisateur d'éxecuter plusieurs threads simultanément. Les threads partagent la mémoire virtuelle et l'utilisation du coeur. Chaque thread possède néanmoins son propre fil d'exécution, ses propres registres (dont le pointeur d'instrcution PC) et sa pile.
 
+
+Tout les threads sont identifié par des identifiants unique stocké sur des unsigned int. A la mort de chaque thread, lors de la mort de son parent, l'identifiant du thread enfant est retransmis au système de gestion des identifiants afin qu'il soit recyclé. Le thread principal ayant pour identifiant '1', si la mémoire le permet, il est possible d'utiliser jusqu'à \(2^{32}-1\) thread simultanément mais aussi possible d'avoir une infinité de thread ayant était éxecuté sur la machine d'un point de vue temporel.
+
+Dans le système tacOS il existe un lien de parenté entre tout les threads. Chaque thread créé est enfant du thread créateur. A la fin de l'exécution d'un thread dis \textit{\textbf{parent}} , celui-ci va attendre la fin de l'exécution de tout ses fils. 
+
+Cependant, un mode \textit{\textbf{survivant}} est mis en place tel que lorsqu'un un thread est dis \textit{\textbf{survivant}}, il ne seras pas attendu pas son thread père met par son grand père. 
+
+Voici les différentes procédures liéé aux threads :
+\begin{itemize}
+ 
     \item 
     \textbf{unsigned int CreateThread(void * f (void * arg), void * arg;}
     
@@ -96,7 +105,7 @@ En cours de développement
    \item 
    \textbf{void ExitThread(void * obj)} 
    
-   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Doit absolument être utiliser à la fin de l'execution d'un thread (mise à part les utilisateurs avancés, 2.3
+   Termine le thread courant et injecte l'adresse de l'objet dans les structures l'adresse \textbf{void * obj} afin qu'un thread parent puisse l'utiliser. Doit être appelé lorsque l'on désire terminer un thread "fils". \textit{Le système possède néanmoins un mécanisme permettant de rattraper cet oubli }
    
    \item 
    \textbf{unsigned int ThreadId();}
@@ -106,20 +115,17 @@ En cours de développement
    \item
    \textbf{void * WaitForChildExited(int CID);} 
    
-   Attente passif que le thread d'identifiant \textbf{CID} termine. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente <trouver une valeur>, alors l'identifiant \textbf{CID} n'as pas était reconnu où le thread n'est pas enfant.
-   Cette fonction détruit le thread système. Il faut donc veiller à l'utiliser.
+   Attente passif que le thread d'identifiant \textbf{CID} termine. Retourne une adresse correspondant à l'objet donné par le thread enfant lors de son exit. Si cette adresse est équivalente à \textbf{(void *) -1}, alors l'identifiant \textbf{CID} n'as pas était reconnu où le thread n'est pas enfant.
    
     
 \end{itemize}
-
-\subsection{Threads mode avancé}
 
 
 \begin{itemize}
   \item 
   \textbf{void WaitForAllChildExited();}
   
-  Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution
+  Met le thread en attente actif. Le thread sort de l'attente quand plus aucun de ses threads enfants sont en cours d'execution (y compris les thread en mode survivant)
   
   \item 
   \textbf{int StopChild(int CID)}
@@ -128,9 +134,10 @@ En cours de développement
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
-      \item \textbf{-1} Si l'arrêt à échoué
-      \item \textbf{-2} Si l'identifiant n'est pas celui d'un de ses enfants
-    \end{itemize}       
+      \item \textbf{1} Si l'arrêt à échoué
+      \item \textbf{2} Si l'identifiant n'est pas celui d'un de ses enfants
+    \end{itemize} 
+    Si le thread est en zone critique (Ecriture /lecture) dans la conssole, le thread s'arretera après cette lecture/ecriture.      
     
   
   \item 
@@ -141,30 +148,58 @@ En cours de développement
   La fonction retourne :    
     \begin{itemize}
       \item \textbf{0} Si succès
-      \item \textbf{-1} Si l'identifiant n'est pas celui d'un de ses enfants
-      \item \textbf{-2} Si le thread n'est pas en pause
+      \item \textbf{1} Si l'identifiant n'est pas celui d'un de ses enfants
+      \item \textbf{2} Si le thread n'est pas en pause
     \end{itemize} 
+    
   
   \item 
   \textbf{int makeChildSurvive(int CID);}
   
-  Met le thread enfant d'identifiant \textbf{CID} en \textbf{mode survivor}
+  Met le thread enfant d'identifiant \textbf{CID} en \textbf{mode survivor} jusqu'à la mort du père .
   
   \item 
   \textbf{void makeAllChildSurvive();}
   
-  Met tout les threads enfant en \textbf{mode survivor}
+  Met tout les threads enfant en \textbf{mode survivor} jusqu'à la mort du père courant.
 \end{itemize}
 
 \subsection{Système de fichiers}
-JULIEN AND HUGO
 
+\newpage
 \section{Tests Utilisateurs}
 \textit{une partie "tests utilisateurs" décrivant les programmes de test que vous avez réalisés, ce qu'ils montrent, ...}
 \vspace{5mm}
 
+\subsection{Threads}
 
-Ici je veux bien que t'explique vite faire que la CI execute ton script, ce que fait ton script. J'écrirais les tests pour step2 et threads.
+\begin{itemize}
+	\item Le test de la class \textit{\textbf{ List} (que nous avons modifié)} se lance avec l'argument -tl. Ce test va vérifier si : Un liste retourne le bon boolean lors de l'appel de IsEmpty(), les éléments ont bien était ajouté dans le bon ordre, les éléments ont bien était supprimé dans le bon ordre, la fonction ajouté get(index) fonctionne correctement. \textit{voir testImplem.cc}
+
+
+\item Le test de la class \textbf{UserThreadManagerId} se lance avec l'argument -utmmono. Ce test va vérifier si : Le manager commence au bon endroit, les identifiants sont recyclés, un identifiant recyclé est donné en priorité par rapport à un nouvel indentifiant. \textit{voir testImplem.cc}
+
+\item \textbf{CreateAndReturn.c} : Ce test vérifie qu'un Thread se crée correctement et que sa valeur de retour est juste.
+	
+\item \textbf{ExitWithoutStatement.c} : Ce test vérifie que même lorsqu'un thread n'utilise pas d'appel de retour (return ou ExitThread), celui-ci se termine correctement.
+	
+\item \textbf{MultiGetChar.c} : Ce test vérifie la spécification de la console and mode multithreadé : Plusieurs getString sont lancé en même temps, on vérifie que l'execution de celle-ci est bien de manière séquentiel.
+
+	
+\item \textbf{Survive.c} : Ce test vérifie que l'implémentation du mode survivor fonctionne correctement. Le fils doit écrire sur le terminal avec que le petit fils ait finis d'écrire.
+	
+\item \textbf{WaitForThread.c} : Ce test vérifie que les parents attendent bien que leurs fils se terminent (un seul père, 2 fils)
+
+\item \textbf{WaitForThreadMulti.c} : Ce test vérifie que les parents attendent bien que leurs fils se terminent (un seul père, 1 fils, 1 petit fils)
+		
+		\item \textbf{Sleep.c} : Ce test vérifie qu'un thread père peux bien mettre en attente un fils : Le fils est programmé pour ecrire en continu sur la console, le StopThread() arrète donc bien l'enfant de parler.
+
+\item \textbf{Wake.c} :	Ce test vérifie père peux bien réveiller son fils.
+		
+	
+	
+
+\end{itemize} 
 
 \newpage
 \section{Implémentation}
@@ -173,6 +208,9 @@ Ici je veux bien que t'explique vite faire que la CI execute ton script, ce que 
 \vspace{5mm}
 
 \subsection{Threads}
+
+
+
 
 Pour implémenter les threads, nous avons choisis d'utiliser les 3 classes suivantes
 \begin{itemize}

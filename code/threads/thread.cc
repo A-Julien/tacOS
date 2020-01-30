@@ -72,6 +72,7 @@ Thread::~Thread ()
     if (stack != NULL)
 	DeallocBoundedArray ((char *) stack, StackSize * sizeof (int));
     delete ((Semaphore *) critique);
+    free((void *) name);
 }
 
 ///

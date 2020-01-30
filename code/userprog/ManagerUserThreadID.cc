@@ -47,6 +47,9 @@ unsigned int ManagerUserThreadID::GetNewId(){
         res = *((int *) adressInt);
         free(adressInt);
     } else {
+        if(compteur >= 4294967295){
+            return 0;
+        }
         res = compteur;
         compteur++;
     }

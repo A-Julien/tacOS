@@ -104,9 +104,9 @@ int testUTMmono(){
 	unsigned int un = managerUserThreadID->GetNewId();
 	unsigned int deux = managerUserThreadID->GetNewId();
 	
-	if (zero != 0 ||
-	 	un != 1 || 
-	 	deux != 2 ){
+	if (zero != 2 ||
+	 	un != 3 || 
+	 	deux != 4 ){
 		return 1;
 	 }	
 
@@ -114,14 +114,14 @@ int testUTMmono(){
 	
 	unsigned int test = managerUserThreadID->GetNewId(); 
 
-	if(test != 1){
+	if(test != 3){
 		return 2;
 	}
 
 	unsigned int trois = managerUserThreadID->GetNewId();
 	unsigned int quatre = managerUserThreadID->GetNewId();
 
-	if(trois != 3 || quatre != 4){
+	if(trois != 5 || quatre != 6){
 		return 3;
 	}
 
@@ -131,11 +131,11 @@ int testUTMmono(){
 	managerUserThreadID->addIdFreed(test);
 	managerUserThreadID->addIdFreed(zero);
 
-	quatre = 0;
-	trois = 0;
-	deux = 0;
-	un = 0;
-	zero = 1;
+	quatre = 2;
+	trois = 2;
+	deux = 2;
+	un = 2;
+	zero = 3;
 
 	quatre = managerUserThreadID->GetNewId();
 	trois = managerUserThreadID->GetNewId();
@@ -143,11 +143,11 @@ int testUTMmono(){
 	un = managerUserThreadID->GetNewId();
 	zero = managerUserThreadID->GetNewId();
 
-	if (zero != 0 ||
-	 	un != 1 || 
-	 	deux != 2 ||
-	 	trois != 3 ||
-	 	quatre != 4 
+	if (zero != 2 ||
+	 	un != 3 || 
+	 	deux != 4 ||
+	 	trois != 5 ||
+	 	quatre != 6 
 	 	 ){
 		return 4;
 	 }	
